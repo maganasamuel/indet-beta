@@ -1,0 +1,549 @@
+<?php include_once "bootstrap.html"; ?>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+        aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="main">INDET "the EliteInsure Tracker"</a>
+    </div>
+    <div class="navbar-collapse collapse" id='navbar'>
+      <ul class="nav navbar-nav navbar" style="margin-left:5vw;">
+        <!--
+        <li>
+          <a href="main"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> <span class="glyphicon-class">Home</span>
+          </a>
+        </li>
+      -->
+        <!--ADMIN ONLY -->
+        <?php
+      if($_SESSION["myusertype"]=="Telemarketer"){
+    ?>
+        <li><a href="main"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+        <li><a href="my_leads_generated"><span class="glyphicon glyphicon-ok"></span> Leads</a></li>
+        <li><a href="callbacks"><span class="glyphicon glyphicon-refresh"></span> Callbacks</a></li>
+        <li><a href="dataminer"><span class="glyphicon glyphicon-ban-circle"></span> Do Not Call</a></li>
+
+        <!--
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> Clients
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="callbacks" class='mw' >Callbacks</a></li>
+            <li><a href="my_leads_generated" class='mw' >Leads Generated</a></li>
+        </ul>
+      </li>
+    -->
+        <?php
+      }
+      if($_SESSION["myusertype"]=="Adviser"){
+    ?>
+        <li><a href="leads_assigned"><span class="glyphicon glyphicon-user"></span> Assigned Leads</a></li>
+
+        <!--
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> Clients
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="callbacks" class='mw' >Callbacks</a></li>
+            <li><a href="my_leads_generated" class='mw' >Leads Generated</a></li>
+        </ul>
+      </li>
+    -->
+        <?php
+      }
+      if($_SESSION['myusertype']=="Admin"){
+    ?>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>
+            Staff
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Advisers</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="advisers" class='mw'>Adviser Profiles</a></li>
+                  <li><a href="teams" class='mw'>Teams</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Lead Generators</a>
+              <ul class="dropdown-menu">
+                <li><li><a href="lead_generator_profiles?type=Face-to-Face Marketer" class='mw'>Face to Face Profiles</a></li>
+                <li><a href="lead_generator_profiles?type=Telemarketer" class='mw'>Telemarketer Profiles</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="personal_data" class='mw'>Personal Data</a>
+            </li>
+          </ul>
+        </li>
+        <?php
+        }
+        
+        if($_SESSION['myusertype']=="Admin"||$_SESSION['myusertype']=="User"){
+      
+      ?>
+        <!--ADMIN ONLY -->
+
+        <?php
+        if($_SESSION['myusertype']=="Admin"){
+      ?>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>
+            Clients
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="clients" class='mw'>Clients Profiles</a></li>
+            <li><a href="annual_reviews" class='mw'>Annual Reviews</a></li>
+
+            <li><a href="clients_bin" class='mw'>Clients Bin</a></li>
+            <li><a href="create_send_client_data_request" class='mw'>Send Client Data</a></li>
+
+          </ul>
+        </li>
+        <?php
+        }
+      ?>
+
+        <?php if($_SESSION['myusertype']=="User"){ ?>
+          
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
+            Client Data
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="clients" class='mw'>Client Profiles</a></li>
+            <li><a href="do_not_calls" class='mw'>Do Not Calls</a></li>
+            <li><a href="leads_data" class='mw'>Leads Data </a></li>
+          </ul>
+        </li>
+        <li></li>
+        
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
+            Deals
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
+            <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
+            <li><a href="arrear_deals" class='mw'>Arrears Deals</a></li>
+          </ul>
+        </li>
+
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-pencil"></span>
+            Create Report
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+             
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_lead_gen_report" class='mw'>Create Lead Gen Report</a></li>
+                </li>
+                <li><a href="create_magazine" class='mw'>Create Magazine</a></li>
+              </ul>
+            </li>
+
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list-alt"></span>
+            Reports
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="lead_gen_reports" class='mw'>Lead Gen Reports</a></li>
+                </li>
+                <li><a href="magazines" class='mw'>Magazines</a></li>
+                <li><a href="records_to_beat" class='mw'>Record-Breakers</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <?php
+        }
+      }
+            if($_SESSION['myusertype']=="Admin"){
+          ?>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
+            Deals
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Insurance</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
+                  <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
+                  <li><a href="arrear_deals" class='mw'>Arrears Deals</a></li>
+                  <li><a href="cancelled_deals" class='mw'>Cancelled Deals</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">KiwiSaver</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="kiwisavers" class='mw'>KiwiSaver Clients Profiles</a>
+                </li>
+                <li>
+                  <a href="kiwisaver_deals" class='mw'>KiwiSaver Deals</a>
+                </li>
+              </ul>
+            </li>
+            
+            <li><a href="create_send_issued_client_data_request" class='mw'>Send Issued Client Profile</a></li>
+          </ul>
+        </li>
+
+        <?php
+          }
+        ?>
+        <!--ADMIN ONLY -->
+        <?php
+        if($_SESSION['myusertype']=="Admin"){
+      ?>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-pencil"></span>
+            Create Report
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_invoice" class='mw'>Create Invoice</a></li>
+                  <li><a href="create_summary" class='mw'>Create Invoice Summary</a></li>
+                  <li><a href="create_customized_invoice" class='mw'>Create Customized Invoice</a></li>
+                </li>
+              </ul>
+            </li>
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_production_report" class='mw'>Create Adviser Report</a></li>
+                  <li><a href="create_lead_gen_report" class='mw'>Create Lead Gen Report</a></li>
+                </li>
+              </ul>
+            </li>
+
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_deal_tracker_report" class='mw'>Create Deal Tracker Report</a></li>
+                  <li><a href="create_team_deal_tracker_report" class='mw'>Create Deal Tracker Summary Report</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li><a href="create_client_data_report" class='mw'>Create Client Data Report</a></li>
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list-alt"></span>
+            Reports
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="invoices" class='mw'>Invoices</a></li>
+                  <li><a href="summaries" class='mw'>Invoice Summaries</a></li>
+                  <li><a href="customized_invoices" class='mw'>Customized Invoices</a></li>
+                </li>
+              </ul>
+            </li>
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="deals_reports" class='mw'>Adviser Reports</a></li>
+                  <li><a href="lead_gen_reports" class='mw'>Lead Gen Reports</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="deal_tracker_reports" class='mw'>Deal Tracker Reports</a></li>
+                  <li><a href="team_deal_tracker_reports" class='mw'>Deal Tracker Summary Reports</a></li>
+                </li>
+              </ul>
+            </li>
+            
+            <!--
+              <li><a href="deal_tracker_summaries" class='mw'>Deal Tracker Summaries</a></li>
+          -->
+            <li><a href="client_databases" class='mw'>Client Database Reports</a></li>
+          </ul>
+        </li>
+
+
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span> Others
+            <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Telemarketing App</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="leads_data" class='mw'>Leads Data</a></li>
+                  <li><a href="products" class='mw'>Products</a></li>
+                  <li><a href="scripts" class='mw'>Scripts</a></li>
+                  <li><a href="script_groups" class='mw'>Script Groups</a></li>
+                  <li><a href="insurance_types" class='mw'>Insurance Types</a></li>
+                  <li><a href="insurance_companies" class='mw'>Insurance Companies</a></li>
+                  <li><a href="do_not_calls" class='mw'>Do Not Call</a></li>
+                </li>
+              </ul>
+            </li>
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Magazine</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_magazine" class='mw'>Create Magazine</a></li>
+                  <li><a href="magazines" class='mw'>Magazines</a></li>
+                  <li><a href="records_to_beat" class='mw'>Record-Breakers</a></li>
+                </li>
+              </ul>
+            </li>
+            
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">HTML Emails</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_html_email" class='mw'>Create HTML Email</a></li>
+                  <li><a href="html_emails" class='mw'>HTML Emails</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li class="dropdown dropdown-submenu">
+              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">PDF Emails</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <li><a href="create_bulk_email" class='mw'>Create PDF Email</a></li>
+                  <li><a href="bulk_emails" class='mw'>PDF Emails</a></li>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="bin_entries" class='mw'> Bin Entries </a>
+            </li>
+            <li>
+              <a href="users" class='mw'>User Accounts</a>
+            </li>
+            <li>
+              <a href="settings" class='mw'> Account Settings</a>
+            </li>
+          </ul>
+        </li>
+        <?php
+        }
+      ?>
+        <!--ADMIN ONLY -->
+
+        <li><a href="index"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+
+      <!--
+        Second Layer for nav bar
+      <ul class="nav navbar-nav navbar-right padded">
+        <?php
+            if($_SESSION['myusertype']=="Admin"){
+          ?>
+          
+
+        <?php
+          }
+        ?>
+      </ul>
+       -->
+    </div>
+  </div>
+</nav>
+
+<script type="text/javascript">
+  $(function () {
+
+    $('ul.dropdown-menu [data-toggle=dropdown]').on('click', function(event) {
+			event.preventDefault(); 
+			event.stopPropagation(); 
+			$(this).parent().siblings().removeClass('open');
+			$(this).parent().toggleClass('open');
+		});
+
+    $('.a').click(function (e) {
+      e.preventDefault();
+
+      var loc = $(this).attr('href');
+      $.confirm({
+        title: 'Delete all',
+        content: "Input Password: <input type='password' id='confirmpass' class='form-control'>",
+        buttons: {
+          confirm: function () {
+            if ($('#confirmpass').val() == '5000') {
+              location.href = loc;
+            } else {
+              $.dialog({
+                title: 'Incorrect Password',
+                content: 'Please try again!',
+              });
+            }
+          },
+          cancel: function () {
+
+          },
+
+        }
+      });
+
+    });
+
+
+    $('.a_single').click(function (e) {
+      e.preventDefault();
+
+      var loc = $(this).attr('href');
+      $.confirm({
+        title: 'Alert',
+        content: "Are you sure you want to delete this permanently?",
+        buttons: {
+          confirm: function () {
+
+            location.href = loc;
+
+          },
+          cancel: function () {
+
+
+          },
+
+        }
+      });
+
+    });
+
+
+
+    $('.a_single_email').click(function (e) {
+      e.preventDefault();
+
+      var loc = $(this).attr('href');
+      $.confirm({
+        title: 'Alert',
+        content: "Are you sure you want to send this?",
+        buttons: {
+          confirm: function () {
+            $.confirm({
+              title: 'Email Sent!',
+              content: 'Invoice pdf has been sent.',
+              buttons: {
+                ok: function () {
+                  location.href = loc;
+                }
+              }
+            });
+
+
+          },
+          cancel: function () {
+
+
+          },
+
+        }
+      });
+
+    });
+
+
+
+
+    $('.a_email').click(function (e) {
+
+
+      e.preventDefault();
+
+      var loc = $(this).attr('href');
+      $.confirm({
+        title: 'Select Period to send email',
+        content: '<div class="form"><select name="mymonth" class="form-control col-sm-2" id="mymonth" required=""><option value="" disabled="" selected="">Select month</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select><select name="mydate" class="form-control col-sm-2" id="mydate" required=""><option value="" disabled="" selected="">Select period</option><option value="01"> 1-15</option><option id="nextdate" value="15"> 15 up to end of the month</option></select><select name="myyear" id="myyear" class="form-control col-sm-2" required=""><option value="2018">2018</option><option value="2017">2017</option><option value="2016">2016</option><option value="2015">2015</option><option value="2014">2014</option><option value="2013">2013</option><option value="2012">2012</option><option value="2011">2011</option><option value="2010">2010</option><option value="2009">2009</option><option value="2008">2008</option><option value="2007">2007</option><option value="2006">2006</option><option value="2005">2005</option><option value="2004">2004</option><option value="2003">2003</option><option value="2002">2002</option><option value="2001">2001</option><option value="2000">2000</option><option value="1999">1999</option><option value="1998">1998</option><option value="1997">1997</option><option value="1996">1996</option><option value="1995">1995</option><option value="1994">1994</option><option value="1993">1993</option><option value="1992">1992</option><option value="1991">1991</option><option value="1990">1990</option><option value="1989">1989</option><option value="1988">1988</option><option value="1987">1987</option><option value="1986">1986</option><option value="1985">1985</option><option value="1984">1984</option><option value="1983">1983</option><option value="1982">1982</option><option value="1981">1981</option><option value="1980">1980</option></select></div>',
+        buttons: {
+          confirm: function () {
+
+            if ($('#mymonth').val() !== null && $('#mydate').val() !== null) {
+              var month = 0;
+              if ($('#mymonth').val() < 10) {
+                month = '0' + $('#mymonth').val();
+              } else {
+                month = $('#mymonth').val();
+              }
+              location.href = "email_pdf?id=all&startingdate=" + $('#myyear').val() + month + $('#mydate')
+                .val();
+            } else {
+              $.dialog({
+                title: 'Missing Information',
+                content: 'Please try again!',
+              });
+            }
+
+          },
+          cancel: function () {
+
+
+          },
+
+        }
+      });
+
+
+
+
+
+    });
+
+
+
+
+
+
+  });
+</script>

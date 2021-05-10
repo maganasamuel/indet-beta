@@ -1,0 +1,447 @@
+<?php
+session_start();
+date_default_timezone_set('Pacific/Auckland');
+require("fpdf/fpdf.php");
+require("database.php");
+
+//post
+if(!isset($_POST["adviser_id"])){
+header("Refresh:0; url=summary.php");
+}
+else{
+if(!isset($_SESSION["x"])){
+header("Refresh:0; url=summary.php");
+}
+else{
+unset($_SESSION["x"]);
+$adviser_id=$_POST["adviser_id"];//array
+$start_date=$_POST["start_date"];
+$until_date=$_POST["until_date"];
+$_SESSION["prevnum"]=0;
+$mystart_date = substr($start_date,6,4).substr($start_date,3,2).substr($start_date,0,2);
+$myuntil_date = substr($until_date,6,4).substr($until_date,3,2).substr($until_date,0,2);
+$datenow=date("Ymd");
+$stringarr=implode(",",$adviser_id);
+ //$name = "SELECT * FROM adviser_tbl where id='$adviser_id'";
+$name = "SELECT * FROM adviser_tbl where id IN (".$stringarr.")";
+$displayname=mysqli_query($con,$name) or die('Could not look up user information; ' . mysqli_error($con));
+
+//$rows = mysqli_fetch_array($displayname);
+
+
+$name_arr=array();
+$email_arr=array();
+$agency_pc_arr=array();
+$taxrate_arr=array();
+$fsp_num_arr=array();
+
+WHILE($rows = mysqli_fetch_array($displayname)){
+$name=preg_replace("/\([^)]+\)/","",$rows["name"]);
+$email=$rows["email"];
+$agency_pct=$rows["agency_pct"]/100;
+$taxrate=$rows["tax_rate"]/100;//edited
+$fsp_num=$rows["fsp_num"];
+
+array_push($name_arr,$name);
+array_push($email_arr,$email);
+array_push($agency_pc_arr,$agency_pct);
+array_push($taxrate_arr,$taxrate);
+array_push($fsp_num_arr,$fsp_num);
+}
+
+$listnames=implode(", ",$name_arr);
+$listfsp=implode(", ",$fsp_num_arr);
+
+class PDF extends FPDF
+{
+
+function Footer()
+{
+global $listfsp;
+global $listnames;
+
+
+
+
+//$pdf->SetXY($x+24,$y+200);
+  if ( $this->PageNo() == 1 ) {
+
+        $this->SetY(-35);
+    $this->SetX(30);
+
+  $this->SetFont('Arial','',8);
+$this->MultiCell(170,3.5,"As an Independant Contractor you are responsible for your own taxation arrangements. Eliteinsure Limited recommends that you keep this statement in a safe place with your business records to assist you with the completion of your GST, Tax Returns and other business related requirements. A fee will apply for the reprinting and distribution of duplicated statements.",0,"C",false);
+$this->SetAutoPageBreak(false);
+//$this->SetXY($x+30,$y+330);
+$this->SetTextColor(0,42,160);
+
+$x = $this->GetX();
+$y = $this->GetY();
+ 
+ $this->SetXY($x+26,$y+1);
+$this->MultiCell(170,3.5,"Street Address: 3G/39 Mackelvie Street Grey Lynn 1021 Auckland New Zealand | Contact: +6493789676
+Email: admin@eliteinsure.co.nz | Website: www.eliteinsure.co.nz",0,"C",false);
+        }
+
+
+        $this->SetY(-15);
+    //$this->SetX(30);
+
+ $this->SetFont('Arial','',8);
+$this->SetTextColor(0,0,0);
+
+
+  //  $this->Cell(0,10,'Adviser: '. $listfsp.' '.preg_replace("/\([^)]+\)/","",$listnames),0,0,'L');  
+    $this->Cell(0,10,'Page '.$this->PageNo(),0,1,'R');
+
+  //  $this->SetFont('Arial','',8);
+   // $this->SetTextColor(0,0,0);
+   // $this->Cell(0,10,'Adviser: '. $fsp_num.' '.preg_replace("/\([^)]+\)/","",$name),0,0,'L'); 
+   // $this->Cell(0,10,'Page '.$this->PageNo(),0,1,'R');
+
+}
+}
+if(count($name_arr)>1){
+  $name='Multiple Advisers';
+  $email='sumit@eliteinsure.co.nz';
+  $adviser_id=0;
+}
+
+$mix="$name".$mystart_date."to".$myuntil_date;
+$path="summary/".$mix.".pdf";
+
+//search if existing pdf
+$query = "SELECT filename FROM pdf_tbl where filename='$mix'";
+$searchsum=mysqli_query($con,$query) or die('Could not look up user information; ' . mysqli_error($con));
+$find = mysqli_num_rows($searchsum);
+
+if($find>0){  //if existing or not  
+
+echo "Already existing commission pdf. You can view/delete it <a href=pdf.php>here</a>";
+
+}
+else{
+//xxxxxx
+
+$pdf = new PDF('P', 'mm', 'Legal');
+$x = $pdf->GetX();
+$y = $pdf->GetY();
+
+//page 1
+$pdf->AddPage('P', 'Legal');
+$pdf->Image('logo.png',10,10,-300);
+$pdf->SetFont('Arial','B',12);
+$pdf->SetTextColor(0,42,160);
+$pdf->Cell(0,20,'Adviser Commission Summary  '.$start_date.' - '.$until_date,"0","1","C");
+$pdf->SetTextColor(0,0,0);
+
+
+function convertNum($x){
+
+return number_format($x, 2, '.', ',');
+}
+
+
+
+
+ $pdf->Ln(10);
+$pdf->SetFont('Arial','B',10);
+
+
+
+
+$query = "SELECT * FROM summary_tbl where adviser_id IN (".$stringarr.") AND entrydate<='$myuntil_date'AND entrydate>='$mystart_date' ORDER BY name DESC, entrydate ASC ";
+
+$displayquery=mysqli_query($con,$query) or die('Could not look up user information; ' . mysqli_error($con));
+
+
+
+if(count($name_arr)>1)  {
+  $pdf->Write(5,$listnames);
+  $name='Multiple Advisers';
+  $email='sumit@eliteinsure.co.nz';
+  $adviser_id=0;
+
+$mix="$name".$mystart_date."to".$myuntil_date;
+$path="summary/".$mix.".pdf";
+
+}else{
+$pdf->Write(5,'Adviser '. $listnames);  
+}
+
+
+$y=67;
+$pdf->SetXY($x+10,$y);
+$pdf->SetFont('Arial','',9);
+$pdf->SetFillColor(224,224,224);
+
+if(count($name_arr)>1){
+$pdf->Cell(37,8,' Adviser Name',"1","0",'C',"true");
+$pdf->Cell(20,8,' Nett',"1","0",'C',"true");
+$pdf->Cell(25,8,' GST ',"1","0",'C',"true");
+$pdf->Cell(30,8,' Withoding Tax ',"1","0",'C',"true");
+$pdf->Cell(30,8,' Payment Amount ',"1","0",'C',"true");
+$pdf->Cell(37,8,'Agency Closing Balance',"1","0",'C',"true");
+$pdf->Cell(25,8,' Period ',"1","1",'C',"true");
+}
+else{
+$pdf->Cell(37,8,'  Nett',"1","0",'C',"true");
+$pdf->Cell(20,8,' GST ',"1","0",'C',"true");
+$pdf->Cell(25,8,' Withoding Tax ',"1","0",'C',"true");
+$pdf->Cell(30,8,' Annual Premium ',"1","0",'C',"true");
+$pdf->Cell(30,8,' Payment Amount ',"1","0",'C',"true");
+$pdf->Cell(37,8,'Agency Closing Balance',"1","0",'C',"true");
+$pdf->Cell(25,8,' Date ',"1","1",'C',"true");
+}
+
+$netsum=0;
+$gstsum=0;
+$withodingtaxsum=0;
+$annual_premsum=0;
+$payment_amountsum=0;
+$closing_balsum=0;
+
+if(count($name_arr)>1){
+
+
+}
+else{
+$page=0;
+$limit=30;
+}
+
+
+
+
+$adv_arr=array();
+$net_arr=array();
+$gst_arr=array();
+$withodingtax_arr=array();
+$annual_prem_arr=array();
+$payment_amount_arr=array();
+$entrydate_arr=array();
+$entrydate_arr=array();
+$closing_bal_arr=array();
+$startingdate_arr=array();
+
+
+
+WHILE($rows = mysqli_fetch_array($displayquery)){
+if(count($name_arr)>1){
+
+
+
+}
+else{
+if($page==$limit){
+$pdf->AddPage('P', 'Legal');
+$x=0;
+$y=0;
+$pdf->SetAutoPageBreak(false);
+$limit=40;
+$page=0;
+}
+
+
+}
+
+
+
+
+$y+=8;  
+$id=$rows["id"];
+$net=$rows["net"];
+//$net=$net*(1-$agency_pct);
+
+
+
+$multiplytowithoding=1;
+if($net>0){
+$multiplytowithoding=-1;
+}
+
+$adv=$rows["adviser_id"];
+$gst=$rows["gst"];
+$withodingtax=$rows["withodingtax"]*$multiplytowithoding;//kevin edit
+$annual_prem=$rows["annual_prem"];
+$payment_amount=$rows["payment_amount"];
+$entrydate=$rows["entrydate"];
+$entrydate=substr($entrydate,6,2)."/".substr($entrydate,4,2)."/".substr($entrydate,0,4);
+$closing_bal=$rows["closing_bal"];
+$startingdate=$rows["startingdate"];
+
+if($withodingtax==0){
+$net=$net-($net-$payment_amount+$gst);
+}
+
+else{
+$net=($withodingtax/-.2); 
+} 
+
+if($rows["net"]<0){
+  $net*=-1;
+}
+if($rows["withodingtax"]<0){
+  $withodingtax*=-1;
+}
+
+
+
+
+
+
+if(count($name_arr)>1){
+array_push($adv_arr,$adv);
+array_push($net_arr,$net);
+array_push($gst_arr,$gst);
+array_push($withodingtax_arr,$withodingtax);
+array_push($annual_prem_arr,$annual_prem);
+array_push($payment_amount_arr,$payment_amount);
+array_push($entrydate_arr,$entrydate);
+array_push($entrydate_arr,$entrydate);
+array_push($closing_bal_arr,$closing_bal);
+array_push($startingdate_arr,$startingdate);
+}
+
+
+//$net=$rows["net"];
+//$net=$net*(1-$agency_pct);
+
+$netsum+=$net;
+$gstsum+=$gst;
+$withodingtaxsum+=$withodingtax;
+$annual_premsum+=$annual_prem;
+$payment_amountsum+=$payment_amount;
+
+$closing_balsum=$closing_bal;
+$closing_bal_agency=$closing_balsum-$_SESSION["prevnum"];
+
+//FORMULAS end
+//convert to 2 decimal number
+
+//convert to 2 decimal number end
+
+if(count($name_arr)>1){
+
+
+
+}
+else{
+$pdf->SetXY($x+10,$y);
+$pdf->SetFont('Arial','',9);
+$pdf->SetFillColor(224,224,224);
+
+
+
+$pdf->Cell(37,8,'$'.convertNum($net),"0","0",'C');
+$pdf->Cell(20,8,'$'.convertNum($gst),"0","0",'C');
+$pdf->Cell(25,8,'$'.convertNum($withodingtax),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($annual_prem),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($payment_amount),"0","0",'C');
+$pdf->Cell(37,8,'$'.convertNum($closing_balsum),"0","0",'C');
+$pdf->Cell(25,8,$entrydate,"0","1",'C');
+
+$_SESSION["prevnum"]=$closing_balsum;
+$page++;
+}
+}
+
+
+
+
+
+if(count($name_arr)>1){
+
+$net=0;
+$gst=0;
+$withodingtax=0;
+$payment_amount=0;
+$closing_bal=0;
+
+
+foreach ($adv_arr as $z => $val) {
+ if ($z > 0 && $val==$adv_arr[$z-1]) {
+$net_arr[$z]=$net_arr[$z]+$net_arr[$z-1];
+$gst_arr[$z]=$gst_arr[$z]+$gst_arr[$z-1];
+$withodingtax_arr[$z]=$withodingtax_arr[$z]+$withodingtax_arr[$z-1];
+$payment_amount_arr[$z]=$payment_amount_arr[$z]+$payment_amount_arr[$z-1];
+//$closing_bal_arr[$z]=$closing_bal_arr[$z]+$closing_bal_arr[$z-1];
+ }
+
+if($z < count($adv_arr) && $val!=$adv_arr[$z+1]){
+
+$name_ = "SELECT * FROM adviser_tbl where id = '$val'";
+$displayname=mysqli_query($con,$name_) or die('Could not look up user information; ' . mysqli_error($con));
+$rows = mysqli_fetch_array($displayname);
+$dp=$rows['name'];
+$closing_bal+=$closing_bal_arr[$z];
+
+$pdf->Cell(37,8,preg_replace("/\([^)]+\)/","",$dp),"0","0",'C');
+$pdf->Cell(20,8,'$'.convertNum($net_arr[$z]),"0","0",'C');
+$pdf->Cell(25,8,'$'.convertNum($gst_arr[$z]),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($withodingtax_arr[$z]),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($payment_amount_arr[$z]),"0","0",'C');
+$pdf->Cell(37,8,'$'.convertNum($closing_bal_arr[$z]),"0","0",'C');
+$pdf->Cell(25,8,substr($startingdate_arr[$z],6,2)."/".substr($startingdate_arr[$z],4,2)."/".substr($startingdate_arr[$z],0,4),"0","1",'C');
+$page++;
+}
+}
+
+
+
+
+$pdf->Cell(37,8,'Total',"0","0",'C');
+$pdf->Cell(20,8,'$'.convertNum($netsum),"0","0",'C');
+$pdf->Cell(25,8,'$'.convertNum($gstsum),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($withodingtaxsum),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($payment_amountsum),"0","0",'C');
+$pdf->Cell(37,8,'$'.convertNum($closing_bal),"0","0",'C');
+$pdf->Cell(25,8,'',"0","1",'C');
+
+
+
+
+
+
+}
+else{
+//total
+
+$pdf->SetFont('Arial','B',9);
+$pdf->SetXY($x+10,$y+8);
+$pdf->Cell(37,8,'$'.convertNum($netsum),"0","0",'C');
+$pdf->Cell(20,8,'$'.convertNum($gstsum),"0","0",'C');
+$pdf->Cell(25,8,'$'.convertNum($withodingtaxsum),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($annual_premsum),"0","0",'C');
+$pdf->Cell(30,8,'$'.convertNum($payment_amountsum),"0","0",'C');
+$pdf->Cell(37,8,'$'.convertNum($closing_balsum),"0","0",'C');
+$pdf->Cell(25,8,'',"0","1",'C');
+
+$pdf->SetXY($x+5, $y+12); // position of text1, numerical, of course, not x1 and y1
+
+$pdf->Write(0, "Total");
+}
+
+$pdf->Output($path,'F');
+
+
+
+
+$sql="INSERT INTO pdf_tbl (adviser_id,name,email,link,filename,entrydate,type) 
+VALUES ('$adviser_id','$name','$email','$path','$mix','$datenow','summary')"; 
+
+mysqli_query($con,$sql);
+
+header("Content-type: application/pdf");
+header("Content-Disposition: inline; filename=".$path);
+@readfile($path);
+//db add end
+
+}
+
+
+
+
+}
+}
+?>

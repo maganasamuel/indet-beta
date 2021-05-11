@@ -1,76 +1,106 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-if (file_exists("libs/api/controllers/Adviser.controller.php")) {
-    require "libs/api/controllers/Adviser.controller.php";
-} elseif (file_exists("controllers/Adviser.controller.php")) {
-    require "controllers/Adviser.controller.php";
+if (file_exists('libs/api/controllers/Adviser.controller.php')) {
+    require 'libs/api/controllers/Adviser.controller.php';
+} elseif (file_exists('controllers/Adviser.controller.php')) {
+    require 'controllers/Adviser.controller.php';
 }
 
-if (file_exists("libs/api/controllers/LeadGenerator.controller.php")) {
-    require "libs/api/controllers/LeadGenerator.controller.php";
-} elseif (file_exists("controllers/LeadGenerator.controller.php")) {
-    require "controllers/LeadGenerator.controller.php";
+if (file_exists('libs/api/controllers/LeadGenerator.controller.php')) {
+    require 'libs/api/controllers/LeadGenerator.controller.php';
+} elseif (file_exists('controllers/LeadGenerator.controller.php')) {
+    require 'controllers/LeadGenerator.controller.php';
 }
 
-if (file_exists("libs/indet_dates_helper.php")) {
-    require_once "libs/indet_dates_helper.php";
-} elseif (file_exists("../../indet_dates_helper.php")) {
-    require_once "../../indet_dates_helper.php";
+if (file_exists('libs/indet_dates_helper.php')) {
+    require_once 'libs/indet_dates_helper.php';
+} elseif (file_exists('../../indet_dates_helper.php')) {
+    require_once '../../indet_dates_helper.php';
 }
 
 class Magazine extends Database
 {
-    public $date = "";
-    public $announcement = "";
-    public $quote = "";
-    public $message = "";
-    public $issue_number = "";
-    public $issue_number_line_2 = "";
+    public $date = '';
 
-    public $cumulativeRange = "";
-    public $actualCumulativeRange = "";
+    public $announcement = '';
 
-    public $bimonthRange = "";
-    public $quarterRange = "";
-    public $quarterTitle = "";
-    public $currentBiMonthRange = "";
+    public $quote = '';
+
+    public $message = '';
+
+    public $issue_number = '';
+
+    public $issue_number_line_2 = '';
+
+    public $cumulativeRange = '';
+
+    public $actualCumulativeRange = '';
+
+    public $bimonthRange = '';
+
+    public $quarterRange = '';
+
+    public $quarterTitle = '';
+
+    public $currentBiMonthRange = '';
 
     public $pages = [];
+
     public $last_page_index = 1;
+
     public $photos = [];
 
     public $bi_monthly_advisers = [];
+
     public $cumulative_advisers = [];
 
     public $rba_cumulative_advisers = [];
 
     public $bi_monthly_bdms = [];
+
     public $cumulative_bdms = [];
 
     public $bi_monthly_advisers_kiwisavers = [];
+
     public $cumulative_advisers_kiwisavers = [];
 
     public $bdm_performances = [];
+
     public $bdm_ks_performances = [];
 
     public $tm_performances = [];
+
     public $tm_ks_performances = [];
 
     public $winner_score = [];
+
     public $all_winner_score = [];
 
     public $records_to_beat = [];
+
     public $new_faces = [];
+
     public $upcoming_birthdays = [];
+
     public $upcoming_work_anniversaries = [];
 
-    public $featured_bi_monthly_adviser_id = "";
-    public $adviserController = null;
+    public $featured_bi_monthly_adviser_id = '';
+
+    public $adviserController;
 
     /**
-    @desc: init the class
+     * @desc: init the class
+     *
+     * @param mixed $date
+     * @param mixed $announcement
+     * @param mixed $quote
+     * @param mixed $message
+     * @param mixed $photos
      */
-    public function __construct($date, $announcement = "", $quote = "", $message = "", $photos = [])
+    public function __construct($date, $announcement = '', $quote = '', $message = '', $photos = [])
     {
         //initialize database connection
         parent::__construct();
@@ -80,16 +110,16 @@ class Magazine extends Database
 
         $this->date = $date;
         $this->announcement = $announcement;
-        $this->quote = mb_convert_encoding($quote, "HTML-ENTITIES", "UTF-8");
+        $this->quote = mb_convert_encoding($quote, 'HTML-ENTITIES', 'UTF-8');
         $this->message = $message;
         $this->photos = $photos;
 
         $this->bimonthRange = $this->getBiMonthlyRange($date);
         $this->cumulativeRange = $this->getCumulativeRange($date);
         $this->actualCumulativeRange = $this->getActualCumulativeRange($date);
-        $this->quarterTitle = "";
+        $this->quarterTitle = '';
         $this->quarterRange = $this->getQuarterRange($date);
-        
+
         $this->currentBiMonthRange = $this->getCurrentBiMonthlyRange($date);
         $this->issue_number = $this->getIssueFromDate($this->bimonthRange->from, $this->actualCumulativeRange);
         $this->issue_number_line_2 = $this->getIssueLine2FromDate($this->bimonthRange);
@@ -123,7 +153,6 @@ class Magazine extends Database
         $this->all_winner_score = $this->GetStringsWinnerScore();
         $this->winnerScore = $this->winnerScore();
         $this->winnerScore = $this->CheckRows($this->winnerScore);
-        
 
         $this->records_to_beat = $this->GetRecordsToBeat();
         $this->new_faces = array_chunk($this->GetNewFaces(), 4);
@@ -153,156 +182,152 @@ class Magazine extends Database
                 $work_anniversaries = $specific_adviser;
             }
 
-        */
+         */
 
-            
-            $this->upcoming_work_anniversaries = array_chunk($work_anniversaries, 3);
+        $this->upcoming_work_anniversaries = array_chunk($work_anniversaries, 3);
 
         //Stress test
         //$this->DuplicateArray($this->bi_monthly_advisers, 8);
         //$this->DuplicateArray($this->cumulative_advisers, 8);
 
         //Announcements
-            if (!empty($this->message) > 0) {
-                $this->last_page_index++;
-            }
-
-        //Bi-Monthly
-            if (count($this->bi_monthly_advisers)) {
-                $bm_pages = $this->PageCounter($this->bi_monthly_advisers, 10, 24);
-                $this->PushToPages("Bi-Monthly API", "Page {$this->getPages($bm_pages)}");
-            }
-
-        //Cumulative
-            if (count($this->cumulative_advisers)) {
-                $cumulative_pages = $this->PageCounter($this->cumulative_advisers, 10, 24);
-                $this->PushToPages("Cumulative API", "Page {$this->getPages($cumulative_pages)}");
-            }
-
-        //Bi-Monthly
-            if (count($this->bi_monthly_advisers_kiwisavers)) {
-                $bi_monthly_advisers_kiwisavers = $this->PageCounter($this->bi_monthly_advisers_kiwisavers, 10, 24);
-                $this->PushToPages("Bi-Monthly KiwiSaver", "Page {$this->getPages($bi_monthly_advisers_kiwisavers)}");
-            }
-
-        //Cumulative
-            if (count($this->cumulative_advisers_kiwisavers)) {
-                $cumulative_advisers_kiwisavers = $this->PageCounter($this->cumulative_advisers_kiwisavers, 10, 24);
-                $this->PushToPages("Cumulative KiwiSaver", "Page {$this->getPages($cumulative_advisers_kiwisavers)}");
-            }
-
-        //BDM
-            // if (count($this->bdm_performances) > 0) {
-            //     $bdm_performances = $this->PageCounter($this->bdm_performances, 9, 24);
-            //     $this->PushToPages("BDM Cumulative Performance", "Page {$this->getPages($bdm_performances)}");
-            // }
-
-        //Bi-Monthly Winner
-            if (count($this->winner_score) > 0) {
-                $winner_score = $this->PageCounter($this->winner_score, 9, 24);
-                $this->PushToPages("Bi Monthly Winners", "Page {$this->getPages($winner_score)}");
-            }
-        //Winner Score
-            if (count($this->all_winner_score) > 0) {
-                $all_winner_score = $this->PageCounter($this->all_winner_score, 9, 24);
-                $this->PushToPages("Winner Strings", "Page {$this->getPages($all_winner_score)}");
-            }
-        //BDM KS
-            if (count($this->bdm_ks_performances) > 0) {
-                $bdm_ks_performances = $this->PageCounter($this->bdm_ks_performances, 10, 24);
-                $this->PushToPages("BDM KiwiSavers Performance", "Page {$this->getPages($bdm_ks_performances)}");
-            }
-
-
-
-        //TM
-            if (count($this->tm_performances) > 0) {
-                $tm_performances = $this->PageCounter($this->tm_performances, 9, 24);
-                $this->PushToPages("TM Cumulative Performance", "Page {$this->getPages($tm_performances)}");
-            }
-
-
-        //Records
-            if (count($this->records_to_beat) > 0) {
-                $this->last_page_index++;
-                $this->PushToPages("Records to Break", "Page {$this->last_page_index}");
-            }
-
-        //New Faces
-            if (count($this->new_faces) > 0) {
-                $this->PushToPages("New Faces", "Page " . $this->getPages(count($this->new_faces)));
-            }
-
-        //Birthdays
-            if (count($this->upcoming_birthdays) > 0) {
-                $this->PushToPages("Birthdays", "Page " . $this->getPages(count($this->upcoming_birthdays)));
-            }
-
-        //Work Anniversaries
-            if (count($this->upcoming_work_anniversaries) > 0) {
-                $this->PushToPages("Work Anniversaries", "Page " . $this->getPages(count($this->upcoming_work_anniversaries)));
-            }
-
-        //Announcements
-            if (!empty($this->announcement) > 0) {
-                $this->last_page_index++;
-                $this->PushToPages("Announcements", "Page {$this->last_page_index}");
-            }
-
-            if (count($this->photos) > 0) {
-                $this->last_page_index++;
-                $this->PushToPages("Photos", "Page {$this->last_page_index}");
-            }
+        if (! empty($this->message) > 0) {
+            $this->last_page_index++;
         }
 
-    //Return empty if the only rows left are others
-        
+        //Bi-Monthly
+        if (count($this->bi_monthly_advisers)) {
+            $bm_pages = $this->PageCounter($this->bi_monthly_advisers, 10, 24);
+            $this->PushToPages('Bi-Monthly API', "Page {$this->getPages($bm_pages)}");
+        }
 
-        public function CheckRows ($rows){
-            if(count($rows) == 1){
-                if($rows[0]["name"] == "Others"){
-                    return [];
-                }
-                else{
-                    return $rows;
-                }
-            }
-            else{
+        //Cumulative
+        if (count($this->cumulative_advisers)) {
+            $cumulative_pages = $this->PageCounter($this->cumulative_advisers, 10, 24);
+            $this->PushToPages('Cumulative API', "Page {$this->getPages($cumulative_pages)}");
+        }
+
+        //Bi-Monthly
+        if (count($this->bi_monthly_advisers_kiwisavers)) {
+            $bi_monthly_advisers_kiwisavers = $this->PageCounter($this->bi_monthly_advisers_kiwisavers, 10, 24);
+            $this->PushToPages('Bi-Monthly KiwiSaver', "Page {$this->getPages($bi_monthly_advisers_kiwisavers)}");
+        }
+
+        //Cumulative
+        if (count($this->cumulative_advisers_kiwisavers)) {
+            $cumulative_advisers_kiwisavers = $this->PageCounter($this->cumulative_advisers_kiwisavers, 10, 24);
+            $this->PushToPages('Cumulative KiwiSaver', "Page {$this->getPages($cumulative_advisers_kiwisavers)}");
+        }
+
+        //BDM
+        // if (count($this->bdm_performances) > 0) {
+        //     $bdm_performances = $this->PageCounter($this->bdm_performances, 9, 24);
+        //     $this->PushToPages("BDM Cumulative Performance", "Page {$this->getPages($bdm_performances)}");
+        // }
+
+        //Bi-Monthly Winner
+        if (count($this->winner_score) > 0) {
+            $winner_score = $this->PageCounter($this->winner_score, 9, 24);
+            $this->PushToPages('Bi Monthly Winners', "Page {$this->getPages($winner_score)}");
+        }
+        //Winner Score
+        if (count($this->all_winner_score) > 0) {
+            $all_winner_score = $this->PageCounter($this->all_winner_score, 9, 24);
+            $this->PushToPages('Winner Strings', "Page {$this->getPages($all_winner_score)}");
+        }
+        //BDM KS
+        if (count($this->bdm_ks_performances) > 0) {
+            $bdm_ks_performances = $this->PageCounter($this->bdm_ks_performances, 10, 24);
+            $this->PushToPages('BDM KiwiSavers Performance', "Page {$this->getPages($bdm_ks_performances)}");
+        }
+
+        //TM
+        if (count($this->tm_performances) > 0) {
+            $tm_performances = $this->PageCounter($this->tm_performances, 9, 24);
+            $this->PushToPages('TM Cumulative Performance', "Page {$this->getPages($tm_performances)}");
+        }
+
+        //Records
+        if (count($this->records_to_beat) > 0) {
+            $this->last_page_index++;
+            $this->PushToPages('Records to Break', "Page {$this->last_page_index}");
+        }
+
+        //New Faces
+        if (count($this->new_faces) > 0) {
+            $this->PushToPages('New Faces', 'Page ' . $this->getPages(count($this->new_faces)));
+        }
+
+        //Birthdays
+        if (count($this->upcoming_birthdays) > 0) {
+            $this->PushToPages('Birthdays', 'Page ' . $this->getPages(count($this->upcoming_birthdays)));
+        }
+
+        //Work Anniversaries
+        if (count($this->upcoming_work_anniversaries) > 0) {
+            $this->PushToPages('Work Anniversaries', 'Page ' . $this->getPages(count($this->upcoming_work_anniversaries)));
+        }
+
+        //Announcements
+        if (! empty($this->announcement) > 0) {
+            $this->last_page_index++;
+            $this->PushToPages('Announcements', "Page {$this->last_page_index}");
+        }
+
+        if (count($this->photos) > 0) {
+            $this->last_page_index++;
+            $this->PushToPages('Photos', "Page {$this->last_page_index}");
+        }
+    }
+
+    //Return empty if the only rows left are others
+
+    public function CheckRows($rows)
+    {
+        if (1 == count($rows)) {
+            if ('Others' == $rows[0]['name']) {
+                return [];
+            } else {
                 return $rows;
             }
-
+        } else {
             return $rows;
         }
 
-        public function PushToPages($page_title, $pages)
-        {
+        return $rows;
+    }
 
-            $this->pages[] = [
-                "title" => $page_title,
-                "page" => $pages,
-                "page_start" => $this->GetFirstPage($pages),
-                "page_debugger" => $pages,
-            ];
+    public function PushToPages($page_title, $pages)
+    {
+        $this->pages[] = [
+            'title' => $page_title,
+            'page' => $pages,
+            'page_start' => $this->GetFirstPage($pages),
+            'page_debugger' => $pages,
+        ];
+    }
+
+    public function GetFirstPage($pages)
+    {
+        $pages = str_replace('Page ', '', $pages);
+
+        $output = $pages;
+
+        if (false !== strpos($pages, '-')) {
+            $output = explode('-', $pages)[0];
         }
 
-        public function GetFirstPage($pages)
-        {
-            $pages = str_replace("Page ", "", $pages);
-
-            $output = $pages;
-
-            if (strpos($pages, '-') !== false) {
-                $output = explode("-", $pages)[0];
-            }
-
-            return $output;
-        }
+        return $output;
+    }
 
     /**
      * @desc: Stress test hell
      * @param:
      *     Array - Array to duplicate
      *     Int - The number of times you want to duplicate the array
+     *
+     * @param mixed $array
+     * @param mixed $times
      */
     public function DuplicateArray(&$array, $times = 1)
     {
@@ -317,6 +342,7 @@ class Magazine extends Database
             return 1;
         } else {
             $rows = count($array) - $initial_limit;
+
             return ceil($rows / $limit_per_page) + 1;
         }
     }
@@ -326,7 +352,7 @@ class Magazine extends Database
         $output = $this->last_page_index + 1;
 
         if ($pages > 1) {
-            $output .= "-" . ($this->last_page_index + $pages);
+            $output .= '-' . ($this->last_page_index + $pages);
         }
 
         $this->last_page_index += $pages;
@@ -336,28 +362,30 @@ class Magazine extends Database
 
     public function getIssueString($issue)
     {
-        $issue_array = explode("_", $issue);
+        $issue_array = explode('_', $issue);
+
         foreach ($issue_array as $value) {
             $value = ucfirst($value);
         }
 
-        return $issue_array[0] . " " . $issue_array[1] . " - " . $issue_array[2] . " " . $issue_array[3];
+        return $issue_array[0] . ' ' . $issue_array[1] . ' - ' . $issue_array[2] . ' ' . $issue_array[3];
     }
 
     public function getIssueFromDate($date, $cumulativeRange)
     {
-        $first_volume_year = "2017";
+        $first_volume_year = '2017';
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
         $volume = ($year - $first_volume_year) * 2;
+
         if ($month > 6) {
             $volume++;
             $month -= 6;
         }
-        
+
         $issue = ($month - 1) * 2;
 
         if ($day >= 16) {
@@ -366,40 +394,39 @@ class Magazine extends Database
             $issue++;
         }
 
-        return "Volume $volume: " . date("jS F", strtotime($cumulativeRange->from)) . " - " . date("jS F", strtotime($cumulativeRange->to));
+        return "Volume $volume: " . date('jS F', strtotime($cumulativeRange->from)) . ' - ' . date('jS F', strtotime($cumulativeRange->to));
     }
-
 
     public function getIssueLine2FromDate($bimonthRange)
     {
-        return "Issue Period: " . date("jS F", strtotime($bimonthRange->from)) . " - " . date("jS F", strtotime($bimonthRange->to));
+        return 'Issue Period: ' . date('jS F', strtotime($bimonthRange->from)) . ' - ' . date('jS F', strtotime($bimonthRange->to));
     }
 
     public function getCumulativeRange($date)
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
         if ($month > 6) {
-            if ($day < 16 && $month == "07") {
-                $output->from = $year . "0101";
+            if ($day < 16 && '07' == $month) {
+                $output->from = $year . '0101';
             } else {
-                $output->from = $year . "0701";
+                $output->from = $year . '0701';
             }
         } else {
-            if ($day < 16 && $month == "01") {
-                $year -= 1;
-                $output->from = $year . "0701";
+            if ($day < 16 && '01' == $month) {
+                --$year;
+                $output->from = $year . '0701';
             } else {
-                $output->from = $year . "0101";
+                $output->from = $year . '0101';
             }
         }
 
         $output->to = $this->bimonthRange->to;
-        
+
         return $output;
     }
 
@@ -407,27 +434,29 @@ class Magazine extends Database
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
+
         if ($month > 6) {
-            if ($day < 16 && $month == "07") {
-                $output->from = $year . "0101";
-                $output->to = $year . "0630";
+            if ($day < 16 && '07' == $month) {
+                $output->from = $year . '0101';
+                $output->to = $year . '0630';
             } else {
-                $output->from = $year . "0701";
-                $output->to = $year . "1231";
+                $output->from = $year . '0701';
+                $output->to = $year . '1231';
             }
         } else {
-            if ($day < 16 && $month == "01") {
-                $year -= 1;
-                $output->from = $year . "0701";
-                $output->to = $year . "1231";
+            if ($day < 16 && '01' == $month) {
+                --$year;
+                $output->from = $year . '0701';
+                $output->to = $year . '1231';
             } else {
-                $output->from = $year . "0101";
-                $output->to = $year . "0630";
+                $output->from = $year . '0101';
+                $output->to = $year . '0630';
             }
         }
+
         return $output;
     }
 
@@ -436,32 +465,34 @@ class Magazine extends Database
         $output = new stdClass();
         $date_helper = new INDET_DATES_HELPER();
 
-        $day = date("d", strtotime($date));
-        $start_date = "";
+        $day = date('d', strtotime($date));
+        $start_date = '';
 
         if ($day >= 16) {
-            $start_date = date("Ym", strtotime($date)) . "01";
+            $start_date = date('Ym', strtotime($date)) . '01';
         } else {
-            $start_date = date('Ym', strtotime('last day of last month', strtotime($date))) . "16";
+            $start_date = date('Ym', strtotime('last day of last month', strtotime($date))) . '16';
         }
 
-        $year = date("Y", strtotime($start_date));
+        $year = date('Y', strtotime($start_date));
 
         $quarters = [];
-        $quarters[] = $date_helper->GetQuarter("First", $year);
-        $quarters[] = $date_helper->GetQuarter("Second", $year);
-        $quarters[] = $date_helper->GetQuarter("Third", $year);
-        $quarters[] = $date_helper->GetQuarter("Fourth", $year);
+        $quarters[] = $date_helper->GetQuarter('First', $year);
+        $quarters[] = $date_helper->GetQuarter('Second', $year);
+        $quarters[] = $date_helper->GetQuarter('Third', $year);
+        $quarters[] = $date_helper->GetQuarter('Fourth', $year);
 
-        foreach($quarters as $q => $quarter){
+        foreach ($quarters as $q => $quarter) {
             $from = $quarter->from->format('Ymd');
             $to = $quarter->to->format('Ymd');
             $start_date = $start_date;
-            if($start_date >= $from && $start_date <= $to){
+
+            if ($start_date >= $from && $start_date <= $to) {
                 $output->from = $from;
                 $output->to = $to;
-                
-                $this->quarterTitle = "Q" . ($q + 1) . " " . $year;
+
+                $this->quarterTitle = 'Q' . ($q + 1) . ' ' . $year;
+
                 break;
             }
         }
@@ -475,18 +506,18 @@ class Magazine extends Database
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
         if ($day >= 16) {
-            $output->from = date("Ym", strtotime($date)) . "01";
-            $output->to = date("Ym", strtotime($date)) . "15";
+            $output->from = date('Ym', strtotime($date)) . '01';
+            $output->to = date('Ym', strtotime($date)) . '15';
         } else {
-            $output->from = date('Ym', strtotime('last day of last month', strtotime($date))) . "16";
+            $output->from = date('Ym', strtotime('last day of last month', strtotime($date))) . '16';
             $output->to = date('Ymd', strtotime('last day of last month', strtotime($date)));
         }
-        
+
         return $output;
     }
 
@@ -494,25 +525,25 @@ class Magazine extends Database
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
 
         if ($month > 6) {
-            if ($day < 16 && $month == "07") {
-                $output->from = $year . "0101";
-                $output->to = $year . "0630";
+            if ($day < 16 && '07' == $month) {
+                $output->from = $year . '0101';
+                $output->to = $year . '0630';
             } else {
-                $output->from = $year . "0701";
-                $output->to = $year . "1231";
+                $output->from = $year . '0701';
+                $output->to = $year . '1231';
             }
         } else {
-            if ($day < 16 && $month == "01") {
-                $year -= 1;
-                $output->from = $year . "0701";
-                $output->to = $year . "1231";
+            if ($day < 16 && '01' == $month) {
+                --$year;
+                $output->from = $year . '0701';
+                $output->to = $year . '1231';
             } else {
-                $output->from = $year . "0101";
-                $output->to = $year . "0630";
+                $output->from = $year . '0101';
+                $output->to = $year . '0630';
             }
         }
 
@@ -527,16 +558,16 @@ class Magazine extends Database
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
-        $output->from = date("Ymd", strtotime($date));
+        $output->from = date('Ymd', strtotime($date));
 
-        if ($day == 16) {
-            $output->to = date("Ymt", strtotime($date));
+        if (16 == $day) {
+            $output->to = date('Ymt', strtotime($date));
         } else {
-            $output->to = $year . $month . "15";
+            $output->to = $year . $month . '15';
         }
 
         return $output;
@@ -546,16 +577,16 @@ class Magazine extends Database
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
-        $output->from = date("Ymd", strtotime($date));
+        $output->from = date('Ymd', strtotime($date));
 
-        if ($day == 16) {
-            $output->to = date("Ymt", strtotime($date));
+        if (16 == $day) {
+            $output->to = date('Ymt', strtotime($date));
         } else {
-            $output->to = $year . $month . "15";
+            $output->to = $year . $month . '15';
         }
 
         return $output;
@@ -569,128 +600,127 @@ class Magazine extends Database
         $dataset = $this->adviserController->getActiveAdvisers();
 
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
-            if($row["team"] == "")
-                $row["team"] = "None";
+            $activeAdvisers[] = $row['id'];
 
-
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
 
         //Register inactive advisers
         $dataset = $this->adviserController->getExAdvisers();
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
                     }
                 }
             }
-            
-            if($row["adviser_name"] != "Sumit Monga"){
-                $output[$row["adviser_id"]]["issued_api"] += floatval($total_issued_api);
-                $output[$row["adviser_id"]]["deals"] += floatval($total_issued_deals);
+
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
             }
         }
 
         //Ex advisers deals fetching
         if ($otherAdvisers) {
-
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
             $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
 
             while ($row = $dataset->fetch_assoc()) {
-                $deals = json_decode($row["deals"], true);
+                $deals = json_decode($row['deals'], true);
                 $total_issued_api = 0;
                 $total_issued_deals = 0;
-                if ($row["client_id"] == "55") {
+
+                if ('55' == $row['client_id']) {
                 }
-                if ($deals == null) {
+
+                if (null == $deals) {
                     continue;
                 }
 
                 foreach ($deals as $deal) {
-                    if (isset($deal["status"])) {
-                        if ($deal["status"] == "Issued") {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
 
                             //Check if cancelled
-                            if (isset($deal["clawback_status"])) {
-                                if ($deal["clawback_status"] == "Cancelled") {
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
                                     continue;
                                 }
                             }
 
-                            //
-                            if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                                $total_issued_api += $deal["issued_api"];
+                            if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                                $total_issued_api += $deal['issued_api'];
                                 $total_issued_deals++;
                             }
                         }
                     }
                 }
 
-                $output["Others"]["issued_api"] += floatval($total_issued_api);
-                $output["Others"]["deals"] += floatval($total_issued_deals);
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
             }
         }
 
         $issued_apis = array_column($output, 'issued_api');
-        
+
         array_multisort($issued_apis, SORT_DESC, $output);
 
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        return $this->FilterOutput($output, "deals");
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetWinnerBiMonthlyAdvisers()
@@ -701,35 +731,35 @@ class Magazine extends Database
         $dataset = $this->adviserController->getActiveAdvisers();
 
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
-            if($row["team"] == "")
-                $row["team"] = "None";
+            $activeAdvisers[] = $row['id'];
 
-
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
 
         //Register inactive advisers
         $dataset = $this->adviserController->getExAdvisers();
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
 
         // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         // var_dump($advisersArrayString);die;
@@ -738,97 +768,95 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
-                            
                         }
                     }
                 }
             }
-            
-            if($row["adviser_name"] != "Sumit Monga"){
-                $output[$row["adviser_id"]]["issued_api"] += floatval($total_issued_api);
-                $output[$row["adviser_id"]]["deals"] += floatval($total_issued_deals);
-                $output[$row["adviser_id"]]["current_bimonthly_date"] = $row["current_bimonthly_date"];
-                $output[$row["adviser_id"]]["scores"] = $row["scores"];
+
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+                $output[$row['adviser_id']]['current_bimonthly_date'] = $row['current_bimonthly_date'];
+                $output[$row['adviser_id']]['scores'] = $row['scores'];
             }
         }
 
         //Ex advisers deals fetching
         if ($otherAdvisers) {
-
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
             $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
 
             while ($row = $dataset->fetch_assoc()) {
-                $deals = json_decode($row["deals"], true);
+                $deals = json_decode($row['deals'], true);
                 $total_issued_api = 0;
                 $total_issued_deals = 0;
-                if ($row["client_id"] == "55") {
+
+                if ('55' == $row['client_id']) {
                 }
-                if ($deals == null) {
+
+                if (null == $deals) {
                     continue;
                 }
 
                 foreach ($deals as $deal) {
-                    if (isset($deal["status"])) {
-                        if ($deal["status"] == "Issued") {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
 
                             //Check if cancelled
-                            if (isset($deal["clawback_status"])) {
-                                if ($deal["clawback_status"] == "Cancelled") {
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
                                     continue;
                                 }
                             }
 
-                            //
-                            if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                                $total_issued_api += $deal["issued_api"];
+                            if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                                $total_issued_api += $deal['issued_api'];
                                 $total_issued_deals++;
                             }
                         }
                     }
                 }
 
-                $output["Others"]["issued_api"] += floatval($total_issued_api);
-                $output["Others"]["deals"] += floatval($total_issued_deals);
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
             }
         }
 
         // $issued_apis = array_column($output, 'issued_api');
         $deals_winner = array_column($output, 'deals');
-        
+
         array_multisort($deals_winner, SORT_DESC, $output);
 
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        return $this->FilterOutput($output, "deals");
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetCumulativeAdvisers()
@@ -838,27 +866,27 @@ class Magazine extends Database
         $otherAdvisers = [];
         $dataset = $this->adviserController->getActiveAdvisers();
 
-
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $others["team"] = "Ex-Advisers";
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $output['Others'] = $others;
 
         //Get Active
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
-            if($row["team"] == "")
-                $row["team"] = "None";
+            $activeAdvisers[] = $row['id'];
 
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
 
@@ -867,92 +895,90 @@ class Magazine extends Database
 
         //Get Others
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->cumulativeRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
-
                     }
                 }
             }
 
-            if($row["adviser_name"] != "Sumit Monga"){
-                $output[$row["adviser_id"]]["issued_api"] += floatval($total_issued_api);
-                $output[$row["adviser_id"]]["deals"] += floatval($total_issued_deals);
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
             }
         }
 
         //Ex advisers deals fetching
         if (count($otherAdvisers) > 0) {
-
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
             $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
 
             while ($row = $dataset->fetch_assoc()) {
-                $deals = json_decode($row["deals"], true);
+                $deals = json_decode($row['deals'], true);
                 $total_issued_api = 0;
                 $total_issued_deals = 0;
-                if ($row["client_id"] == "55") {
+
+                if ('55' == $row['client_id']) {
                 }
-                if ($deals == null) {
+
+                if (null == $deals) {
                     continue;
                 }
 
                 foreach ($deals as $deal) {
-                    if (isset($deal["status"])) {
-                        if ($deal["status"] == "Issued") {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
 
                             //Check if cancelled
-                            if (isset($deal["clawback_status"])) {
-                                if ($deal["clawback_status"] == "Cancelled") {
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
                                     continue;
                                 }
                             }
 
-                            //
-                            if ($this->WithinDateRange($deal["date_issued"], $this->cumulativeRange)) {
-                                $total_issued_api += $deal["issued_api"];
+                            if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                                $total_issued_api += $deal['issued_api'];
                                 $total_issued_deals++;
                             }
                         }
                     }
                 }
 
-                $output["Others"]["issued_api"] += floatval($total_issued_api);
-                $output["Others"]["deals"] += floatval($total_issued_deals);
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
             }
         }
 
@@ -963,7 +989,8 @@ class Magazine extends Database
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
 
         $this->moveElement($output, $key, count($output) - 1);
-        return $this->FilterOutput($output, "deals");
+
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetCumulativeRBAAdvisers()
@@ -973,30 +1000,30 @@ class Magazine extends Database
         $otherAdvisers = [];
         $dataset = $this->adviserController->getActiveAdvisers();
 
-
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $others["rba"] = 0;
-        $others["percent_rba"] = 0;
-        $others["team"] = "Ex-Advisers";
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['rba'] = 0;
+        $others['percent_rba'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $output['Others'] = $others;
 
         //Get Active
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
-            if($row["team"] == "")
-                $row["team"] = "None";
+            $activeAdvisers[] = $row['id'];
 
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
-                $output[$row["id"]]["rba"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+                $output[$row['id']]['rba'] = 0;
             }
         }
 
@@ -1005,120 +1032,114 @@ class Magazine extends Database
 
         //Get Others
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
             $total_rba = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
                         // var_dump($deal);
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->cumulativeRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
-                            if(isset($deal["replacement_business"])){
-                                if($deal["replacement_business"] == "1"){
+
+                            if (isset($deal['replacement_business'])) {
+                                if ('1' == $deal['replacement_business']) {
                                     $total_rba++;
                                 }
                             }
                         }
-
                     }
                 }
             }
 
-            if($row["adviser_name"] != "Sumit Monga"){
-                $output[$row["adviser_id"]]["issued_api"] += floatval($total_issued_api);
-                $output[$row["adviser_id"]]["deals"] += floatval($total_issued_deals);
-                $output[$row["adviser_id"]]["rba"] += floatval($total_rba);        
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+                $output[$row['adviser_id']]['rba'] += floatval($total_rba);
             }
-
         }
-
 
         //Ex advisers deals fetching
         if (count($otherAdvisers) > 0) {
-
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
             $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
 
             while ($row = $dataset->fetch_assoc()) {
-                $deals = json_decode($row["deals"], true);
+                $deals = json_decode($row['deals'], true);
                 $total_issued_api = 0;
                 $total_issued_deals = 0;
-                if ($row["client_id"] == "55") {
+
+                if ('55' == $row['client_id']) {
                 }
-                if ($deals == null) {
+
+                if (null == $deals) {
                     continue;
                 }
 
                 foreach ($deals as $deal) {
-                    if (isset($deal["status"])) {
-                        if ($deal["status"] == "Issued") {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
 
                             //Check if cancelled
-                            if (isset($deal["clawback_status"])) {
-                                if ($deal["clawback_status"] == "Cancelled") {
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
                                     continue;
                                 }
                             }
 
-                            //
-                            if ($this->WithinDateRange($deal["date_issued"], $this->cumulativeRange)) {
-                                $total_issued_api += $deal["issued_api"];
+                            if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                                $total_issued_api += $deal['issued_api'];
                                 $total_issued_deals++;
                             }
                         }
                     }
                 }
 
-                $output["Others"]["issued_api"] += floatval($total_issued_api);
-                $output["Others"]["deals"] += floatval($total_issued_deals);
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
             }
         }
 
-        foreach($output as $index => $data){
-                if($data["deals"] < 5){
-                    // var_dump($test["name"]);
-                    unset($output[$index]);
-                }
+        foreach ($output as $index => $data) {
+            if ($data['deals'] < 5) {
+                // var_dump($test["name"]);
+                unset($output[$index]);
+            }
             // if($index != "Others"){
             // }
         }
 
-
-        foreach($output as $index => $data){
-            if($index != "Others"){
-                $output[$data["id"]]["percent_rba"] = ($data["rba"]/$data["deals"])*100;
+        foreach ($output as $index => $data) {
+            if ('Others' != $index) {
+                $output[$data['id']]['percent_rba'] = ($data['rba'] / $data['deals']) * 100;
             }
         }
 
@@ -1129,7 +1150,8 @@ class Magazine extends Database
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
 
         $this->moveElement($output, $key, count($output) - 1);
-        return $this->FilterOutput($output, "deals");
+
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetBiMonthlyAdvisersKiwiSavers()
@@ -1144,53 +1166,53 @@ class Magazine extends Database
         $dataset = $this->adviserController->getActiveAdvisers();
 
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $others["team"] = "Ex-Advisers";
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
-            if($row["team"] == "")
-                $row["team"] = "None";
+            $activeAdvisers[] = $row['id'];
 
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
-
 
         //Register inactive advisers
         $dataset = $this->adviserController->getExAdvisers();
 
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            if ($row["deals"] > 0) {
-                if($row["name"] != "Sumit Monga"){
-                    $output[$row["adviser_id"]]["deals"] = $row["deals"];
+            if ($row['deals'] > 0) {
+                if ('Sumit Monga' != $row['name']) {
+                    $output[$row['adviser_id']]['deals'] = $row['deals'];
                 }
             }
         }
 
         //Ex advisers deals fetching
         if (count($otherAdvisers) > 0) {
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
             $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
@@ -1206,7 +1228,7 @@ class Magazine extends Database
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        return $this->FilterOutput($output, "deals");
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetCumulativeAdvisersKiwiSavers()
@@ -1218,40 +1240,38 @@ class Magazine extends Database
         $from = $this->cumulativeRange->from;
         $to = $this->cumulativeRange->to;
 
-
         $others = [];
-        $others["name"] = "Others";
-        $others["deals"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['deals'] = 0;
+        $output['Others'] = $others;
 
         $dataset = $this->adviserController->getActiveAdvisers();
-        
+
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
+            $activeAdvisers[] = $row['id'];
 
-            if($row["team"] == "")
-                $row["team"] = "None";
-
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
-
 
         //Register inactive advisers
         $dataset = $this->adviserController->getExAdvisers();
 
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
         //var_dump($query);
@@ -1259,20 +1279,18 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            if ($row["deals"] > 0) {
-                if($row["name"] == "Sumit Monga"){
-                    $output["Others"]["deals"] = $row["deals"];
-                }
-                else{
-                    $output[$row["adviser_id"]]["deals"] = $row["deals"];
+            if ($row['deals'] > 0) {
+                if ('Sumit Monga' == $row['name']) {
+                    $output['Others']['deals'] = $row['deals'];
+                } else {
+                    $output[$row['adviser_id']]['deals'] = $row['deals'];
                 }
             }
-
         }
 
         //Ex advisers deals fetching
         if (count($otherAdvisers) > 0) {
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
             $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
@@ -1288,7 +1306,7 @@ class Magazine extends Database
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        return $this->FilterOutput($output, "deals");
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetCumulativeBDMs()
@@ -1300,72 +1318,70 @@ class Magazine extends Database
         // var_dump($this->cumulativeRange->from);
         // var_dump($this->cumulativeRange->to);die;
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $others["generated"] = 0;
-        $others["cancelled"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['generated'] = 0;
+        $others['cancelled'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeBDMs[] = $row["id"];
-            $output[$row["id"]] = $row;
-            $output[$row["id"]]["issued_api"] = 0;
-            $output[$row["id"]]["deals"] = 0;
+            $activeBDMs[] = $row['id'];
+            $output[$row['id']] = $row;
+            $output[$row['id']]['issued_api'] = 0;
+            $output[$row['id']]['deals'] = 0;
         }
-        
+
         $bdms_array = array_merge($activeBDMs, $otherBDMs);
-        $bdmsArrayString = implode(",", $bdms_array);
+        $bdmsArrayString = implode(',', $bdms_array);
         // var_dump($bdmsArrayString);die;
         $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
 
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
 
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->cumulativeRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
                     }
                 }
             }
 
-            $output[$row["leadgen_id"]]["issued_api"] += floatval($total_issued_api);
-            $output[$row["leadgen_id"]]["deals"] += floatval($total_issued_deals);
-            
+            $output[$row['leadgen_id']]['issued_api'] += floatval($total_issued_api);
+            $output[$row['leadgen_id']]['deals'] += floatval($total_issued_deals);
         }
 
         $dataset = $this->leadGeneratorController->getInactiveBDMsData($this->cumulativeRange->from, $this->cumulativeRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $otherBDMs[] = $row["id"];
+            $otherBDMs[] = $row['id'];
 
-            $output["Others"]["generated"] += $row["generated"];
-            $output["Others"]["cancelled"] += $row["cancelled"];
+            $output['Others']['generated'] += $row['generated'];
+            $output['Others']['cancelled'] += $row['cancelled'];
         }
 
-        $bdmsArrayString = implode(",", $otherBDMs);
+        $bdmsArrayString = implode(',', $otherBDMs);
 
         $query = "SELECT c.id as client_id, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
 
@@ -1373,36 +1389,35 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->cumulativeRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
                     }
                 }
             }
 
-            $output["Others"]["issued_api"] += floatval($total_issued_api);
-            $output["Others"]["deals"] += floatval($total_issued_deals);
+            $output['Others']['issued_api'] += floatval($total_issued_api);
+            $output['Others']['deals'] += floatval($total_issued_deals);
         }
 
         //Lower priority to higher priority ordering
@@ -1415,8 +1430,7 @@ class Magazine extends Database
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        
-        return $this->FilterOutput($output, "generated");
+        return $this->FilterOutput($output, 'generated');
     }
 
     public function GetCumulativeBDMsKS()
@@ -1424,20 +1438,19 @@ class Magazine extends Database
         $output = [];
         $dataset = $this->leadGeneratorController->getActiveBDMsKSData($this->quarterRange->from, $this->quarterRange->to);
         $others = [];
-        $others["name"] = "Others";
-        $others["deals"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['deals'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $output[$row["id"]] = $row;
+            $output[$row['id']] = $row;
         }
-        
+
         $dataset = $this->leadGeneratorController->getInactiveBDMsKSData($this->quarterRange->from, $this->quarterRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $output["Others"]["deals"] += $row["deals"];
+            $output['Others']['deals'] += $row['deals'];
         }
-
 
         //Lower priority to higher priority ordering
         $deals = array_column($output, 'deals');
@@ -1445,11 +1458,12 @@ class Magazine extends Database
 
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
         $this->moveElement($output, $key, count($output) - 1);
-        
-        return $this->FilterOutput($output, "deals");
+
+        return $this->FilterOutput($output, 'deals');
     }
 
-    public function GetBiMonthlyBDMs(){
+    public function GetBiMonthlyBDMs()
+    {
         $output = [];
         $activeBDMs = [];
         $otherBDMs = [];
@@ -1457,18 +1471,18 @@ class Magazine extends Database
         $dataset = $this->leadGeneratorController->getActiveBDMsData($this->bimonthRange->from, $this->bimonthRange->to);
         // var_dump($this->bimonthRange->to);die;
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $others["generated"] = 0;
-        $others["cancelled"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['generated'] = 0;
+        $others['cancelled'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeBDMs[] = $row["id"];
-            $output[$row["id"]] = $row;
-            $output[$row["id"]]["issued_api"] = 0;
-            $output[$row["id"]]["deals"] = 0;
+            $activeBDMs[] = $row['id'];
+            $output[$row['id']] = $row;
+            $output[$row['id']]['issued_api'] = 0;
+            $output[$row['id']]['deals'] = 0;
         }
         // while ($row = $dataset->fetch_assoc()) {
         //     $activeBDMs[] = $row["id"];
@@ -1486,7 +1500,7 @@ class Magazine extends Database
         //     else{
         //         $output[$row["id"]] = $row;
         //         $output[$row["id"]]["issued_api"] = 0;
-        //         $output[$row["id"]]["deals"] = 0;        
+        //         $output[$row["id"]]["deals"] = 0;
         //         $others["generated"] = 0;
         //         $others["cancelled"] = 0;
         //     }
@@ -1495,85 +1509,83 @@ class Magazine extends Database
         // $bdms_array = array_merge($activeBDMs, $otherBDMs);
         // $bdmsArrayString = implode(",", $bdms_array);
         // var_dump($bdmsArrayString);die;
-        $bdmsArrayString = implode(",", $activeBDMs);
-        
+        $bdmsArrayString = implode(',', $activeBDMs);
+
         // $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($bdmsArrayString) order by l.name";
-        $query= "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
+        $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
         $statement = $this->prepare($query);
 
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
                     }
                 }
             }
-            
-            $output[$row["leadgen_id"]]["issued_api"] += floatval($total_issued_api);
-            $output[$row["leadgen_id"]]["deals"] += floatval($total_issued_deals);
+
+            $output[$row['leadgen_id']]['issued_api'] += floatval($total_issued_api);
+            $output[$row['leadgen_id']]['deals'] += floatval($total_issued_deals);
         }
-        
+
         $dataset = $this->leadGeneratorController->getInactiveBDMsData($this->bimonthRange->from, $this->bimonthRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $otherBDMs[] = $row["id"];
-            $output["Others"]["generated"] += $row["generated"];
-            $output["Others"]["cancelled"] += $row["cancelled"];
+            $otherBDMs[] = $row['id'];
+            $output['Others']['generated'] += $row['generated'];
+            $output['Others']['cancelled'] += $row['cancelled'];
         }
 
-        $otherBDMsArrayString = implode(",", $otherBDMs);
+        $otherBDMsArrayString = implode(',', $otherBDMs);
 
         $query = "SELECT c.id as client_id, l.name as lname, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($otherBDMsArrayString) order by l.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
-                    //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
+                        //Check if cancelled
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                    //
+                        //
                         // var_dump($deal["date_issued"]);
-                        if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         } else {
                             $total_issued_api = 0;
@@ -1582,8 +1594,8 @@ class Magazine extends Database
                     }
                 }
             }
-            $output["Others"]["issued_api"] += floatval($total_issued_api);
-            $output["Others"]["deals"] += floatval($total_issued_deals);
+            $output['Others']['issued_api'] += floatval($total_issued_api);
+            $output['Others']['deals'] += floatval($total_issued_deals);
         }
         // var_dump($output);die;
         $issued_apis = array_column($output, 'issued_api');
@@ -1593,8 +1605,7 @@ class Magazine extends Database
         $key = array_search('Others', array_column($output, 'name'));
         $this->moveElement($output, $key, count($output) - 1);
 
-
-        return $this->FilterOutput($output, "deals");
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function CumulativeBDMs()
@@ -1605,24 +1616,23 @@ class Magazine extends Database
         $dataset = $this->leadGeneratorController->getActiveBDMsData($this->quarterRange->from, $this->quarterRange->to);
 
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
         // $others["generated"] = 0;
         // $others["cancelled"] = 0;
-        $output["Others"] = $others;
+        $output['Others'] = $others;
 
         //Get Active
         while ($row = $dataset->fetch_assoc()) {
-            $activeBDMs[] = $row["id"];
+            $activeBDMs[] = $row['id'];
 
-            if($row["name"] == "Sumit Monga"){
-                $otherBDMs[] = $row["id"];
-            }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+            if ('Sumit Monga' == $row['name']) {
+                $otherBDMs[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
 
@@ -1635,88 +1645,86 @@ class Magazine extends Database
         // }
 
         //Active Advisers deal fetching
-        $bdmsArrayString = implode(",", $activeBDMs);
+        $bdmsArrayString = implode(',', $activeBDMs);
 
         $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($bdmsArrayString) order by l.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->quarterRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->quarterRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
-
                     }
                 }
             }
 
-            if($row["leadgen_name"] != "Sumit Monga"){
-                $output[$row["leadgen_id"]]["issued_api"] += floatval($total_issued_api);
-                $output[$row["leadgen_id"]]["deals"] += floatval($total_issued_deals);
+            if ('Sumit Monga' != $row['leadgen_name']) {
+                $output[$row['leadgen_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['leadgen_id']]['deals'] += floatval($total_issued_deals);
             }
         }
 
         //Ex advisers deals fetching
         if (count($otherBDMs) > 0) {
-
-            $otherBDMsArrayString = implode(",", $otherBDMs);
+            $otherBDMsArrayString = implode(',', $otherBDMs);
 
             $query = "SELECT c.id as client_id, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherBDMsArrayString) order by l.name";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
 
             while ($row = $dataset->fetch_assoc()) {
-                $deals = json_decode($row["deals"], true);
+                $deals = json_decode($row['deals'], true);
                 $total_issued_api = 0;
                 $total_issued_deals = 0;
-                if ($row["client_id"] == "55") {
+
+                if ('55' == $row['client_id']) {
                 }
-                if ($deals == null) {
+
+                if (null == $deals) {
                     continue;
                 }
 
                 foreach ($deals as $deal) {
-                    if (isset($deal["status"])) {
-                        if ($deal["status"] == "Issued") {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
 
                             //Check if cancelled
-                            if (isset($deal["clawback_status"])) {
-                                if ($deal["clawback_status"] == "Cancelled") {
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
                                     continue;
                                 }
                             }
 
-                            //
-                            if ($this->WithinDateRange($deal["date_issued"], $this->quarterRange)) {
-                                $total_issued_api += $deal["issued_api"];
+                            if ($this->WithinDateRange($deal['date_issued'], $this->quarterRange)) {
+                                $total_issued_api += $deal['issued_api'];
                                 $total_issued_deals++;
                             }
                         }
                     }
                 }
 
-                $output["Others"]["issued_api"] += floatval($total_issued_api);
-                $output["Others"]["deals"] += floatval($total_issued_deals);
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
             }
         }
 
@@ -1724,7 +1732,8 @@ class Magazine extends Database
         array_multisort($issued_apis, SORT_DESC, $output);
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
         $this->moveElement($output, $key, count($output) - 1);
-        return $this->FilterOutput($output, "deals");
+
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function GetCumulativeTMs()
@@ -1734,102 +1743,100 @@ class Magazine extends Database
         $otherTMs = [];
         $dataset = $this->leadGeneratorController->getActiveTMsData($this->quarterRange->from, $this->quarterRange->to);
         $others = [];
-        $others["name"] = "Others";
-        $others["kiwisavers"] = 0;
-        $others["submissions"] = 0;
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $others["generated"] = 0;
-        $others["cancelled"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['kiwisavers'] = 0;
+        $others['submissions'] = 0;
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['generated'] = 0;
+        $others['cancelled'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeTMs[] = $row["id"];
-            $output[$row["id"]] = $row;
-            $output[$row["id"]]["kiwisavers"] = 0;
-            $output[$row["id"]]["submissions"] = 0;
-            $output[$row["id"]]["issued_api"] = 0;
-            $output[$row["id"]]["deals"] = 0;
+            $activeTMs[] = $row['id'];
+            $output[$row['id']] = $row;
+            $output[$row['id']]['kiwisavers'] = 0;
+            $output[$row['id']]['submissions'] = 0;
+            $output[$row['id']]['issued_api'] = 0;
+            $output[$row['id']]['deals'] = 0;
         }
-        
+
         $tms_array = array_merge($activeTMs, $otherTMs);
-        $tmsArrayString = implode(",", $tms_array);
+        $tmsArrayString = implode(',', $tms_array);
 
         $query = "SELECT c.id as client_id, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($tmsArrayString) order by l.name";
 
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
 
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
-
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->quarterRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->quarterRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
                     }
                 }
             }
 
-            $output[$row["leadgen_id"]]["issued_api"] += floatval($total_issued_api);
-            $output[$row["leadgen_id"]]["deals"] += $total_issued_deals;
+            $output[$row['leadgen_id']]['issued_api'] += floatval($total_issued_api);
+            $output[$row['leadgen_id']]['deals'] += $total_issued_deals;
         }
 
         $query = "SELECT c.id as client_id, l.id as leadgen_id, s.deals as deals FROM submission_clients s LEFT JOIN clients_tbl c ON s.client_id = c.id LEFT JOIN leadgen_tbl l ON c.leadgen = l.id WHERE c.leadgen IN ($tmsArrayString) order by l.name";
-        
+
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
 
             $total_submissions = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] != "Deferred" || $deal["status"] != "Withdrawn") {
-                        if ($this->WithinDateRange($deal["submission_date"], $this->quarterRange)) {
+                if (isset($deal['status'])) {
+                    if ('Deferred' != $deal['status'] || 'Withdrawn' != $deal['status']) {
+                        if ($this->WithinDateRange($deal['submission_date'], $this->quarterRange)) {
                             $total_submissions++;
                         }
                     }
                 }
             }
 
-            $output[$row["leadgen_id"]]["submissions"] += $total_submissions;
+            $output[$row['leadgen_id']]['submissions'] += $total_submissions;
         }
 
         $dataset = $this->leadGeneratorController->getInactiveTMsData($this->quarterRange->from, $this->quarterRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $otherTMs[] = $row["id"];
-            
-            $output["Others"]["generated"] += $row["generated"];
-            $output["Others"]["cancelled"] += $row["cancelled"];
+            $otherTMs[] = $row['id'];
+
+            $output['Others']['generated'] += $row['generated'];
+            $output['Others']['cancelled'] += $row['cancelled'];
         }
 
-        $tmsArrayString = implode(",", $otherTMs);
+        $tmsArrayString = implode(',', $otherTMs);
 
         $query = "SELECT c.id as client_id, l.id as leadgen_id, s.deals as deals FROM submission_clients s LEFT JOIN clients_tbl c ON s.client_id = c.id LEFT JOIN leadgen_tbl l ON c.leadgen = l.id WHERE c.leadgen IN ($tmsArrayString) order by l.name";
 
@@ -1837,38 +1844,36 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->quarterRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->quarterRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
                     }
                 }
             }
 
-            $output["Others"]["issued_api"] += floatval($total_issued_api);
-            $output["Others"]["deals"] += $total_issued_deals;
+            $output['Others']['issued_api'] += floatval($total_issued_api);
+            $output['Others']['deals'] += $total_issued_deals;
         }
-
 
         $query = "SELECT c.id as client_id, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($tmsArrayString) order by l.name";
 
@@ -1876,36 +1881,36 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $deals = json_decode($row["deals"], true);
+            $deals = json_decode($row['deals'], true);
             $total_submissions = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] != "Deferred" || $deal["status"] != "Withdrawn") {
-                        if ($this->WithinDateRange($deal["submission_date"], $this->quarterRange)) {
+                if (isset($deal['status'])) {
+                    if ('Deferred' != $deal['status'] || 'Withdrawn' != $deal['status']) {
+                        if ($this->WithinDateRange($deal['submission_date'], $this->quarterRange)) {
                             $total_submissions++;
                         }
                     }
                 }
             }
 
-            $output["Others"]["submissions"] += $total_submissions;
+            $output['Others']['submissions'] += $total_submissions;
         }
 
         $dataset = $this->leadGeneratorController->getActiveTMsKSData($this->quarterRange->from, $this->quarterRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $output[$row["id"]]["kiwisavers"] = $row["deals"];
+            $output[$row['id']]['kiwisavers'] = $row['deals'];
         }
 
         $dataset = $this->leadGeneratorController->getInactiveTMsKSData($this->quarterRange->from, $this->quarterRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $output["Others"]["kiwisavers"] += $row["deals"];
+            $output['Others']['kiwisavers'] += $row['deals'];
         }
 
         //Lower priority to higher priority ordering
@@ -1918,7 +1923,7 @@ class Magazine extends Database
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        return $this->FilterOutput($output, "generated");
+        return $this->FilterOutput($output, 'generated');
     }
 
     public function GetCumulativeTMsKS()
@@ -1926,20 +1931,19 @@ class Magazine extends Database
         $output = [];
         $dataset = $this->leadGeneratorController->getActiveTMsKSData($this->quarterRange->from, $this->quarterRange->to);
         $others = [];
-        $others["name"] = "Others";
-        $others["deals"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['deals'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $output[$row["id"]] = $row;
+            $output[$row['id']] = $row;
         }
-        
+
         $dataset = $this->leadGeneratorController->getInactiveTMsKSData($this->quarterRange->from, $this->quarterRange->to);
 
         while ($row = $dataset->fetch_assoc()) {
-            $output["Others"]["deals"] += $row["deals"];
+            $output['Others']['deals'] += $row['deals'];
         }
-
 
         //Lower priority to higher priority ordering
         $deals = array_column($output, 'deals');
@@ -1947,48 +1951,47 @@ class Magazine extends Database
 
         $key = array_search('Others', array_column($output, 'name')); // $key = 2;
         $this->moveElement($output, $key, count($output) - 1);
-        
-        return $this->FilterOutput($output, "deals");
+
+        return $this->FilterOutput($output, 'deals');
     }
 
     public function FilterOutput($output, $key)
     {
         $filtered_output = [];
+
         foreach ($output as $row) {
             if ($row[$key] > 0) {
                 $filtered_output[] = $row;
             }
         }
-        
+
         return $filtered_output;
     }
 
-    public function TieRule($collection){
+    public function TieRule($collection)
+    {
         $output = [];
 
         $ties = [];
-        
-        foreach ($collection as $item){
 
+        foreach ($collection as $item) {
         }
 
         //Get Ties
-
     }
 
     public function CheckRecordsToBeat()
     {
-
     }
 
     public function GetRecordsToBeat()
     {
-        $period = date("j", strtotime($this->bimonthRange->from)) . "-" . date("j M Y", strtotime($this->bimonthRange->to));
-        $magazine_date = date("Ymd", strtotime($this->bimonthRange->to));
+        $period = date('j', strtotime($this->bimonthRange->from)) . '-' . date('j M Y', strtotime($this->bimonthRange->to));
+        $magazine_date = date('Ymd', strtotime($this->bimonthRange->to));
 
         $output = [];
 
-        $query = "SELECT
+        $query = 'SELECT
         records_to_beat.*, record_types.*
         FROM
         (SELECT
@@ -2006,7 +2009,7 @@ class Magazine extends Database
         record_types
         ON records_to_beat.record_type_id = record_types.id
         WHERE
-        is_shown = 1;";
+        is_shown = 1;';
 
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
@@ -2014,9 +2017,8 @@ class Magazine extends Database
             $output[] = $row;
         }
 
-        
         //Uncomment if there are BDMs again
-        $highest_bdm_record = $output[0]["record"];
+        $highest_bdm_record = $output[0]['record'];
         //Get Current Bi-Monthly Data
         // $dataset = $this->leadGeneratorController->getActiveBDMsData($this->bimonthRange->from, $this->bimonthRange->to);
         // while ($row = $dataset->fetch_assoc()) {
@@ -2026,58 +2028,61 @@ class Magazine extends Database
         //     }
         // }
 
-        $highest_adviser_record = (float) $output[1]["record"];
+        $highest_adviser_record = (float) $output[1]['record'];
         //Get Current Bi-Monthly Data
         $dataset = $this->bi_monthly_advisers;
+
         foreach ($dataset as $row) {
-            if ($row["issued_api"] > $highest_adviser_record) {
-                $period = date("j", strtotime($this->bimonthRange->from)) . "-" . date("j M Y", strtotime($this->bimonthRange->to));
-                $this->SetNewRecord(2, $period, $row["name"], $row["image"], "Adviser", "Issued API", "Currency", $row["issued_api"]);
+            if ($row['issued_api'] > $highest_adviser_record) {
+                $period = date('j', strtotime($this->bimonthRange->from)) . '-' . date('j M Y', strtotime($this->bimonthRange->to));
+                $this->SetNewRecord(2, $period, $row['name'], $row['image'], 'Adviser', 'Issued API', 'Currency', $row['issued_api']);
             }
         }
-        
-        
-        $highest_adviser_record = "";
-        foreach($output as $out){
-            if($out["type"] == "All-Time Bi-Monthly Highest Issued API"){
-                $highest_adviser_record = (float) $out["record"];
+
+        $highest_adviser_record = '';
+
+        foreach ($output as $out) {
+            if ('All-Time Bi-Monthly Highest Issued API' == $out['type']) {
+                $highest_adviser_record = (float) $out['record'];
             }
         }
         //Add a check here that if the highest record is null, it should skip the whole process.
-        
+
         //var_dump($highest_adviser_record);
-        
+
         //Get Current Bi-Monthly Data
         $collection = $this->bi_monthly_advisers;
-        $column = "issued_api";
+        $column = 'issued_api';
+
         foreach ($collection as $row) {
             if ($row[$column] > $highest_adviser_record) {
                 $highest_adviser_record = $row[$column];
-                $period = date("j", strtotime($this->bimonthRange->from)) . "-" . date("j M Y", strtotime($this->bimonthRange->to));
-                $magazine_date = date("Ymd", strtotime($this->bimonthRange->to));
-                $this->SetNewRecord(2, $row["name"], $period, $row[$column], $magazine_date, $row["image"]);
+                $period = date('j', strtotime($this->bimonthRange->from)) . '-' . date('j M Y', strtotime($this->bimonthRange->to));
+                $magazine_date = date('Ymd', strtotime($this->bimonthRange->to));
+                $this->SetNewRecord(2, $row['name'], $period, $row[$column], $magazine_date, $row['image']);
             }
         }
-        
-        foreach($output as $out){
-            if($out["type"] == "All-Time Bi-Monthly Highest KiwiSaver Enrolments"){
-                $highest_adviser_record = (float) $out["record"];
+
+        foreach ($output as $out) {
+            if ('All-Time Bi-Monthly Highest KiwiSaver Enrolments' == $out['type']) {
+                $highest_adviser_record = (float) $out['record'];
             }
         }
         //Get Current Bi-Monthly Data
         $collection = $this->bi_monthly_advisers_kiwisavers;
         //var_dump($collection);
-        $column = "deals";
+        $column = 'deals';
+
         foreach ($collection as $row) {
             if ($row[$column] > $highest_adviser_record) {
                 $highest_adviser_record = $row[$column];
-                $this->SetNewRecord(3, $row["name"], $period, $row[$column], $magazine_date, $row["image"]);
+                $this->SetNewRecord(3, $row['name'], $period, $row[$column], $magazine_date, $row['image']);
             }
         }
 
         $output = [];
 
-        $query = "SELECT
+        $query = 'SELECT
         records_to_beat.*, record_types.*
         FROM
         (SELECT
@@ -2095,13 +2100,14 @@ class Magazine extends Database
         record_types
         ON records_to_beat.record_type_id = record_types.id
         WHERE
-        is_shown = 1 ORDER BY record_types.id;";
+        is_shown = 1 ORDER BY record_types.id;';
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
             $output[] = $row;
         }
+
         return $output;
     }
 
@@ -2111,166 +2117,160 @@ class Magazine extends Database
         $image = $this->clean($image);
 
         $query = "INSERT INTO records_to_beat (record_type_id, name, date, record, magazine_date, image) VALUES ($record_type_id, '$name', '$date', '$record', '$magazine_date', '$image')";
-        
+
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
-
     }
 
-    public function GetWinnerScore(){
+    public function GetWinnerScore()
+    {
         $winner_adviser = $this->GetWinnerBiMonthlyAdvisers();
-        $query = "SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id";
+        $query = 'SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id';
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
-        while($output = $dataset->fetch_assoc()) {
+        while ($output = $dataset->fetch_assoc()) {
             $advisers[] = $output;
         }
 
         return $advisers;
     }
 
-
-    public function winnerScore(){
-
+    public function winnerScore()
+    {
         $output = [];
         $activeAdvisers = [];
         $otherAdvisers = [];
         $dataset = $this->adviserController->getActiveAdvisers();
 
         $others = [];
-        $others["name"] = "Others";
-        $others["issued_api"] = 0;
-        $others["deals"] = 0;
-        $output["Others"] = $others;
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
-            if($row["team"] == "")
-                $row["team"] = "None";
+            $activeAdvisers[] = $row['id'];
 
-
-            if($row["name"] == "Sumit Monga"){
-                $otherAdvisers[] = $row["id"];
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
             }
-            else{
-                $output[$row["id"]] = $row;
-                $output[$row["id"]]["issued_api"] = 0;
-                $output[$row["id"]]["deals"] = 0;
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
             }
         }
 
         //Register inactive advisers
         $dataset = $this->adviserController->getExAdvisers();
         while ($row = $dataset->fetch_assoc()) {
-            $otherAdvisers[] = $row["id"];
+            $otherAdvisers[] = $row['id'];
         }
 
         //Active Advisers deal fetching
-        $advisersArrayString = implode(",", $activeAdvisers);
+        $advisersArrayString = implode(',', $activeAdvisers);
         // var_dump($advisersArrayString);
-        
+
         $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN winner_score w ON a.id = w.adviser_id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
 
-         // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
-
         while ($row = $dataset->fetch_assoc()) {
-            
-            $deals = json_decode($row["deals"], true);
-            $scores = json_decode($row["scores"], true);
-            
+            $deals = json_decode($row['deals'], true);
+            $scores = json_decode($row['scores'], true);
+
             $total_issued_api = 0;
             $total_issued_deals = 0;
 
-            if ($deals == null) {
+            if (null == $deals) {
                 continue;
             }
 
-            if($row["scores"] == null){
+            if (null == $row['scores']) {
                 continue;
             }
-            
+
             foreach ($deals as $deal) {
-                if (isset($deal["status"])) {
-                    if ($deal["status"] == "Issued") {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal["clawback_status"])) {
-                            if ($deal["clawback_status"] == "Cancelled") {
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
                         }
 
-                        //
-                        if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                            $total_issued_api += $deal["issued_api"];
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
-                            
                         }
                     }
                 }
             }
-            
-            if($row["adviser_name"] != "Sumit Monga"){
-                $output[$row["adviser_id"]]["issued_api"] += floatval($total_issued_api);
-                $output[$row["adviser_id"]]["deals"] += floatval($total_issued_deals);
-                $output[$row["adviser_id"]]["scores"] = $row["scores"];
-                $output[$row["adviser_id"]]["silver"] = $row["silver"];
-                $output[$row["adviser_id"]]["gold"] = $row["gold"];
-                $output[$row["adviser_id"]]["platinum"] = $row["platinum"];
-                $output[$row["adviser_id"]]["titanium"] = $row["titanium"];
-                $output[$row["adviser_id"]]["current_bimonthly_date"] = $row["current_bimonthly_date"];
 
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+                $output[$row['adviser_id']]['scores'] = $row['scores'];
+                $output[$row['adviser_id']]['silver'] = $row['silver'];
+                $output[$row['adviser_id']]['gold'] = $row['gold'];
+                $output[$row['adviser_id']]['platinum'] = $row['platinum'];
+                $output[$row['adviser_id']]['titanium'] = $row['titanium'];
+                $output[$row['adviser_id']]['current_bimonthly_date'] = $row['current_bimonthly_date'];
             }
         }
 
         //Ex advisers deals fetching
         if ($otherAdvisers) {
-
-            $otherAdvisersArrayString = implode(",", $otherAdvisers);
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
             $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
 
             while ($row = $dataset->fetch_assoc()) {
-                $deals = json_decode($row["deals"], true);
+                $deals = json_decode($row['deals'], true);
                 $total_issued_api = 0;
                 $total_issued_deals = 0;
-                if ($row["client_id"] == "55") {
+
+                if ('55' == $row['client_id']) {
                 }
-                if ($deals == null) {
+
+                if (null == $deals) {
                     continue;
                 }
 
                 foreach ($deals as $deal) {
-                    if (isset($deal["status"])) {
-                        if ($deal["status"] == "Issued") {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
 
                             //Check if cancelled
-                            if (isset($deal["clawback_status"])) {
-                                if ($deal["clawback_status"] == "Cancelled") {
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
                                     continue;
                                 }
                             }
 
-                            //
-                            if ($this->WithinDateRange($deal["date_issued"], $this->bimonthRange)) {
-                                $total_issued_api += $deal["issued_api"];
+                            if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                                $total_issued_api += $deal['issued_api'];
                                 $total_issued_deals++;
                             }
                         }
                     }
                 }
 
-                $output["Others"]["issued_api"] += floatval($total_issued_api);
-                $output["Others"]["deals"] += floatval($total_issued_deals);
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
             }
         }
-        
+
         // foreach($output as $index => $data){
         //     if($data["scores"] == "Titanium"){
         //         $output[$index]["scores"] = "a";
@@ -2319,7 +2319,6 @@ class Magazine extends Database
         //     }
         // }
 
-
         // foreach($titanium as $t){
         //     $newArray[] = $t;
         // }
@@ -2350,10 +2349,11 @@ class Magazine extends Database
 
         $this->moveElement($output, $key, count($output) - 1);
 
-        return $this->FilterOutput($output, "deals");
+        return $this->FilterOutput($output, 'deals');
     }
 
-    public function array_reorder($array, $oldIndex, $newIndex) {
+    public function array_reorder($array, $oldIndex, $newIndex)
+    {
         array_splice(
             $array,
             $newIndex,
@@ -2363,18 +2363,20 @@ class Magazine extends Database
                 array_slice($array, $newIndex, count($array))
             )
         );
+
         return $array;
     }
 
-    public function cmp($a, $b) {
-        return strcmp($a["score"], $b["score"]);
+    public function cmp($a, $b)
+    {
+        return strcmp($a['score'], $b['score']);
     }
 
     public function SetWinnerScore()
     {
         $datetoday = date('Ymd');
         $bimonthlyrange = $this->getCurrentBiMonthlyRange($datetoday);
-        $bimonthly_range = date("Y-m-d", strtotime($this->bimonthRange->from));
+        $bimonthly_range = date('Y-m-d', strtotime($this->bimonthRange->from));
         $winner_adviser = $this->GetWinnerBiMonthlyAdvisers();
         // var_dump($winner_adviser);die;
         $advisers = [];
@@ -2382,169 +2384,171 @@ class Magazine extends Database
         $dataset = $this->adviserController->getActiveAdvisers();
 
         while ($row = $dataset->fetch_assoc()) {
-            $activeAdvisers[] = $row["id"];
+            $activeAdvisers[] = $row['id'];
         }
 
-        $query = "SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id";
+        $query = 'SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id';
         // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
-        while($test = $dataset->fetch_assoc()) {
+        while ($test = $dataset->fetch_assoc()) {
             $advisers[] = $test;
         }
 
-        foreach($advisers as $index => $data){
-            if($data["score"] == "Titanium"){
-                $advisers[$index]["score"] = "a";
-            } else if ($data["score"] == "Platinum"){
-                $advisers[$index]["score"] = "i";
-            } else if ($data["score"] =="Gold"){
-                $advisers[$index]["score"] = "o";
-            } else if ($data["score"] =="Silver"){
-                $advisers[$index]["score"] = "v";
+        foreach ($advisers as $index => $data) {
+            if ('Titanium' == $data['score']) {
+                $advisers[$index]['score'] = 'a';
+            } elseif ('Platinum' == $data['score']) {
+                $advisers[$index]['score'] = 'i';
+            } elseif ('Gold' == $data['score']) {
+                $advisers[$index]['score'] = 'o';
+            } elseif ('Silver' == $data['score']) {
+                $advisers[$index]['score'] = 'v';
             }
         }
 
-        usort($advisers, array($this, "cmp"));
+        usort($advisers, [$this, 'cmp']);
 
-        foreach($advisers as $index => $data){
-            if($data["score"] == "a"){
-                $advisers[$index]["score"] = "Titanium";
-            } else if ($data["score"] == "i"){
-                $advisers[$index]["score"] = "Platinum";
-            } else if ($data["score"] =="o"){
-                $advisers[$index]["score"] = "Gold";
-            } else if ($data["score"] =="v"){
-                $advisers[$index]["score"] = "Silver";
+        foreach ($advisers as $index => $data) {
+            if ('a' == $data['score']) {
+                $advisers[$index]['score'] = 'Titanium';
+            } elseif ('i' == $data['score']) {
+                $advisers[$index]['score'] = 'Platinum';
+            } elseif ('o' == $data['score']) {
+                $advisers[$index]['score'] = 'Gold';
+            } elseif ('v' == $data['score']) {
+                $advisers[$index]['score'] = 'Silver';
             }
         }
 
-        $adviser_id = array();
-        $bi_monthly_adv = array();
-        $all_adviser = array();
+        $adviser_id = [];
+        $bi_monthly_adv = [];
+        $all_adviser = [];
 
-        foreach($advisers as $adv_id){
-            $all_adviser[] = $adv_id["adviser_id"];
-            $adviser_id[] = $adv_id["adviser_id"];
+        foreach ($advisers as $adv_id) {
+            $all_adviser[] = $adv_id['adviser_id'];
+            $adviser_id[] = $adv_id['adviser_id'];
         }
 
-         foreach($winner_adviser as $adviser){
-            if($adviser["name"] != "Others"){
-                $all_adviser[] = $adviser["id"];
-                $bi_monthly_adv[] = $adviser["id"];
-
+        foreach ($winner_adviser as $adviser) {
+            if ('Others' != $adviser['name']) {
+                $all_adviser[] = $adviser['id'];
+                $bi_monthly_adv[] = $adviser['id'];
             }
         }
 
         // var_dump($bi_monthly_adv);
-        foreach($all_adviser as $adv){
-            if(!in_array($adv, $bi_monthly_adv)){
+        foreach ($all_adviser as $adv) {
+            if (! in_array($adv, $bi_monthly_adv)) {
                 $query = "DELETE FROM winner_score WHERE adviser_id = {$adv}";
                 $statement = $this->prepare($query);
                 $dataset = $this->execute($statement);
             }
         }
 
+        // echo json_encode($adviser_id); exit();
+
         // var_dump($this->bimonthRange->from);
-        foreach($winner_adviser as $adviser){
-            if($adviser["name"] != "Others"){
-                if(in_array($adviser["id"], $adviser_id)){
-                    if($adviser["current_bimonthly_date"] <= $this->bimonthRange->from){
-                       if($adviser["current_bimonthly_date"] != $bimonthly_range){
-                            if($adviser["deals"] >= 5 && $adviser["issued_api"] >= 7500){
-                                $query = "UPDATE winner_score SET `titanium` = titanium + 1, score = \"Titanium\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+        foreach ($winner_adviser as $adviser) {
+            if ('Others' != $adviser['name']) {
+                if (in_array($adviser['id'], $adviser_id)) {
+                    // pending... modify
+                    if ($adviser['current_bimonthly_date'] <= $this->bimonthRange->from) {
+                        if ($adviser['current_bimonthly_date'] != $bimonthly_range) {
+                            if ($adviser['deals'] >= 5 && $adviser['issued_api'] >= 7500) {
+                                $query = "UPDATE winner_score SET `titanium` = titanium + 1, score = \"Titanium\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                 $statement = $this->prepare($query);
                                 $dataset = $this->execute($statement);
-                            } else if($adviser["deals"] >= 4 && $adviser["issued_api"] >= 6000) {
-                                if($adviser["scores"] == "Titanium"){
-                                    $query = "UPDATE winner_score SET `platinum` = platinum + 1, `titanium` = 0, score = \"Platinum\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+                            } elseif ($adviser['deals'] >= 4 && $adviser['issued_api'] >= 6000) {
+                                if ('Titanium' == $adviser['scores']) {
+                                    $query = "UPDATE winner_score SET `platinum` = platinum + 1, `titanium` = 0, score = \"Platinum\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
-                                }else{
-                                    $query = "UPDATE winner_score SET `platinum` = platinum + 1, score = \"Platinum\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
-                                    $statement = $this->prepare($query);
-                                    $dataset = $this->execute($statement);
-                                }
-                            } else if ($adviser["deals"] >= 3 && $adviser["issued_api"] >= 4500) {
-                                if($adviser["scores"] == "Titanium"){
-                                    $query = "UPDATE winner_score SET `gold` = titanium + 1, `titanium` = 0, `platinum` = 0, score = \"Gold\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
-                                    $statement = $this->prepare($query);
-                                    $dataset = $this->execute($statement);
-                                }else if($adviser["scores"] == "Platinum"){
-                                    $query = "UPDATE winner_score SET `gold` = platinum + 1, `titanium` = 0, `platinum` = 0, score = \"Gold\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
-                                    $statement = $this->prepare($query);
-                                    $dataset = $this->execute($statement);
-                                }else{
-                                    $query = "UPDATE winner_score SET `gold` = gold + 1, `platinum` = 0, `titanium` = 0, score = \"Gold\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+                                } else {
+                                    $query = "UPDATE winner_score SET `platinum` = platinum + 1, score = \"Platinum\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
                                 }
-                            } else if ($adviser["deals"] >= 2 && $adviser["issued_api"] >= 2000){
-                                if($adviser["scores"] == "Titanium"){
-                                    $query = "UPDATE winner_score SET `silver` = titanium + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+                            } elseif ($adviser['deals'] >= 3 && $adviser['issued_api'] >= 4500) {
+                                if ('Titanium' == $adviser['scores']) {
+                                    $query = "UPDATE winner_score SET `gold` = titanium + 1, `titanium` = 0, `platinum` = 0, score = \"Gold\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
-                                }else if($adviser["scores"] == "Platinum"){
-                                    $query = "UPDATE winner_score SET `silver` = platinum + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+                                } elseif ('Platinum' == $adviser['scores']) {
+                                    $query = "UPDATE winner_score SET `gold` = platinum + 1, `titanium` = 0, `platinum` = 0, score = \"Gold\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
-                                }else if($adviser["scores"] == "Gold"){
-                                    $query = "UPDATE winner_score SET `silver` = gold + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+                                } else {
+                                    $query = "UPDATE winner_score SET `gold` = gold + 1, `platinum` = 0, `titanium` = 0, score = \"Gold\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
-                                }else {
-                                    $query = "UPDATE winner_score SET `silver` = silver + 1, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser["id"]}";
+                                }
+                            } elseif ($adviser['deals'] >= 2 && $adviser['issued_api'] >= 2000) {
+                                if ('Titanium' == $adviser['scores']) {
+                                    $query = "UPDATE winner_score SET `silver` = titanium + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
+                                    $statement = $this->prepare($query);
+                                    $dataset = $this->execute($statement);
+                                } elseif ('Platinum' == $adviser['scores']) {
+                                    $query = "UPDATE winner_score SET `silver` = platinum + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
+                                    $statement = $this->prepare($query);
+                                    $dataset = $this->execute($statement);
+                                } elseif ('Gold' == $adviser['scores']) {
+                                    $query = "UPDATE winner_score SET `silver` = gold + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
+                                    $statement = $this->prepare($query);
+                                    $dataset = $this->execute($statement);
+                                } else {
+                                    $query = "UPDATE winner_score SET `silver` = silver + 1, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
                                 }
                             } else {
-                                $query = "DELETE FROM winner_score WHERE adviser_id = {$adviser["id"]}";
+                                $query = "DELETE FROM winner_score WHERE adviser_id = {$adviser['id']}";
                                 $statement = $this->prepare($query);
                                 $dataset = $this->execute($statement);
                             }
                         }
                     } else {
-                        if($adviser["deals"] >= 5 && $adviser["issued_api"] >= 7500){
-                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 0, 0, 0, 1, \"Titanium\", '$bimonthly_range')";
+                        if ($adviser['deals'] >= 5 && $adviser['issued_api'] >= 7500) {
+                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 0, 0, 0, 1, \"Titanium\", '$bimonthly_range')";
                             $statement = $this->prepare($query);
                             $dataset = $this->execute($statement);
-                        } else if($adviser["deals"] >= 4 && $adviser["issued_api"] >= 6000) {
-                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 0, 0, 1, 0, \"Platinum\", '$bimonthly_range')";
+                        } elseif ($adviser['deals'] >= 4 && $adviser['issued_api'] >= 6000) {
+                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 0, 0, 1, 0, \"Platinum\", '$bimonthly_range')";
                             $statement = $this->prepare($query);
                             $dataset = $this->execute($statement);
-                        } else if ($adviser["deals"] >= 3 && $adviser["issued_api"] >= 4500) {
-                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 0, 1, 0, 0, \"Gold\", '$bimonthly_range')";
+                        } elseif ($adviser['deals'] >= 3 && $adviser['issued_api'] >= 4500) {
+                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 0, 1, 0, 0, \"Gold\", '$bimonthly_range')";
                             $statement = $this->prepare($query);
                             $dataset = $this->execute($statement);
-                        } else if ($adviser["deals"] >= 2 && $adviser["issued_api"] >= 2000){
-                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 1, 0, 0, 0, \"Silver\", '$bimonthly_range')";
+                        } elseif ($adviser['deals'] >= 2 && $adviser['issued_api'] >= 2000) {
+                            $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 1, 0, 0, 0, \"Silver\", '$bimonthly_range')";
                             $statement = $this->prepare($query);
                             $dataset = $this->execute($statement);
                         } else {
-                            $query = "DELETE FROM winner_score WHERE adviser_id = {$adviser["id"]}";
+                            $query = "DELETE FROM winner_score WHERE adviser_id = {$adviser['id']}";
                             $statement = $this->prepare($query);
                             $dataset = $this->execute($statement);
                         }
                     }
                 } else {
-                    if($adviser["deals"] >= 5 && $adviser["issued_api"] >= 7500){
-                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 0, 0, 0, 1, \"Titanium\", '$bimonthly_range')";
+                    if ($adviser['deals'] >= 5 && $adviser['issued_api'] >= 7500) {
+                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 0, 0, 0, 1, \"Titanium\", '$bimonthly_range')";
                         $statement = $this->prepare($query);
                         $dataset = $this->execute($statement);
-                    } else if($adviser["deals"] >= 4 && $adviser["issued_api"] >= 6000) {
-                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 0, 0, 1, 0, \"Platinum\", '$bimonthly_range')";
+                    } elseif ($adviser['deals'] >= 4 && $adviser['issued_api'] >= 6000) {
+                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 0, 0, 1, 0, \"Platinum\", '$bimonthly_range')";
                         $statement = $this->prepare($query);
                         $dataset = $this->execute($statement);
-                    } else if ($adviser["deals"] >= 3 && $adviser["issued_api"] >= 4500) {
-                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 0, 1, 0, 0, \"Gold\", '$bimonthly_range')";
+                    } elseif ($adviser['deals'] >= 3 && $adviser['issued_api'] >= 4500) {
+                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 0, 1, 0, 0, \"Gold\", '$bimonthly_range')";
                         $statement = $this->prepare($query);
                         $dataset = $this->execute($statement);
-                    } else if ($adviser["deals"] >= 2 && $adviser["issued_api"] >= 2000){
-                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser["id"]}, 1, 0, 0, 0, \"Silver\", '$bimonthly_range')";
+                    } elseif ($adviser['deals'] >= 2 && $adviser['issued_api'] >= 2000) {
+                        $query = "INSERT INTO winner_score (adviser_id, silver, gold, platinum, titanium, score, bimonthly_range) VALUES ({$adviser['id']}, 1, 0, 0, 0, \"Silver\", '$bimonthly_range')";
                         $statement = $this->prepare($query);
                         $dataset = $this->execute($statement);
                     } else {
-                        $query = "DELETE FROM winner_score WHERE adviser_id = {$adviser["id"]}";
+                        $query = "DELETE FROM winner_score WHERE adviser_id = {$adviser['id']}";
                         $statement = $this->prepare($query);
                         $dataset = $this->execute($statement);
                     }
@@ -2562,41 +2566,44 @@ class Magazine extends Database
 
         // $sort = $this->array_orderby($advisers, 'silver', SORT_DESC);
         // $sort = $this->array_orderby($advisers, 'gold', SORT_DESC);
-        
-        
 
         // die;
         return $advisers;
     }
 
-    public function GetStringsWinnerScore(){
-        $query = "SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id";
+    public function GetStringsWinnerScore()
+    {
+        $query = 'SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id';
         // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
-        while($test = $dataset->fetch_assoc()) {
+        while ($test = $dataset->fetch_assoc()) {
             $advisers[] = $test;
         }
 
         return $advisers;
     }
+
     public function array_orderby()
     {
         $args = func_get_args();
         $data = array_shift($args);
+
         foreach ($args as $n => $field) {
             if (is_string($field)) {
-                $tmp = array();
-                foreach ($data as $key => $row)
+                $tmp = [];
+
+                foreach ($data as $key => $row) {
                     $tmp[$key] = $row[$field];
-                $args[$n] = $tmp;
                 }
+                $args[$n] = $tmp;
+            }
         }
         $args[] = &$data;
         call_user_func_array('array_multisort', $args);
+
         return array_pop($args);
     }
-
 
     public function GetNewFaces()
     {
@@ -2605,9 +2612,7 @@ class Magazine extends Database
         $to = $this->bimonthRange->to;
 
         //Get Admins
-        
-        $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE p.date_hired >= '$from' AND p.date_hired <= '$to' AND p.termination_date = '' GROUP BY name";
-        // $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE p.termination_date = '' GROUP BY name";
+        $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE p.termination_date = '' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -2616,7 +2621,7 @@ class Magazine extends Database
         }
 
         //Get Advisers
-        $query = "SELECT name, image, 'Financial Adviser' as role FROM adviser_tbl WHERE date_hired >= '$from' AND date_hired <= '$to' GROUP BY name";
+        $query = "SELECT name, image, 'Financial Adviser' as role FROM adviser_tbl WHERE date_hired >= '$from' AND date_hired <= '$to' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -2625,77 +2630,77 @@ class Magazine extends Database
         }
 
         //Get Lead Generators
-        $query = "SELECT name, image, type as role FROM leadgen_tbl WHERE date_hired >= '$from' AND date_hired <= '$to' GROUP BY name";
+        $query = "SELECT name, image, type as role FROM leadgen_tbl WHERE date_hired >= '$from' AND date_hired <= '$to' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            if ($row["role"] == "Face-to-Face Marketer") {
-                $row["role"] = "BDM";
+            if ('Face-to-Face Marketer' == $row['role']) {
+                $row['role'] = 'BDM';
             }
 
             $output[] = $row;
         }
-        
+
         //Alphabetically arrange
-        usort($output, array('Magazine', 'sortByName'));
-        
+        usort($output, ['Magazine', 'sortByName']);
+
         return $output;
     }
 
     public function GetBirthdays()
     {
         $output = [];
-        $from = date("md", strtotime($this->currentBiMonthRange->to));
-        $to = date("md", strtotime($this->currentBiMonthRange->from));
-        
+        $from = date('md', strtotime($this->currentBiMonthRange->to));
+        $to = date('md', strtotime($this->currentBiMonthRange->from));
+
         //Get Admins
-        $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE RIGHT(p.birthday,4) >= '$from' AND RIGHT(p.birthday,4) <= '$to' AND p.termination_date = '' GROUP BY name";
+        $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE RIGHT(p.birthday,4) >= '$from' AND RIGHT(p.birthday,4) <= '$to' AND p.termination_date = '' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $row["birthday"] = date("jS F", strtotime($row["birthday"]));
+            $row['birthday'] = date('jS F', strtotime($row['birthday']));
             $output[] = $row;
         }
 
         //Get Advisers
-        $query = "SELECT name, image, 'Financial Adviser' as role, birthday FROM adviser_tbl WHERE RIGHT(birthday,4) >= '$from' AND RIGHT(birthday,4) <= '$to' AND termination_date = '' GROUP BY name";
+        $query = "SELECT name, image, 'Financial Adviser' as role, birthday FROM adviser_tbl WHERE RIGHT(birthday,4) >= '$from' AND RIGHT(birthday,4) <= '$to' AND termination_date = '' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $row["birthday"] = date("jS F", strtotime($row["birthday"]));
+            $row['birthday'] = date('jS F', strtotime($row['birthday']));
             $output[] = $row;
         }
 
         //Get Lead Generators
-        $query = "SELECT name, image, type as role, birthday FROM leadgen_tbl WHERE RIGHT(birthday,4) >= '$from' AND RIGHT(birthday,4) <= '$to' AND termination_date = '' GROUP BY name";
+        $query = "SELECT name, image, type as role, birthday FROM leadgen_tbl WHERE RIGHT(birthday,4) >= '$from' AND RIGHT(birthday,4) <= '$to' AND termination_date = '' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $row["birthday"] = date("jS F", strtotime($row["birthday"]));
-            if ($row["role"] == "Face-to-Face Marketer") {
-                $row["role"] = "BDM";
+            $row['birthday'] = date('jS F', strtotime($row['birthday']));
+
+            if ('Face-to-Face Marketer' == $row['role']) {
+                $row['role'] = 'BDM';
             }
 
             $output[] = $row;
         }
 
         //Alphabetically arrange
-        usort($output, array('Magazine', 'sortByName'));
-        
+        usort($output, ['Magazine', 'sortByName']);
+
         return $output;
     }
-
 
     public function GetWorkAnniversaries()
     {
         $output = [];
-        $from = date("md", strtotime($this->currentBiMonthRange->from));
-        $to = date("md", strtotime($this->currentBiMonthRange->to));
-        $current_year = date("Y");
+        $from = date('md', strtotime($this->currentBiMonthRange->from));
+        $to = date('md', strtotime($this->currentBiMonthRange->to));
+        $current_year = date('Y');
 
         //Get Admins
         $query = "SELECT p.full_name as name, p.image as image, p.role, p.date_hired FROM users u LEFT JOIN personal_data p ON p.id = u.linked_id WHERE RIGHT(p.date_hired,4) >= '$from' AND RIGHT(p.date_hired,4) <= '$to' AND p.termination_date = ''";
@@ -2703,9 +2708,9 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $row["anniversary"] = date("jS F", strtotime($row["date_hired"]));
-            $year = date("Y", strtotime($row["date_hired"]));
-            $row["years"] = $current_year - $year;
+            $row['anniversary'] = date('jS F', strtotime($row['date_hired']));
+            $year = date('Y', strtotime($row['date_hired']));
+            $row['years'] = $current_year - $year;
 
             $output[] = $row;
         }
@@ -2716,9 +2721,9 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $row["anniversary"] = date("jS F", strtotime($row["date_hired"]));
-            $year = date("Y", strtotime($row["date_hired"]));
-            $row["years"] = $current_year - $year;
+            $row['anniversary'] = date('jS F', strtotime($row['date_hired']));
+            $year = date('Y', strtotime($row['date_hired']));
+            $row['years'] = $current_year - $year;
             $output[] = $row;
         }
 
@@ -2728,21 +2733,16 @@ class Magazine extends Database
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $row["anniversary"] = date("jS F", strtotime($row["date_hired"]));
-            $year = date("Y", strtotime($row["date_hired"]));
-            $row["years"] = $current_year - $year;
+            $row['anniversary'] = date('jS F', strtotime($row['date_hired']));
+            $year = date('Y', strtotime($row['date_hired']));
+            $row['years'] = $current_year - $year;
             $output[] = $row;
         }
 
         //Alphabetically arrange
-        usort($output, array('Magazine', 'sortByName'));
+        usort($output, ['Magazine', 'sortByName']);
 
-        return $this->FilterOutput($output, "years");
-    }
-
-    private static function sortByName($a, $b)
-    {
-        return strcmp($a["name"], $b["name"]);
+        return $this->FilterOutput($output, 'years');
     }
 
     //Range should be an object with from and to as attributes
@@ -2751,6 +2751,7 @@ class Magazine extends Database
         if ($date <= $range->to && $date >= $range->from) {
             return true;
         }
+
         return false;
     }
 
@@ -2760,16 +2761,23 @@ class Magazine extends Database
         $out = array_splice($array, $from, 1);
         array_splice($array, $to, 0, $out);
     }
+
+    private static function sortByName($a, $b)
+    {
+        return strcmp($a['name'], $b['name']);
+    }
 }
 
-class Series extends Database {
+class Series extends Database
+{
+    public $bimonthRange = '';
 
-    public $bimonthRange = "";
-    public $actualCumulativeRange = "";
-    public $issue_number = "";
+    public $actualCumulativeRange = '';
 
+    public $issue_number = '';
 
-    public function __construct($date, $announcement = "", $quote = "", $message = "", $photos = []) {
+    public function __construct($date, $announcement = '', $quote = '', $message = '', $photos = [])
+    {
         $this->bimonthRange = $this->getBiMonthlyRange($date);
         $this->actualCumulativeRange = $this->getActualCumulativeRange($date);
         $this->issue_number = $this->getIssueFromDate($this->bimonthRange->from, $this->actualCumulativeRange);
@@ -2779,18 +2787,18 @@ class Series extends Database {
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
         if ($day >= 16) {
-            $output->from = date("Ym", strtotime($date)) . "01";
-            $output->to = date("Ym", strtotime($date)) . "15";
+            $output->from = date('Ym', strtotime($date)) . '01';
+            $output->to = date('Ym', strtotime($date)) . '15';
         } else {
-            $output->from = date('Ym', strtotime('last day of last month', strtotime($date))) . "16";
+            $output->from = date('Ym', strtotime('last day of last month', strtotime($date))) . '16';
             $output->to = date('Ymd', strtotime('last day of last month', strtotime($date)));
         }
-        
+
         return $output;
     }
 
@@ -2798,44 +2806,47 @@ class Series extends Database {
     {
         $output = new stdClass();
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
+
         if ($month > 6) {
-            if ($day < 16 && $month == "07") {
-                $output->from = $year . "0101";
-                $output->to = $year . "0630";
+            if ($day < 16 && '07' == $month) {
+                $output->from = $year . '0101';
+                $output->to = $year . '0630';
             } else {
-                $output->from = $year . "0701";
-                $output->to = $year . "1231";
+                $output->from = $year . '0701';
+                $output->to = $year . '1231';
             }
         } else {
-            if ($day < 16 && $month == "01") {
-                $year -= 1;
-                $output->from = $year . "0701";
-                $output->to = $year . "1231";
+            if ($day < 16 && '01' == $month) {
+                --$year;
+                $output->from = $year . '0701';
+                $output->to = $year . '1231';
             } else {
-                $output->from = $year . "0101";
-                $output->to = $year . "0630";
+                $output->from = $year . '0101';
+                $output->to = $year . '0630';
             }
         }
+
         return $output;
     }
 
     public function getIssueFromDate($date, $cumulativeRange)
     {
-        $first_volume_year = "2017";
+        $first_volume_year = '2017';
 
-        $year = date("Y", strtotime($date));
-        $month = date("m", strtotime($date));
-        $day = date("d", strtotime($date));
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
         $volume = ($year - $first_volume_year) * 2;
+
         if ($month > 6) {
             $volume++;
             $month -= 6;
         }
-        
+
         $issue = ($month - 1) * 2;
 
         if ($day >= 16) {
@@ -2844,6 +2855,6 @@ class Series extends Database {
             $issue++;
         }
 
-        return "Volume $volume: " . date("jS F", strtotime($cumulativeRange->from)) . " - " . date("jS F", strtotime($cumulativeRange->to));
+        return "Volume $volume: " . date('jS F', strtotime($cumulativeRange->from)) . ' - ' . date('jS F', strtotime($cumulativeRange->to));
     }
-} 
+}

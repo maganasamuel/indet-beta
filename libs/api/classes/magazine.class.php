@@ -21,6 +21,8 @@ if (file_exists('libs/indet_dates_helper.php')) {
     require_once '../../indet_dates_helper.php';
 }
 
+require __DIR__ . '../../../composer/vendor/autoload.php';
+
 class Magazine extends Database
 {
     public $date = '';
@@ -147,6 +149,7 @@ class Magazine extends Database
 
         //$this->tm_performances = $this->GetCumulativeTMs();
         $this->SetWinnerScore();
+
         $this->winner_score = $this->GetWinnerBiMonthlyAdvisers();
         $this->winner_score = $this->CheckRows($this->winner_score);
 
@@ -527,6 +530,7 @@ class Magazine extends Database
 
         $year = date('Y', strtotime($date));
         $month = date('m', strtotime($date));
+        $day = date('d', strtotime($date));
 
         if ($month > 6) {
             if ($day < 16 && '07' == $month) {
@@ -723,7 +727,7 @@ class Magazine extends Database
         return $this->FilterOutput($output, 'deals');
     }
 
-    public function GetWinnerBiMonthlyAdvisers()
+    public function GetWinnerBiMonthlyAdvisers($adviserId = null, $biMonthRange = null)
     {
         $output = [];
         $activeAdvisers = [];
@@ -763,7 +767,23 @@ class Magazine extends Database
 
         // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         // var_dump($advisersArrayString);die;
-        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN winner_score w ON a.id = w.adviser_id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        $query = 'SELECT
+                c.id as client_id,
+                a.name as adviser_name,
+                a.id as adviser_id,
+                s.deals as deals,
+                w.score as scores,
+                w.bimonthly_range as current_bimonthly_date
+            FROM issued_clients_tbl i
+            LEFT JOIN submission_clients s ON s.client_id = i.name
+            LEFT JOIN adviser_tbl a ON i.assigned_to = a.id
+            LEFT JOIN winner_score w ON a.id = w.adviser_id
+            LEFT JOIN clients_tbl c ON i.name = c.id
+            WHERE
+                i.assigned_to IN (' . ($adviserId ?? $advisersArrayString) . ')
+            order by
+                a.name';
+
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -787,7 +807,7 @@ class Magazine extends Database
                             }
                         }
 
-                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                        if ($this->WithinDateRange($deal['date_issued'], $biMonthRange ?? $this->bimonthRange)) {
                             $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
                         }
@@ -2372,13 +2392,191 @@ class Magazine extends Database
         return strcmp($a['score'], $b['score']);
     }
 
+    public function getFirstDealDateIssued($adviserId)
+    {
+        $query = 'SELECT
+                    c.id AS client_id,
+                    a.name AS adviser_name,
+                    a.id AS adviser_id,
+                    s.deals AS deals
+                FROM issued_clients_tbl i
+                LEFT JOIN submission_clients s ON s.client_id = i.name
+                LEFT JOIN adviser_tbl a ON i.assigned_to = a.id
+                LEFT JOIN clients_tbl c ON i.name = c.id
+                WHERE
+                    i.assigned_to IN (' . $adviserId . ')
+                ORDER BY
+                    a.name
+                ';
+
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+        $deals = [];
+
+        while ($data = $dataset->fetch_assoc()) {
+            $deals = array_merge($deals, json_decode($data['deals']));
+        }
+
+        $firstDeal = collect($deals)->filter(function ($deal) {
+            if (! isset($deal->status)) {
+                return false;
+            }
+
+            if (isset($deal->clawback_status)) {
+                if ('Cancelled' == $deal->clawback_status) {
+                    return false;
+                }
+            }
+
+            if ('Issued' == $deal->status) {
+                return true;
+            }
+
+            return false;
+        })->sortBy('date_issued', SORT_NUMERIC)
+            ->first();
+
+        return $this->getNextRunDate($firstDeal->date_issued);
+    }
+
+    public function getNextRunDate($date)
+    {
+        $day = (int) date('d', strtotime($date));
+
+        if ($day > 15) {
+            $newDate = date('Ym01', strtotime($date . ' + 1 month'));
+        } else {
+            $newDate = date('Ym16', strtotime($date));
+        }
+
+        return $newDate;
+    }
+
     public function SetWinnerScore()
     {
-        $datetoday = date('Ymd');
-        $bimonthlyrange = $this->getCurrentBiMonthlyRange($datetoday);
+        $query = 'DELETE FROM winner_score';
+        $statement = $this->prepare($query);
+        $this->execute($statement);
+
         $bimonthly_range = date('Y-m-d', strtotime($this->bimonthRange->from));
+
         $winner_adviser = $this->GetWinnerBiMonthlyAdvisers();
-        // var_dump($winner_adviser);die;
+
+        $levels = [
+            ['level' => 'Titanium', 'deal' => 5, 'api' => 7500],
+            ['level' => 'Platinum', 'deal' => 4, 'api' => 6000],
+            ['level' => 'Gold', 'deal' => 3, 'api' => 4500],
+            ['level' => 'Silver', 'deal' => 2, 'api' => 2000],
+        ];
+
+        $winner_adviser = collect($winner_adviser)->slice(0, 5);
+
+        foreach ($winner_adviser as $adviser) {
+            $counterDate = $this->getFirstDealDateIssued($adviser['id']);
+
+            $runs = [];
+
+            $silver = 0;
+            $gold = 0;
+            $platinum = 0;
+            $titanium = 0;
+
+            while ($counterDate <= $this->date) {
+                $biMonthRange = $this->getBiMonthlyRange($counterDate);
+
+                $run = $this->GetWinnerBiMonthlyAdvisers($adviser['id'], $biMonthRange);
+
+                $run = $run[0] ?? [];
+
+                if (count($run)) {
+                    foreach ($levels as $level) {
+                        if ((int) $run['deals'] >= $level['deal'] && (float) $run['issued_api'] > $level['api']) {
+                            $run['level'] = $level['level'];
+
+                            break;
+                        } else {
+                            $run['level'] = 'none';
+                        }
+                    }
+                } else {
+                    $run['level'] = 'none';
+                    $run['string'] = 0;
+                }
+
+                if ('Titanium' == $run['level']) {
+                    $silver++;
+                    $gold++;
+                    $platinum++;
+                    $titanium++;
+                } elseif ('Platinum' == $run['level']) {
+                    $silver++;
+                    $gold++;
+                    $platinum++;
+                    $titanium = 0;
+                } elseif ('Gold' == $run['level']) {
+                    $silver++;
+                    $gold++;
+                    $platinum = 0;
+                    $titanium = 0;
+                } elseif ('Silver' == $run['level']) {
+                    $silver++;
+                    $gold = 0;
+                    $platinum = 0;
+                    $titanium = 0;
+                } else {
+                    $silver = 0;
+                    $gold = 0;
+                    $platinum = 0;
+                    $titanium = 0;
+                }
+
+                if ($titanium > 0) {
+                    $run['string'] = $titanium;
+                } elseif ($platinum > 0) {
+                    $run['string'] = $platinum;
+                } elseif ($gold > 0) {
+                    $run['string'] = $gold;
+                } elseif ($silver > 0) {
+                    $run['string'] = $silver;
+                } else {
+                    $run['string'] = 0;
+                }
+
+                $runs[] = $run;
+
+                $counterDate = $this->getNextRunDate($counterDate);
+            }
+
+            if ($titanium > 0) {
+                $platinum = 0;
+                $gold = 0;
+                $silver = 0;
+            } elseif ($platinum > 0) {
+                $gold = 0;
+                $silver = 0;
+            } elseif ($gold > 0) {
+                $silver = 0;
+            }
+
+            $values = [
+                'silver' => $silver,
+                'gold' => $gold,
+                'platinum' => $platinum,
+                'titanium' => $titanium,
+                'score' => $run['level'],
+                'adviser_id' => $adviser['id'],
+                'date_updated' => date('Y-m-d H:i:s', strtotime('now')),
+                'bimonthly_range' => $bimonthly_range,
+            ];
+
+            $query = 'INSERT INTO winner_score (' . implode(', ', array_keys($values))
+                . ') values ("' . implode('", "', array_values($values)) . '")';
+            $statement = $this->prepare($query);
+            $this->execute($statement);
+        }
+
+        // pending... REMOVE CODES BELOW RETURN;
+        return;
         $advisers = [];
 
         $dataset = $this->adviserController->getActiveAdvisers();
@@ -2446,13 +2644,9 @@ class Magazine extends Database
             }
         }
 
-        // echo json_encode($adviser_id); exit();
-
-        // var_dump($this->bimonthRange->from);
         foreach ($winner_adviser as $adviser) {
             if ('Others' != $adviser['name']) {
                 if (in_array($adviser['id'], $adviser_id)) {
-                    // pending... modify
                     if ($adviser['current_bimonthly_date'] <= $this->bimonthRange->from) {
                         if ($adviser['current_bimonthly_date'] != $bimonthly_range) {
                             if ($adviser['deals'] >= 5 && $adviser['issued_api'] >= 7500) {

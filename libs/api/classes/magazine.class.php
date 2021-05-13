@@ -1452,7 +1452,7 @@ class Magazine extends Database
             $output[$row['id']]['issued_api'] = 0;
             $output[$row['id']]['deals'] = 0;
         }
-        
+
         $bdmsArrayString = implode(',', $activeBDMs);
 
         $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
@@ -1935,7 +1935,7 @@ class Magazine extends Database
         }
 
         $highest_adviser_record = (float) $output[1]['record'];
-        
+
         //Get Current Bi-Monthly Data
         $dataset = $this->bi_monthly_advisers;
 
@@ -1954,7 +1954,6 @@ class Magazine extends Database
             }
         }
         //Add a check here that if the highest record is null, it should skip the whole process.
-
 
         //Get Current Bi-Monthly Data
         $collection = $this->bi_monthly_advisers;
@@ -2272,9 +2271,9 @@ class Magazine extends Database
         $statement = $this->prepare($query);
         $this->execute($statement);
 
-        /* $query = ' ALTER TABLE winner_score AUTO_INCREMENT = 1;';
+        $query = ' ALTER TABLE winner_score AUTO_INCREMENT = 1;';
         $statement = $this->prepare($query);
-        $this->execute($statement); */
+        $this->execute($statement);
 
         $bimonthly_range = date('Y-m-d', strtotime($this->bimonthRange->from));
 
@@ -2364,6 +2363,8 @@ class Magazine extends Database
 
                 $counterDate = $this->getNextRunDate($counterDate);
             }
+
+            // echo json_encode($runs); die();
 
             if ($titanium > 0) {
                 $platinum = 0;

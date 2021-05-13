@@ -1,4 +1,8 @@
 <?php
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
     require "libs/api/classes/magazine.class.php";
 
     include("magazine_pdf.php");
@@ -69,7 +73,7 @@
 
         $magazine_data = new Magazine($date, $announcement, $quote, $message, $photos);
         $magazine_file = CreateMagazinePDF($magazine_data, $preview, $random_filename);
-        
+
         echo $magazine_file;
     }
     //Generate file only

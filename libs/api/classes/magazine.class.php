@@ -130,7 +130,6 @@ class Magazine extends Database
         $this->bi_monthly_advisers = $this->CheckRows($this->bi_monthly_advisers);
 
         $this->bi_monthly_bdms = $this->GetBiMonthlyBDMs();
-        // $this->bi_monthly_bdms = $this->GetBiMonthlyBDMs($this->bi_monthly_bdms);
 
         $this->cumulative_advisers = $this->GetCumulativeAdvisers();
         $this->cumulative_advisers = $this->CheckRows($this->cumulative_advisers);
@@ -147,7 +146,6 @@ class Magazine extends Database
         $this->bdm_performances = $this->GetCumulativeBDMs();
         $this->bdm_ks_performances = $this->GetCumulativeBDMsKS();
 
-        //$this->tm_performances = $this->GetCumulativeTMs();
         $this->SetWinnerScore();
 
         $this->winner_score = $this->GetWinnerBiMonthlyAdvisers();
@@ -163,35 +161,7 @@ class Magazine extends Database
 
         $work_anniversaries = $this->GetWorkAnniversaries();
 
-        /*Specifically include one adviser into the magazine
-            $specific_adviser = [
-                "name"        => "Sumit Monga",
-                "image"       => "92904245143e65336d848e1dbd495e20.png",
-                "role"        => "Financial Adviser",
-                "date_hired"  => "20160301",
-                "anniversary" => "1st March",
-                "years"       => 4
-            ];
-
-            if(is_array($work_anniversaries)){
-                if(count($work_anniversaries) > 0){
-                    array_unshift($work_anniversaries, $specific_adviser);
-                }
-                else{
-                    $work_anniversaries[] = $specific_adviser;
-                }
-            }
-            else {
-                $work_anniversaries = $specific_adviser;
-            }
-
-         */
-
         $this->upcoming_work_anniversaries = array_chunk($work_anniversaries, 3);
-
-        //Stress test
-        //$this->DuplicateArray($this->bi_monthly_advisers, 8);
-        //$this->DuplicateArray($this->cumulative_advisers, 8);
 
         //Announcements
         if (! empty($this->message) > 0) {
@@ -221,12 +191,6 @@ class Magazine extends Database
             $cumulative_advisers_kiwisavers = $this->PageCounter($this->cumulative_advisers_kiwisavers, 10, 24);
             $this->PushToPages('Cumulative KiwiSaver', "Page {$this->getPages($cumulative_advisers_kiwisavers)}");
         }
-
-        //BDM
-        // if (count($this->bdm_performances) > 0) {
-        //     $bdm_performances = $this->PageCounter($this->bdm_performances, 9, 24);
-        //     $this->PushToPages("BDM Cumulative Performance", "Page {$this->getPages($bdm_performances)}");
-        // }
 
         //Bi-Monthly Winner
         if (count($this->winner_score) > 0) {
@@ -284,7 +248,6 @@ class Magazine extends Database
     }
 
     //Return empty if the only rows left are others
-
     public function CheckRows($rows)
     {
         if (1 == count($rows)) {
@@ -720,7 +683,7 @@ class Magazine extends Database
 
         array_multisort($issued_apis, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -765,8 +728,6 @@ class Magazine extends Database
         //Active Advisers deal fetching
         $advisersArrayString = implode(',', $activeAdvisers);
 
-        // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
-        // var_dump($advisersArrayString);die;
         $query = 'SELECT
                 c.id as client_id,
                 a.name as adviser_name,
@@ -867,12 +828,11 @@ class Magazine extends Database
             }
         }
 
-        // $issued_apis = array_column($output, 'issued_api');
         $deals_winner = array_column($output, 'deals');
 
         array_multisort($deals_winner, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1006,7 +966,7 @@ class Magazine extends Database
 
         array_multisort($issued_apis, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1075,7 +1035,6 @@ class Magazine extends Database
             foreach ($deals as $deal) {
                 if (isset($deal['status'])) {
                     if ('Issued' == $deal['status']) {
-                        // var_dump($deal);
                         //Check if cancelled
                         if (isset($deal['clawback_status'])) {
                             if ('Cancelled' == $deal['clawback_status']) {
@@ -1150,11 +1109,8 @@ class Magazine extends Database
 
         foreach ($output as $index => $data) {
             if ($data['deals'] < 5) {
-                // var_dump($test["name"]);
                 unset($output[$index]);
             }
-            // if($index != "Others"){
-            // }
         }
 
         foreach ($output as $index => $data) {
@@ -1167,7 +1123,7 @@ class Magazine extends Database
 
         array_multisort($rba, SORT_ASC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1236,15 +1192,13 @@ class Magazine extends Database
             $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
-
-            // $output["Others"]["deals"] = $dataset->fetch_assoc()["deals"];
         }
 
         $deals = array_column($output, 'deals');
 
         array_multisort($deals, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1294,7 +1248,6 @@ class Magazine extends Database
         $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
-        //var_dump($query);
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -1315,14 +1268,13 @@ class Magazine extends Database
             $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
-            // $output["Others"]["deals"] = $dataset->fetch_assoc()["deals"];
         }
 
         $deals = array_column($output, 'deals');
 
         array_multisort($deals, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1335,8 +1287,6 @@ class Magazine extends Database
         $activeBDMs = [];
         $otherBDMs = [];
         $dataset = $this->leadGeneratorController->getActiveBDMsData($this->cumulativeRange->from, $this->cumulativeRange->to);
-        // var_dump($this->cumulativeRange->from);
-        // var_dump($this->cumulativeRange->to);die;
         $others = [];
         $others['name'] = 'Others';
         $others['issued_api'] = 0;
@@ -1354,7 +1304,6 @@ class Magazine extends Database
 
         $bdms_array = array_merge($activeBDMs, $otherBDMs);
         $bdmsArrayString = implode(',', $bdms_array);
-        // var_dump($bdmsArrayString);die;
         $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
 
         $statement = $this->prepare($query);
@@ -1446,7 +1395,7 @@ class Magazine extends Database
 
         array_multisort($issued_apis, SORT_DESC, $generated_leads, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1476,7 +1425,7 @@ class Magazine extends Database
         $deals = array_column($output, 'deals');
         array_multisort($deals, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
         $this->moveElement($output, $key, count($output) - 1);
 
         return $this->FilterOutput($output, 'deals');
@@ -1489,7 +1438,6 @@ class Magazine extends Database
         $otherBDMs = [];
 
         $dataset = $this->leadGeneratorController->getActiveBDMsData($this->bimonthRange->from, $this->bimonthRange->to);
-        // var_dump($this->bimonthRange->to);die;
         $others = [];
         $others['name'] = 'Others';
         $others['issued_api'] = 0;
@@ -1504,34 +1452,9 @@ class Magazine extends Database
             $output[$row['id']]['issued_api'] = 0;
             $output[$row['id']]['deals'] = 0;
         }
-        // while ($row = $dataset->fetch_assoc()) {
-        //     $activeBDMs[] = $row["id"];
-        //     // if($row["name"] == "Sumit Monga"){
-        //     //     $otherAdvisers[] = $row["id"];
-        //     // }else{
-        //     //     $output[$row["id"]] = $row;
-        //     //     $output[$row["id"]]["issued_api"] = 0;
-        //     //     $output[$row["id"]]["deals"] = 0;
-        //     // }
-
-        //     if($row["name"] == "Sumit Monga"){
-        //         $otherBDMs[] = $row["id"];
-        //     }
-        //     else{
-        //         $output[$row["id"]] = $row;
-        //         $output[$row["id"]]["issued_api"] = 0;
-        //         $output[$row["id"]]["deals"] = 0;
-        //         $others["generated"] = 0;
-        //         $others["cancelled"] = 0;
-        //     }
-        // }
-
-        // $bdms_array = array_merge($activeBDMs, $otherBDMs);
-        // $bdmsArrayString = implode(",", $bdms_array);
-        // var_dump($bdmsArrayString);die;
+        
         $bdmsArrayString = implode(',', $activeBDMs);
 
-        // $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($bdmsArrayString) order by l.name";
         $query = "SELECT c.id as client_id, l.name as leadgen_name, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.leadgen = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($bdmsArrayString) order by l.name";
         $statement = $this->prepare($query);
 
@@ -1602,8 +1525,6 @@ class Magazine extends Database
                             }
                         }
 
-                        //
-                        // var_dump($deal["date_issued"]);
                         if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
                             $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
@@ -1617,7 +1538,6 @@ class Magazine extends Database
             $output['Others']['issued_api'] += floatval($total_issued_api);
             $output['Others']['deals'] += floatval($total_issued_deals);
         }
-        // var_dump($output);die;
         $issued_apis = array_column($output, 'issued_api');
         $generated_leads = array_column($output, 'generated');
 
@@ -1639,8 +1559,6 @@ class Magazine extends Database
         $others['name'] = 'Others';
         $others['issued_api'] = 0;
         $others['deals'] = 0;
-        // $others["generated"] = 0;
-        // $others["cancelled"] = 0;
         $output['Others'] = $others;
 
         //Get Active
@@ -1658,11 +1576,6 @@ class Magazine extends Database
 
         //Register inactive advisers
         $dataset = $this->leadGeneratorController->getInactiveBDMsKSData($this->quarterRange->from, $this->quarterRange->to);
-
-        //Get Others
-        // while ($row = $dataset->fetch_assoc()) {
-        //     $otherBDMs[] = $row["id"];
-        // }
 
         //Active Advisers deal fetching
         $bdmsArrayString = implode(',', $activeBDMs);
@@ -1750,7 +1663,7 @@ class Magazine extends Database
 
         $issued_apis = array_column($output, 'issued_api');
         array_multisort($issued_apis, SORT_DESC, $output);
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
         $this->moveElement($output, $key, count($output) - 1);
 
         return $this->FilterOutput($output, 'deals');
@@ -1939,7 +1852,7 @@ class Magazine extends Database
 
         array_multisort($issued_apis, SORT_DESC, $generated_leads, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -1969,7 +1882,7 @@ class Magazine extends Database
         $deals = array_column($output, 'deals');
         array_multisort($deals, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
         $this->moveElement($output, $key, count($output) - 1);
 
         return $this->FilterOutput($output, 'deals');
@@ -1986,22 +1899,6 @@ class Magazine extends Database
         }
 
         return $filtered_output;
-    }
-
-    public function TieRule($collection)
-    {
-        $output = [];
-
-        $ties = [];
-
-        foreach ($collection as $item) {
-        }
-
-        //Get Ties
-    }
-
-    public function CheckRecordsToBeat()
-    {
     }
 
     public function GetRecordsToBeat()
@@ -2037,18 +1934,8 @@ class Magazine extends Database
             $output[] = $row;
         }
 
-        //Uncomment if there are BDMs again
-        $highest_bdm_record = $output[0]['record'];
-        //Get Current Bi-Monthly Data
-        // $dataset = $this->leadGeneratorController->getActiveBDMsData($this->bimonthRange->from, $this->bimonthRange->to);
-        // while ($row = $dataset->fetch_assoc()) {
-        //     if ($row["generated"] > $highest_bdm_record) {
-        //         $period = date("j", strtotime($this->bimonthRange->from)) . "-" . date("j M Y", strtotime($this->bimonthRange->to));
-        //         $this->SetNewRecord(1, $period, $row["name"], $row["image"], "BDM", "Leads Generated", "Count", $row["generated"]);
-        //     }
-        // }
-
         $highest_adviser_record = (float) $output[1]['record'];
+        
         //Get Current Bi-Monthly Data
         $dataset = $this->bi_monthly_advisers;
 
@@ -2068,7 +1955,6 @@ class Magazine extends Database
         }
         //Add a check here that if the highest record is null, it should skip the whole process.
 
-        //var_dump($highest_adviser_record);
 
         //Get Current Bi-Monthly Data
         $collection = $this->bi_monthly_advisers;
@@ -2088,9 +1974,9 @@ class Magazine extends Database
                 $highest_adviser_record = (float) $out['record'];
             }
         }
+
         //Get Current Bi-Monthly Data
         $collection = $this->bi_monthly_advisers_kiwisavers;
-        //var_dump($collection);
         $column = 'deals';
 
         foreach ($collection as $row) {
@@ -2193,11 +2079,9 @@ class Magazine extends Database
 
         //Active Advisers deal fetching
         $advisersArrayString = implode(',', $activeAdvisers);
-        // var_dump($advisersArrayString);
 
         $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN winner_score w ON a.id = w.adviser_id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
 
-        // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -2291,81 +2175,11 @@ class Magazine extends Database
             }
         }
 
-        // foreach($output as $index => $data){
-        //     if($data["scores"] == "Titanium"){
-        //         $output[$index]["scores"] = "a";
-        //     } else if ($data["scores"] == "Platinum"){
-        //         $output[$index]["scores"] = "i";
-        //     } else if ($data["scores"] =="Gold"){
-        //         $output[$index]["scores"] = "o";
-        //     } else if ($data["scores"] =="Silver"){
-        //         $output[$index]["scores"] = "v";
-        //     }
-        // }
-
-        // usort($output, array($this, "cmp"));
-
-        // foreach($output as $index => $data){
-        //     if($data["scores"] == "a"){
-        //         $output[$index]["scores"] = "Titanium";
-        //     } else if ($data["scores"] == "i"){
-        //         $output[$index]["scores"] = "Platinum";
-        //     } else if ($data["scores"] =="o"){
-        //         $output[$index]["scores"] = "Gold";
-        //     } else if ($data["scores"] =="v"){
-        //         $output[$index]["scores"] = "Silver";
-        //     }
-        // }
-
-        // var_dump($output);
-        // $issued_apis = array_column($output, 'issued_api');
-        // $newScores = [];
-        // $scores = array_filter(array_column($output, 'scores'), 'strlen');
-        // $titanium = array();
-        // $platinum = array();
-        // $gold = array();
-        // $silver = array();
-
-        // $newArray = array();
-        // foreach($scores as $index => $score){
-        //     if($score == "Titanium"){
-        //         array_push($titanium, $score);
-        //     } else if($score == "Platinum"){
-        //         array_push($platinum, $score);
-        //     } else if($score == "Gold"){
-        //         array_push($gold, $score);
-        //     } else if($score == "Silver"){
-        //         array_push($silver, $score);
-        //     }
-        // }
-
-        // foreach($titanium as $t){
-        //     $newArray[] = $t;
-        // }
-
-        // foreach($platinum as $p){
-        //     $newArray[] = $p;
-        // }
-
-        // foreach($gold as $g){
-        //     $newArray[] = $g;
-        // }
-
-        // foreach($silver as $s){
-        //     $newArray[] = $s;
-        // }
-
-        // foreach($output as $index => $data){
-        //     if($data["deals"] < 2 || $data["issued_api"] < 2000){
-        //         unset($output[$index]);
-        //     }
-        // }
-
         $deals_winner = array_column($output, 'deals');
         // $deals_winner = array_column($output, 'titanium');
         array_multisort($deals_winner, SORT_DESC, $output);
 
-        $key = array_search('Others', array_column($output, 'name')); // $key = 2;
+        $key = array_search('Others', array_column($output, 'name'));
 
         $this->moveElement($output, $key, count($output) - 1);
 
@@ -2454,9 +2268,13 @@ class Magazine extends Database
 
     public function SetWinnerScore()
     {
-        $query = 'DELETE FROM winner_score';
+        $query = 'DELETE FROM winner_score;';
         $statement = $this->prepare($query);
         $this->execute($statement);
+
+        /* $query = ' ALTER TABLE winner_score AUTO_INCREMENT = 1;';
+        $statement = $this->prepare($query);
+        $this->execute($statement); */
 
         $bimonthly_range = date('Y-m-d', strtotime($this->bimonthRange->from));
 
@@ -2586,7 +2404,6 @@ class Magazine extends Database
         }
 
         $query = 'SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id';
-        // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         while ($test = $dataset->fetch_assoc()) {
@@ -2635,7 +2452,6 @@ class Magazine extends Database
             }
         }
 
-        // var_dump($bi_monthly_adv);
         foreach ($all_adviser as $adv) {
             if (! in_array($adv, $bi_monthly_adv)) {
                 $query = "DELETE FROM winner_score WHERE adviser_id = {$adv}";
@@ -2749,33 +2565,20 @@ class Magazine extends Database
                 }
             }
         }
-        // var_dump($advisers);die;
-        // foreach($advisers as $index => $adv){
-        //     if($adv["score"] == "Titanium"){
-        //         $sort = $this->array_orderby($advisers, 'titanium', SORT_DESC);
-        //     } else if($adv["score"] == "Platinum"){
-        //         $sort = $this->array_orderby($advisers, 'platinum', SORT_DESC);
-        //     }
-        // }
 
-        // $sort = $this->array_orderby($advisers, 'silver', SORT_DESC);
-        // $sort = $this->array_orderby($advisers, 'gold', SORT_DESC);
-
-        // die;
         return $advisers;
     }
 
     public function GetStringsWinnerScore()
     {
         $query = 'SELECT * FROM `winner_score` LEFT JOIN adviser_tbl ON adviser_tbl.id = winner_score.adviser_id';
-        // $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, w.score as scores, w.bimonthly_range as current_bimonthly_date, w.silver as silver, w.gold as gold, w.platinum as platinum, w.titanium as titanium FROM winner_score w LEFT JOIN adviser_tbl a ON a.id = w.adviser_id LEFT JOIN issued_clients_tbl i ON i.assigned_to = a.id LEFT JOIN submission_clients s on s.client_id = i.name LEFT JOIN clients_tbl c on i.name = c.id WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         while ($test = $dataset->fetch_assoc()) {
             $advisers[] = $test;
         }
 
-        return $advisers;
+        return $advisers ?? [];
     }
 
     public function array_orderby()

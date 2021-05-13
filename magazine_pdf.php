@@ -26,7 +26,6 @@ class PDF extends PDF_MC_Table
     public $adviser = '';
 
     //Transparency
-
     protected $extgstates = [];
 
     public function AddPage($orientation = '', $size = '', $rotation = 0)
@@ -421,14 +420,6 @@ class PDF extends PDF_MC_Table
         $this->Cell(50, 8, $advisers[0]['name'], '', '1', 'L');
         $this->Ln(5);
 
-        //Policies Issued
-        // $this->SetFont('Calibri', 'B', 20);
-        // $this->Cell(92, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, "Team:", "", "1", "L");
-        // $this->SetFont('Calibri', '', 20);
-        // $this->Cell(100, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, $advisers[0]["team"], "", "1", "L");
-        // $this->Ln(5);
         //Total API
         $this->SetFont('Calibri', 'B', 20);
         $this->Cell(92, 8, '', '', '0', 'L');
@@ -469,11 +460,6 @@ class PDF extends PDF_MC_Table
         $this->SetFont('Calibri', '', 15);
         $this->SetXY(10, $this->GetPageHeight() - 25);
         $this->Write(0, 'Note: table excludes advisers with less than 5 policies issued in the period.');
-
-        // $this->SetFont('Arial', 'B', 15);
-        // $this->Cell(85, 10, "Total", 1, "0", "L", true);
-        // $this->Cell(50, 10, $total, 1, "0", "C", true);
-        // $this->Cell(60, 10, "$" . number_format($total_api, 2), 1, "1", "C", true);
     }
 
     public function BiMonthlyKiwiSaversPage($advisers)
@@ -678,14 +664,7 @@ class PDF extends PDF_MC_Table
         $this->Cell(100, 8, '', '', '0', 'L');
         $this->Cell(50, 8, $bdms[0]['name'], '', '1', 'L');
         $this->Ln(5);
-        //Policies Issued
-        // $this->SetFont('Calibri', 'B', 20);
-        // $this->Cell(92, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, "Policies Issued:", "", "1", "L");
-        // $this->SetFont('Calibri', '', 20);
-        // $this->Cell(100, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, $bdms[0]["deals"], "", "1", "L");
-        // $this->Ln(5);
+
         //Total API
         $this->SetFont('Calibri', 'B', 20);
         $this->Cell(100, 8, '', '', '0', 'L');
@@ -711,7 +690,7 @@ class PDF extends PDF_MC_Table
 
         $total = 0;
         $total_api = 0;
-        // var_dump($bdms);
+
         foreach ($bdms as $bdm) {
             if ($bdm['deals'] > 0) {
                 $total += $bdm['deals'];
@@ -737,7 +716,6 @@ class PDF extends PDF_MC_Table
 
         $this->SetFont('Arial', 'B', 15);
         $this->Cell(80, 10, 'Total', 1, '0', 'L', true);
-        // $this->Cell(50, 10, $total, 1, "0", "C", true);
         $this->Cell(110, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
@@ -776,14 +754,7 @@ class PDF extends PDF_MC_Table
         $this->Cell(100, 8, '', '', '0', 'L');
         $this->Cell(50, 8, $bdms[0]['name'], '', '1', 'L');
         $this->Ln(5);
-        //Policies Issued
-        // $this->SetFont('Calibri', 'B', 20);
-        // $this->Cell(92, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, "Policies Issued:", "", "1", "L");
-        // $this->SetFont('Calibri', '', 20);
-        // $this->Cell(100, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, $bdms[0]["deals"], "", "1", "L");
-        // $this->Ln(5);
+
         //Total API
         $this->SetFont('Calibri', 'B', 20);
         $this->Cell(100, 8, '', '', '0', 'L');
@@ -809,7 +780,7 @@ class PDF extends PDF_MC_Table
 
         $total = 0;
         $total_api = 0;
-        // var_dump($bdms);
+
         foreach ($bdms as $bdm) {
             if ($bdm['deals'] > 0) {
                 $total += $bdm['deals'];
@@ -835,7 +806,6 @@ class PDF extends PDF_MC_Table
 
         $this->SetFont('Arial', 'B', 15);
         $this->Cell(80, 10, 'Total', 1, '0', 'L', true);
-        // $this->Cell(50, 10, $total, 1, "0", "C", true);
         $this->Cell(110, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
@@ -894,44 +864,14 @@ class PDF extends PDF_MC_Table
         $this->Cell(50, 8, '$' . number_format($bdms[0]['issued_api'], 2), '', '1', 'L');
         $this->Ln(5);
 
-        //Total API
-        // $this->SetFont('Calibri', 'B', 20);
-        // $this->Cell(92, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, "Total Leads:", "", "1", "L");
-        // $this->SetFont('Calibri', '', 20);
-        // $this->Cell(100, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, $bdms[0]["generated"] - $bdms[0]["cancelled"], "", "1", "L");
-
         $this->Header1($this->GetY() + 20, 'Marketer Cumulative Performance', 20);
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(120);
         $this->SetFont('Calibri', 'B', 15);
-        // $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-
         $this->SetDrawColor(4, 129, 185);
-
-        // $this->Cell(100, 20, "", "TLR", "0", "C", true);
-        // // $this->Cell(30, 7, "Total Leads", "TLR", "0", "C", true);
-        // // $this->Cell(30, 7, "% of ", "TLR", "0", "C", true);
-        // $this->Cell(95, 7, "Issued API from", "TLR", "1", "C", true);
-
-        // $this->Cell(100, 7, "", "BLR", "0", "C", true);
-        // // $this->Cell(30, 7, "(Gen - Canx)", "BLR", "0", "C", true);
-        // // $this->Cell(30, 7, "Canx/Gen", "BLR", "0", "C", true);
-        // $this->Cell(95, 7, "Leads Generated", "BLR", "1", "C", true);
-
-        // $this->SetY(140);
-        // $this->Cell(100, 14, "Name", "", "0", "C", false);
-        // // $this->Cell(30, 14, "", "TLR", "0", "C", false);
-        // // $this->Cell(30, 14, "", "TLR", "0", "C", false);
-        // $this->Cell(95, 14, "", "", "1", "C", false);
-        /*
-            $this->SetFont('Arial', '', 15);
-            $this->SetWidths(array());
-         */
 
         $total_generated = 0;
         $total_cancelled = 0;
@@ -948,15 +888,10 @@ class PDF extends PDF_MC_Table
         foreach ($bdms as $bdm) {
             if ($bdm['generated'] > 0) {
                 if ($bdm['issued_api'] > 0 && 'Others' != $bdm['name']) {
-                    //var_dump($bdm);
-                    // $this->Cell(100, 10, $bdm["name"], 1, "0", "L", true);
-                    // $this->Cell(30, 10, ($bdm["generated"] - $bdm["cancelled"]), 1, "0", "C", true);
-
                     $total_generated += $bdm['generated'];
                     $total_cancelled += $bdm['cancelled'];
                     $total_issued += $bdm['issued_api'];
 
-                    // $this->Ln(20);
                     $this->SetFillColor($color[0], $color[1], $color[2]);
                     $this->RoundedRect($x, $this->GetY(), $width, 40, 5, '24', 'DF');
 
@@ -974,17 +909,10 @@ class PDF extends PDF_MC_Table
                         $this->Image($this->default_image, $x + 5, $this->GetY() + 5, 30, 30);
                     }
 
-                    // var_dump($color);die;
                     $color[0] += 18;
                     $color[1] += 11;
                     $color[2] += 7;
 
-                    // $r = $r + 18;
-                    // $g = $g + 11;
-                    // $b = $b + 7;
-                    // $this->SetDrawColor(0, 0, 0);
-
-                    // $this->Rect($this->GetX() + 70, $this->GetY() + 15, 100, 45, "DF");
                     $this->SetTextColor(0, 0, 0);
                     $this->SetX($this->GetX());
                     $this->SetY($this->GetY() + 10);
@@ -1006,37 +934,11 @@ class PDF extends PDF_MC_Table
                     $width -= 10;
                     $x += 10;
                     $cellX += 10;
-                    //Canx Percentage
-            // if ($bdm["generated"] != 0 && $bdm["cancelled"] != 0) {
-            //     $this->Cell(30, 10, number_format(($bdm["cancelled"] / $bdm["generated"]) * 100, 2) . "%", 1, "0", "C", true);
-            // } elseif ($bdm["generated"] == 0 && $bdm["cancelled"] != 0) {
-            //     $this->Cell(30, 10, number_format(100, 2) . "%", 1, "0", "C", true);
-            // } elseif ($bdm["generated"] != 0 && $bdm["cancelled"] == 0) {
-            //     $this->Cell(30, 10, number_format(0, 2) . "%", 1, "0", "C", true);
-            // } else {
-            //     $this->Cell(30, 10, number_format(0, 2) . "%", 1, "0", "C", true);
-            // }
-
-                        // $this->Cell(95, 10, "$" . number_format($bdm["issued_api"], 2), 1, "1", "C", true);
                 }
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        // $this->Cell(100, 10, "Total", 1, "0", "L", true);
-        // $this->Cell(30, 10, $total_generated -$total_cancelled, 1, "0", "C", true);
-        //   //Canx Percentage
-        // if ($total_generated != 0 && $total_generated != 0) {
-        //     $this->Cell(30, 10, number_format(($total_cancelled / $total_generated) * 100, 2) . "%", 1, "0", "C", true);
-        // } elseif ($total_generated == 0 && $total_cancelled != 0) {
-        //     $this->Cell(30, 10, number_format(100, 2) . "%", 1, "0", "C", true);
-        // } elseif ($total_generated != 0 && $total_cancelled == 0) {
-        //     $this->Cell(30, 10, number_format(0, 2) . "%", 1, "0", "C", true);
-        // } else {
-        //     $this->Cell(30, 10, number_format(0, 2) . "%", 1, "0", "C", true);
-        // }
-
-            // $this->Cell(95, 10, "$" . number_format($total_issued, 2), 1, "1", "C", true);
     }
 
     public function BDMKSPage($bdms, $quarterTitle)
@@ -1099,18 +1001,12 @@ class PDF extends PDF_MC_Table
         $this->Cell(130, 10, 'Name', '1', '0', 'C', true);
         $this->Cell(65, 10, 'Total Deals', '1', '1', 'C', true);
 
-        /*
-            $this->SetFont('Arial', '', 15);
-            $this->SetWidths(array());
-         */
-
         $total_deals = 0;
 
         $this->SetFont('Arial', '', 15);
 
         foreach ($bdms as $bdm) {
             if ($bdm['deals'] > 0) {
-                var_dump($bdm);
                 $this->Cell(130, 10, $bdm['name'], 1, '0', 'L', true);
 
                 $total_deals += $bdm['deals'];
@@ -1210,10 +1106,6 @@ class PDF extends PDF_MC_Table
         $this->Cell(30, 14, '', 'TLR', '0', 'C', false);
         $this->Cell(30, 14, '', 'TLR', '0', 'C', false);
         $this->Cell(45, 14, '', '', '1', 'C', false);
-        /*
-            $this->SetFont('Arial', '', 15);
-            $this->SetWidths(array());
-         */
 
         $total_submissions = 0;
         $total_kiwisavers = 0;
@@ -1225,7 +1117,6 @@ class PDF extends PDF_MC_Table
 
         foreach ($tms as $tm) {
             if ($tm['generated'] > 0) {
-                //var_dump($tm);
                 $this->Cell(60, 10, $tm['name'], 1, '0', 'L', true);
 
                 $total_submissions += $tm['submissions'];
@@ -1311,18 +1202,12 @@ class PDF extends PDF_MC_Table
         $this->Cell(130, 10, 'Name', '1', '0', 'C', true);
         $this->Cell(65, 10, 'Total Deals', '1', '1', 'C', true);
 
-        /*
-            $this->SetFont('Arial', '', 15);
-            $this->SetWidths(array());
-         */
-
         $total_deals = 0;
 
         $this->SetFont('Arial', '', 15);
 
         foreach ($tms as $tm) {
             if ($tm['deals'] > 0) {
-                //var_dump($tm);
                 $this->Cell(130, 10, $tm['name'], 1, '0', 'L', true);
 
                 $total_deals += $tm['deals'];
@@ -1720,9 +1605,6 @@ class PDF extends PDF_MC_Table
         $this->Rect(11, $this->GetY() + 2, 194, 220, 'DF');
         $this->Ln(5);
         $this->SetX(11);
-
-        //$this->Cell(194, 7, $announcements[0], 0, 1, "C");
-        //var_dump($announcement);
         $this->MultiCell(194, 7, $announcement, 0, 'C', true, 15);
     }
 
@@ -1732,7 +1614,6 @@ class PDF extends PDF_MC_Table
         $this->AddPage();
 
         $this->SetFont('Arial', '', 30);
-        //$this->FlexibleHeader1(41, 30, 164, 15, "From the Desk of Sumit Monga");
         $this->Image('images/EliteInsure Horizonal Logo.png', 10, 4, 110);
         $this->Cell(92, 17.5, '', 0, 0);
         $this->Cell(75, 17.5, '', 0, 1, 'L');
@@ -1745,21 +1626,14 @@ class PDF extends PDF_MC_Table
         $this->SetFont('Calibri', 'B', 30);
         $this->SetY(25);
         $this->Cell(164, 15, 'From the Desk of Sumit Monga', 0, 1, 'L');
-        /*
-        $this->SetFillColor(255,255,255);
-        $this->SetDrawColor(255,255,255);
-        $this->Rect(11,40, 194, 200, "DF");
-         */
         $this->SetFillColor(255, 255, 255);
         $this->SetDrawColor(255, 255, 255);
         $this->Rect(11, 40, 194, 225, 'DF');
         $this->SetFont('Arial', 'B', 10);
-        $announcements = explode("\n", $message);
-        //$this->Cell(194, 7, $announcements[0], 0, 1, "C");
-
         $this->SetFillColor(15, 68, 99);
         $this->SetDrawColor(15, 68, 99);
-        $this->Rect(152, 9, 59, 59, 'DF');// restore full opacity
+        // restore full opacity
+        $this->Rect(152, 9, 59, 59, 'DF');
         $this->Image('images/Sir Sumit.png', 153, 10, 57);
         $this->SetY(50);
         $this->SetX(16);
@@ -1859,9 +1733,6 @@ class PDF extends PDF_MC_Table
 
     public function Strings($advisers)
     {
-
-        // echo json_encode($advisers); die();
-
         $sorted_advisers = [];
         $t_array = [];
         $p_array = [];
@@ -1946,7 +1817,7 @@ class PDF extends PDF_MC_Table
         $this->SetY(15);
 
         $score = $sorted_advisers[0]['score'];
-        // var_dump($advisers);die;
+
         switch ($score) {
             case 'Titanium':
                 $this->SetDrawColor(28, 135, 189);
@@ -1955,13 +1826,11 @@ class PDF extends PDF_MC_Table
                 break;
             case 'Platinum':
                 $this->SetDrawColor(207, 21, 21);
-                // $this->setFillColor(229, 228, 226);
                 $this->setFillColor(212, 91, 91);
 
                 break;
             case 'Gold':
                 $this->SetDrawColor(214, 181, 0);
-                // $this->setFillColor(255,215,0);
                 $this->setFillColor(255, 239, 148);
 
                 break;
@@ -2172,15 +2041,6 @@ class PDF extends PDF_MC_Table
         } else {
         }
 
-        // $this->Ln(5);
-        // //Total API
-        // $this->SetFont('Calibri', 'B', 20);
-        // $this->Cell(92, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, "Strings:", "", "1", "L");
-        // $this->SetFont('Calibri', '', 20);
-        // $this->Cell(100, 8, "", "", "0", "L");
-        // $this->Cell(50, 8, "$" . number_format($advisers[0]["issued_api"], 2), "", "1", "L");
-
         //Tables
         $this->Header1(125, 'Bi-Monthly Winner Scores');
 
@@ -2190,11 +2050,8 @@ class PDF extends PDF_MC_Table
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        // $this->Cell(15, 15, "", 1, "0", "C", true);
         $this->Cell(110, 15, 'Adviser', 1, '0', 'C', true);
         $this->Cell(85, 15, 'Score', 1, '1', 'C', true);
-        // $this->Cell(55, 10, "Issued API", 1, "1", "C", true);
-
         $this->SetFont('Arial', '', 15);
 
         $total = 0;
@@ -2222,7 +2079,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."titanium.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->SetFillColor(102, 163, 194);
                             $this->Cell(85, 15, 'Titanium', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2240,7 +2096,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."platinum.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->setFillColor(212, 91, 91);
                             $this->Cell(85, 15, 'Platinum', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2258,7 +2113,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."gold.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->setFillColor(255, 239, 148);
                             $this->Cell(85, 15, 'Gold', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2276,7 +2130,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."silver.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->setFillColor(192, 192, 192);
                             $this->Cell(85, 15, 'Silver', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2284,14 +2137,10 @@ class PDF extends PDF_MC_Table
                             continue;
                         }
                     }
-                    // $this->Cell(55, 10, "$" . number_format($adviser["issued_api"], 2), 1, "1", "C", true);
                 }
             } elseif ($adviser['deals'] >= 2 && $adviser['issued_api'] >= 2000) {
                 $this->AddPage();
                 $this->SetFont('Arial', '', 7);
-                // $this->Cell(90, 10, "Total", 1, "0", "L", true);
-                // $this->Cell(50, 10, $total, 1, "0", "C", true);
-                // $this->Cell(55, 10, "$" . number_format($total_api, 2), 1, "1", "C", true);
                 $this->SetXY(10, $this->GetPageHeight() - 37);
                 $this->Write(0, 'CRITERIA: ');
                 $this->Ln(3.3);
@@ -2325,7 +2174,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."titanium.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->SetFillColor(102, 163, 194);
                             $this->Cell(85, 15, 'Titanium', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2343,7 +2191,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."platinum.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->setFillColor(212, 91, 91);
                             $this->Cell(85, 15, 'Platinum', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2361,7 +2208,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."gold.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->setFillColor(255, 239, 148);
                             $this->Cell(85, 15, 'Gold', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2379,7 +2225,6 @@ class PDF extends PDF_MC_Table
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
-                            // $this->Cell(15, 15, $this->Image($this->uploads_folder."silver.png", $this->GetX(), $this->GetY(), 15), 0, "0", "L", false);
                             $this->setFillColor(192, 192, 192);
                             $this->Cell(85, 15, 'Silver', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2387,14 +2232,10 @@ class PDF extends PDF_MC_Table
                             continue;
                         }
                     }
-                    // $this->Cell(55, 10, "$" . number_format($adviser["issued_api"], 2), 1, "1", "C", true);
                 }
             }
         }
         $this->SetFont('Arial', '', 7);
-        // $this->Cell(90, 10, "Total", 1, "0", "L", true);
-        // $this->Cell(50, 10, $total, 1, "0", "C", true);
-        // $this->Cell(55, 10, "$" . number_format($total_api, 2), 1, "1", "C", true);
         $this->SetXY(10, $this->GetPageHeight() - 37);
         $this->Write(0, 'CRITERIA: ');
         $this->Ln(3.3);
@@ -2409,10 +2250,6 @@ class PDF extends PDF_MC_Table
         $this->Write(0, 'd. 5 policies and over $7500 APIfor Titanium ');
     }
 
-    // alpha: real value from 0 (transparent) to 1 (opaque)
-    // bm:    blend mode, one of the following:
-    //          Normal, Multiply, Screen, Overlay, Darken, Lighten, ColorDodge, ColorBurn,
-    //          HardLight, SoftLight, Difference, Exclusion, Hue, Saturation, Color, Luminosity
     public function SetAlpha($alpha, $bm = 'Normal')
     {
         // set alpha for stroking (CA) and non-stroking (ca) operations
@@ -2502,7 +2339,6 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $white = [255, 255, 255];
     $gray = [220, 220, 220];
 
-    //$client->notes = str_replace("\r\n", "<br>", $client->notes);
     $pdf = new PDF('P', 'mm', 'Letter');
     $pdf->reference_no = $magazine_data->issue_number;
     $pdf->table_of_contents = $magazine_data->pages;
@@ -2540,7 +2376,6 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $darkblue = [50, 91, 168];
     $pdf->SetY(78);
     $pdf->SetX(15);
-    // $pdf->SetFont('Arial', 'I', 12);
 
     $sorted_advisers = [];
     $t_array = [];
@@ -2617,10 +2452,8 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     if (count($magazine_data->all_winner_score) > 0) {
         if ('Others' != $magazine_data->all_winner_score[0]['name']) {
             $pdf->SetDrawColor(50, 143, 168);
-            // $pdf->LinearGradient($pdf->GetX(), $pdf->GetY() - 2, 80, 60, $blue, $darkblue, $coords);
             $pdf->SetLineWidth(1);
             $pdf->RoundedRect($pdf->GetX() - 3, $pdf->GetY() - 2, 80, 62, 5, '1234', 'DF');
-            // $pdf->LinearGradient(81, 11, 120, 254, $white, $gray, $coords);
             $pdf->SetFont('Arial', 'I', 15);
             $pdf->Cell(8, 3, $pdf->MultiCell(78, 10, '"Everything good happens to a stringwriter."', 0, 'L', false, 15), '0', '1', 'L');
             $pdf->Cell(5, 3, '', '0', '1', 'L');
@@ -2655,10 +2488,8 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         $pdf->SetY(80);
         $pdf->Cell(90, 3, '', '0', 'L');
         $pdf->Cell(100, 3, $pdf->MultiCell(90, 5, $magazine_data->quote, 0, 'C', false, 10), '0', 'L');
-        // $pdf->MultiCell(60, 7, $magazine_data->quote, 0, 'C', false, 15);
     }
 
-    // var_dump(strlen($magazine_data->quote));die;
     $pdf->SetY(136);
     $pdf->SetFont('Calibri', 'U', 16);
 
@@ -2671,41 +2502,14 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         $pdf->Cell(77, 8, $content['title'], '', '0', 'L');
         $pdf->Cell(115, 8, $content['page_start'], '', '1', 'L');
     }
-    // if(strlen($magazine_data->quote) > 100){
-    //     $pdf->Text(100, 140, "Contents");
-    //     $pdf->SetX(5);
-    //     $pdf->SetY(150);
-    //     $pdf->SetFont('Calibri', '', 16);
-
-    //     foreach ($magazine_data->pages as $content) {
-    //         $pdf->Cell(90, 8, "", "", "0");
-    //         $pdf->Cell(77, 8, $content["title"], "", "0", "L");
-    //         $pdf->Cell(115, 8,  $content["page_start"], "", "1", "L");
-    //     }
-    // } else {
-    //     $pdf->Text(100, 105, "Contents");
-
-    //     //var_dump($magazine_data);
-
-    //     $pdf->SetX(5);
-    //     $pdf->SetY(110);
-    //     $pdf->SetFont('Calibri', '', 16);
-    //     foreach ($magazine_data->pages as $content) {
-    //         $pdf->Cell(90, 8, "", "", "0");
-    //         $pdf->Cell(77, 8, $content["title"], "", "0", "L");
-    //         $pdf->Cell(115, 8,  $content["page_start"], "", "1", "L");
-    //     }
-    // }
 
     //Featured Adviser
-
     $featured_adviser = (count($magazine_data->bi_monthly_advisers) > 0) ? $magazine_data->bi_monthly_advisers[0] : $magazine_data->cumulative_advisers[0];
     $featured_title = (count($magazine_data->bi_monthly_advisers) > 0) ? 'Top Adviser of the Period ' . date('j', strtotime($magazine_data->bimonthRange->from)) . '-' . date('j F Y', strtotime($magazine_data->bimonthRange->to)) : 'Top Adviser of the Period ' . date('j M', strtotime($magazine_data->cumulativeRange->from)) . '-' . date('j M Y', strtotime($magazine_data->cumulativeRange->to));
     $pdf->SetX(0);
     $pdf->SetX(190);
-    //Production
-    //    $pdf->Image("uploads/". $magazine_data->bi_monthly_advisers[0]["image"], 15, 140, 75);
 
+    //Production
     $image_path = '';
 
     if (empty($featured_adviser['image'])) {
@@ -2735,7 +2539,6 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $pdf->SetFont('Arial', 'B', 15);
     $pdf->Text(16.5, 255, $magazine_data->pages[0]['page']);
 
-    //var_dump($magazine_data->bi_monthly_advisers);
     if (! empty($magazine_data->message)) {
         $pdf->MessagePage($magazine_data->message);
     }
@@ -2782,18 +2585,6 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         }
     }
 
-    // if (count($magazine_data->bdm_performances) > 0)
-    //     if($magazine_data->bdm_performances[0]["name"] != "Others")
-    //         $pdf->BDMPage($magazine_data->bdm_performances, $magazine_data->quarterTitle);
-
-    // if (count($magazine_data->bdm_ks_performances) > 0)
-    //     if($magazine_data->bdm_ks_performances[0]["name"] != "Others")
-    //         $pdf->BDMKSPage($magazine_data->bdm_ks_performances, $magazine_data->quarterTitle);
-
-    // if (count($magazine_data->tm_performances) > 0)
-    //     if($magazine_data->tm_performances[0]["name"] != "Others")
-    //         $pdf->TMPage($magazine_data->tm_performances, $magazine_data->quarterTitle);
-
     if (count($magazine_data->records_to_beat) > 0) {
         $pdf->RecordsPage($magazine_data->records_to_beat);
     }
@@ -2832,10 +2623,8 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         $pdf->PhotosPage($magazine_data->photos);
     }
 
-    //$mix="$mydateorig"."-$name-"."BCTI".-date("ymd");
-    //$path="files/".$mix.".pdf";
     $path = '';
-    //$pdf->Output($path,'F');
+
     if ($preview) {
         $pdf->Output('I', 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . $magazine_data->issue_number_line_2 . '.pdf');
     } else {
@@ -2850,8 +2639,6 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
 
         return json_encode($data);
     }
-    //db add end
-//}
 }
 
     function DateTimeToNZEntry($date_submitted)

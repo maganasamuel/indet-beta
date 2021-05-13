@@ -2364,8 +2364,6 @@ class Magazine extends Database
                 $counterDate = $this->getNextRunDate($counterDate);
             }
 
-            // echo json_encode($runs); die();
-
             if ($titanium > 0) {
                 $platinum = 0;
                 $gold = 0;
@@ -2610,7 +2608,7 @@ class Magazine extends Database
         $to = $this->bimonthRange->to;
 
         //Get Admins
-        $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE p.termination_date = '' ORDER BY name";
+        $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE p.termination_date = '' AND p.date_hired >= '$from' AND p.date_hired <= '$to' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 

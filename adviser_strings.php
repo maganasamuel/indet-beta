@@ -50,7 +50,12 @@ $levelClasses = [
 ];
 
 $uploadsFolder = '../indet_photos_stash/';
-$defaultImagePath = '/images/default_pic.png';
+
+$folders = explode('/', $_SERVER['PHP_SELF']);
+
+array_pop($folders);
+
+$defaultImagePath = implode('/', $folders) . '/images/default_pic.png';
 ?>
 
 <!DOCTYPE html>

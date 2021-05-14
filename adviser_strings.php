@@ -77,12 +77,12 @@ $defaultImagePath = '/images/default_pic.png';
 
 <body style="font-family: Roboto;">
 	<div class="jumbotron">
-		<h2 class="slide text-center text-5xl">Policy Score</h2>
+		<h2 class="slide text-center text-5xl">Adviser Strings</h2>
 	</div>
 
 	<div class="max-w-screen-lg mx-auto px-4 sm:px-6 md:px-8 mb-8">
 		<div class="rounded-lg bg-white overflow-hidden shadow">
-			<h2 class="sr-only" id="profile-overview-title">Policy Score
+			<h2 class="sr-only" id="profile-overview-title">Adviser Strings
 			</h2>
 			<div class="bg-white p-6">
 				<div class="sm:flex sm:items-center sm:justify-between">
@@ -176,7 +176,7 @@ $defaultImagePath = '/images/default_pic.png';
 				<?php
                 } else {
                     ?>
-				<p class="text-2xl px-6 py-5">No available policy score.</p>
+				<p class="text-2xl px-6 py-5">No available strings.</p>
 				<?php
                 }
                 ?>

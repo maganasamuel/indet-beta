@@ -92,7 +92,7 @@
                          <td>
                              <a href="adviser_profile.php<?php echo "?id=$id" ?>" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile"><i class="fas fa-search"></i></a>
                              &nbsp;
-                             <a href="policy_score.php?adviser_id=<?php echo $id; ?>" class="btn btn-primary" data-toggle="tooltip" title="View Policy Score"><i class="fas fa-star"></i></a>
+                             <a href="adviser_strings.php?adviser_id=<?php echo $id; ?>">View Strings</i></a>
                         </td>
                      <?php
                                 echo "</tr>";

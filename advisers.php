@@ -89,7 +89,11 @@
 
             <td><input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" data-toggle="tooltip" title="Edit Adviser Profile" value='<?php echo "$id" ?>'>
                          </td>
-                         <td><a href="adviser_profile.php<?php echo "?id=$id" ?>" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile"><i class="fas fa-search"></i></a></td>
+                         <td>
+                             <a href="adviser_profile.php<?php echo "?id=$id" ?>" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile"><i class="fas fa-search"></i></a>
+                             &nbsp;
+                             <a href="policy_score.php?adviser_id=<?php echo $id; ?>" class="btn btn-primary" data-toggle="tooltip" title="View Policy Score"><i class="fas fa-star"></i></a>
+                        </td>
                      <?php
                                 echo "</tr>";
 

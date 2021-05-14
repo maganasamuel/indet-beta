@@ -93,6 +93,10 @@ class Magazine extends Database
 
     public $adviserController;
 
+    public $runAdviserId;
+
+    public $adviserRuns;
+
     /**
      * @desc: init the class
      *
@@ -101,8 +105,9 @@ class Magazine extends Database
      * @param mixed $quote
      * @param mixed $message
      * @param mixed $photos
+     * @param null|mixed $runAdviserId
      */
-    public function __construct($date, $announcement = '', $quote = '', $message = '', $photos = [])
+    public function __construct($date, $announcement = '', $quote = '', $message = '', $photos = [], $runAdviserId = null)
     {
         //initialize database connection
         parent::__construct();
@@ -146,7 +151,13 @@ class Magazine extends Database
         $this->bdm_performances = $this->GetCumulativeBDMs();
         $this->bdm_ks_performances = $this->GetCumulativeBDMsKS();
 
+        $this->runAdviserId = $runAdviserId;
+
         $this->SetWinnerScore();
+
+        if ($this->runAdviserId) {
+            return;
+        }
 
         $this->winner_score = $this->GetWinnerBiMonthlyAdvisers();
         $this->winner_score = $this->CheckRows($this->winner_score);
@@ -2267,15 +2278,17 @@ class Magazine extends Database
 
     public function SetWinnerScore()
     {
-        $query = 'DELETE FROM winner_score;';
-        $statement = $this->prepare($query);
-        $this->execute($statement);
+        if (! $this->runAdviserId) {
+            $query = 'DELETE FROM winner_score;';
+            $statement = $this->prepare($query);
+            $this->execute($statement);
 
-        $query = ' ALTER TABLE winner_score AUTO_INCREMENT = 1;';
-        $statement = $this->prepare($query);
-        $this->execute($statement);
+            $query = ' ALTER TABLE winner_score AUTO_INCREMENT = 1;';
+            $statement = $this->prepare($query);
+            $this->execute($statement);
 
-        $bimonthly_range = date('Y-m-d', strtotime($this->bimonthRange->from));
+            $bimonthly_range = date('Y-m-d', strtotime($this->bimonthRange->from));
+        }
 
         $winner_adviser = $this->GetWinnerBiMonthlyAdvisers();
 
@@ -2286,7 +2299,11 @@ class Magazine extends Database
             ['level' => 'Silver', 'deal' => 2, 'api' => 2000],
         ];
 
-        $winner_adviser = collect($winner_adviser)->slice(0, 5);
+        if ($this->runAdviserId) {
+            $winner_adviser = collect($winner_adviser)->where('id', $this->runAdviserId);
+        } else {
+            $winner_adviser = collect($winner_adviser)->slice(0, 5);
+        }
 
         foreach ($winner_adviser as $adviser) {
             $counterDate = $this->getFirstDealDateIssued($adviser['id']);
@@ -2359,9 +2376,19 @@ class Magazine extends Database
                     $run['string'] = 0;
                 }
 
+                if($this->runAdviserId){
+                    $run['biMonthRange'] = $biMonthRange;
+                }
+
                 $runs[] = $run;
 
                 $counterDate = $this->getNextRunDate($counterDate);
+            }
+
+            if ($this->runAdviserId) {
+                $this->adviserRuns = $runs;
+
+                return;
             }
 
             if ($titanium > 0) {

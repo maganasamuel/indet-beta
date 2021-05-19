@@ -231,7 +231,8 @@ class AdviserController extends Database
         $adviserController = new AdviserController();
         $clientController = new ClientController();
 
-        $date_from = $this->getAdviserOldestClient($adviser_id)["assigned_date"];
+        $tmp_assigned_date = $this->getAdviserOldestClient($adviser_id);
+        $date_from = isset($tmp_assigned_date["assigned_date"]) ? $tmp_assigned_date["assigned_date"] : null;
         $until = date("Ymd");
 
         $summary_data = new stdClass();
@@ -530,7 +531,7 @@ class AdviserController extends Database
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $data = $dataset->fetch_assoc();
-        $data["translated_assigned_date"] = $date_helper->NZEntryToDateTime($data["assigned_date"]);
+        $data["translated_assigned_date"] = isset($data["assigned_date"]) ? $date_helper->NZEntryToDateTime($data["assigned_date"]) : null;
         return $data;
     }
 
@@ -552,6 +553,8 @@ class AdviserController extends Database
      */
     public function createAdviser(
         $team_id = "",
+        $steam_id = "",
+        $position_id = "",
         $name = "",
         $company_name = "",
         $payroll_name = "",
@@ -588,8 +591,8 @@ class AdviserController extends Database
         }
 
         $query = "INSERT INTO adviser_tbl 
-        (team_id, name, company_name, payroll_name, fsp_num, address, email, birthday, leads, bonus, image, date_hired, termination_date) VALUES 
-        ($team_id,'$name','$company_name','$payroll_name','$fsp_num','$address','$email','$birthday','$leads','$bonus', '$image', '$date_hired', '$termination_date')";
+        (team_id, steam_id, position_id, name, company_name, payroll_name, fsp_num, address, email, birthday, leads, bonus, image, date_hired, termination_date) VALUES 
+        ($team_id, $steam_id, $position_id, '$name','$company_name','$payroll_name','$fsp_num','$address','$email','$birthday','$leads','$bonus', '$image', '$date_hired', '$termination_date')";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $review_id = $this->mysqli->insert_id;
@@ -607,6 +610,8 @@ class AdviserController extends Database
     public function updateAdviser(
         $id = 0,
         $team_id = "",
+        $steam_id = "",
+        $position_id = "",
         $name = "",
         $company_name = "",
         $payroll_name = "",
@@ -641,8 +646,8 @@ class AdviserController extends Database
 
         }
 
-        $query = "UPDATE adviser_tbl SET team_id = '$team_id', name = '$name', company_name = '$company_name', payroll_name = '$payroll_name', fsp_num = '$fsp_num', 
-        address = '$address', email = '$email', birthday = '$birthday', leads = '$leads', bonus = '$bonus', 
+        $query = "UPDATE adviser_tbl SET team_id = '$team_id', steam_id = '$steam_id', position_id = '$position_id', name = '$name', company_name = '$company_name',
+        payroll_name = '$payroll_name', fsp_num = '$fsp_num', address = '$address', email = '$email', birthday = '$birthday', leads = '$leads', bonus = '$bonus', 
         date_hired = '$date_hired', termination_date = '$termination_date', image = '$image'
         WHERE id = $id";
         

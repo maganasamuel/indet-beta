@@ -42,15 +42,15 @@
  <body>
  	<div align="center">
  		<div class="jumbotron">
- 			<h2 class="slide">Teams (ADR)</h2>
- 		</div> 
+ 			<h2 class="slide">Teams (SADR)</h2>
+ 		</div>
  		<?php require "database.php";
 
 				include_once("libs/api/controllers/Adviser.controller.php");
 				$adviserController = new AdviserController();
 
-				include_once("libs/api/controllers/Team.controller.php");
-				$teamController = new TeamController();
+				include_once("libs/api/controllers/STeam.controller.php");
+				$teamController = new STeamController();
 				$teams = $teamController->getAllTeams();
 
 				?>
@@ -85,7 +85,7 @@
 
  					<td><input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" value='<?php echo "$id" ?>'>
  					</td>
- 					<td><a href="team_members<?php echo "?id=$id" ?>" class="btn btn-primary"><i class="fas fa-search"></i></a></td>
+ 					<td><a href="steam_members<?php echo "?id=$id" ?>" class="btn btn-primary"><i class="fas fa-search"></i></a></td>
  					<?php
 								echo "</tr>";
 
@@ -148,7 +148,7 @@
 	End of Editor
 	-->
 
- 		<script src="js/teams-crud.js"></script>
+ 		<script src="js/steams-crud.js"></script>
  		<script>
  			var table = null;
  			$(function() {

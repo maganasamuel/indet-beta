@@ -174,6 +174,8 @@ function CreateAdviser()
 
     $data = $controller->createAdviser(
         $team_id,
+        $steam_id,
+        $position_id,
         $name,
         $company_name,
         $payroll_name,
@@ -214,6 +216,8 @@ function UpdateAdviser()
     $data = $controller->updateAdviser(
         $adviser_id,
         $team_id,
+        $steam_id,
+        $position_id,
         $name,
         $company_name,
         $payroll_name,

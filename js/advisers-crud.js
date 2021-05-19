@@ -30,7 +30,18 @@ $(document).ready(function () {
                 let team = data.team_id;
                 if (team == null)
                     team = 0;
-                $('#team').val(team);
+                $('form select[name="team_id"] option[value="'+team+'"]').prop('selected', 'selected');
+                
+                let steam = data.steam_id;
+                if (steam == null)
+                    steam = 0;
+                $('form select[name="steam_id"] option[value="'+steam+'"]').prop('selected', 'selected');
+
+                let position_id = data.position_id;
+                if (position_id == null)
+                    position_id = 0;
+                $('form select[name="position_id"] option[value="'+position_id+'"]').prop('selected', 'selected');
+
                 $('#fsp_num').val(data.fsp_num);
                 $('#company_name').val(data.company_name);
                 $("#email").val(data.email);
@@ -178,7 +189,8 @@ $(document).ready(function () {
                     "4": data.leads,
                     "5": data.bonus,
                     "6": "<input data-toggle='modal' data-target='#myModal' type='image' class='open-modal'  src='edit.png' value='" + data.id + "'>",
-                    "7": '<a href="adviser_profile?id=' + data.id + '" class="btn btn-primary"><i class="fas fa-search"></i></a>'
+                    "7": '<a href="adviser_profile?id=' + data.id + '" class="btn btn-primary"><i class="fas fa-search"></i></a>&nbsp;&nbsp;&nbsp;'+
+                         '<a href="adviser_strings.php?adviser_id=' + data.id + '">View Strings</i></a>'
                 };
                 console.log(newData);
 

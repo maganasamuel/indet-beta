@@ -171,9 +171,9 @@ if (!isset($_SESSION["myusername"])) {
                                                 <td>$adviser_name</td>
                                                 <td>$leadgen_name</td>
                                                 <td>KiwiSaver</td>
-                                                <td data-order='$commission'>$" . number_format($commission, 2) . "</td>
-                                                <td data-order='$gst'>$" . number_format($gst, 2) . "</td>
-                                                <td data-order='$balance'>$" . number_format($balance, 2) . "</td>
+                                                <td data-order='$commission'>$" . number_format((float)$commission, 2) . "</td>
+                                                <td data-order='$gst'>$" . number_format((float)$gst, 2) . "</td>
+                                                <td data-order='$balance'>$" . number_format((float)$balance, 2) . "</td>
                                                 <td data-order='$issue_date_order'>$issue_date</td>
                                             ";
         /*<td data-order=".$entrydate.">".$convertdate."</td>

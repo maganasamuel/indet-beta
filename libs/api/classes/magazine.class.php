@@ -97,6 +97,22 @@ class Magazine extends Database
 
     public $adviserRuns;
 
+    public $adr_bi_monthly_advisers = [];
+
+    public $adr_cumulative_advisers = [];
+
+    public $adr_bi_monthly_advisers_kiwisavers = [];
+
+    public $adr_cumulative_advisers_kiwisavers = [];
+
+    public $sadr_bi_monthly_advisers = [];
+
+    public $sadr_cumulative_advisers = [];
+
+    public $sadr_bi_monthly_advisers_kiwisavers = [];
+
+    public $sadr_cumulative_advisers_kiwisavers = [];
+
     /**
      * @desc: init the class
      *
@@ -133,6 +149,34 @@ class Magazine extends Database
 
         $this->bi_monthly_advisers = $this->GetBiMonthlyAdvisers();
         $this->bi_monthly_advisers = $this->CheckRows($this->bi_monthly_advisers);
+
+        //START ADR
+        $this->adr_bi_monthly_advisers = $this->GetADRBiMonthlyAdvisers();
+        // $this->adr_bi_monthly_advisers = $this->CheckRows($this->adr_bi_monthly_advisers);
+                                
+        $this->adr_cumulative_advisers = $this->GetADRCumulativeAdvisers();
+        // $this->adr_cumulative_advisers = $this->CheckRows($this->adr_cumulative_advisers);
+
+        $this->adr_bi_monthly_advisers_kiwisavers = $this->GetADRBiMonthlyAdvisersKiwiSavers();
+        // $this->adr_bi_monthly_advisers_kiwisavers = $this->CheckRows($this->adr_bi_monthly_advisers_kiwisavers);
+                                
+        $this->adr_cumulative_advisers_kiwisavers = $this->GetADRCumulativeAdvisersKiwiSavers();
+        // $this->adr_cumulative_advisers_kiwisavers = $this->CheckRows($this->adr_cumulative_advisers_kiwisavers);
+        //END ADR
+
+        //START SADR
+        $this->sadr_bi_monthly_advisers = $this->GetSADRBiMonthlyAdvisers();
+        // $this->sadr_bi_monthly_advisers = $this->CheckRows($this->sadr_bi_monthly_advisers);
+                                
+        $this->sadr_cumulative_advisers = $this->GetSADRCumulativeAdvisers();
+        // $this->sadr_cumulative_advisers = $this->CheckRows($this->sadr_cumulative_advisers);
+
+        $this->sadr_bi_monthly_advisers_kiwisavers = $this->GetSADRBiMonthlyAdvisersKiwiSavers();
+        // $this->sadr_bi_monthly_advisers_kiwisavers = $this->CheckRows($this->sadr_bi_monthly_advisers_kiwisavers);
+                             
+        $this->sadr_cumulative_advisers_kiwisavers = $this->GetSADRCumulativeAdvisersKiwiSavers();
+        // $this->sadr_cumulative_advisers_kiwisavers = $this->CheckRows($this->sadr_cumulative_advisers_kiwisavers);
+        //END SADR
 
         $this->bi_monthly_bdms = $this->GetBiMonthlyBDMs();
 
@@ -262,7 +306,7 @@ class Magazine extends Database
     public function CheckRows($rows)
     {
         if (1 == count($rows)) {
-            if ('Others' == $rows[0]['name']) {
+            if ((isset($rows[0]['name'])) && ('Others' == $rows[0]['name'])) {
                 return [];
             } else {
                 return $rows;
@@ -700,6 +744,1091 @@ class Magazine extends Database
 
         return $this->FilterOutput($output, 'deals');
     }
+
+    //START ADR
+    public function GetADRBiMonthlyAdvisers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $output['Others'] = $others;
+
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            $deals = json_decode($row['deals'], true);
+            $total_issued_api = 0;
+            $total_issued_deals = 0;
+
+            if (null == $deals) {
+                continue;
+            }
+
+            foreach ($deals as $deal) {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
+
+                        //Check if cancelled
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
+                                continue;
+                            }
+                        }
+
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
+                            $total_issued_deals++;
+                        }
+                    }
+                }
+            }
+
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        //Ex advisers deals fetching
+        if ($otherAdvisers) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+
+            $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+
+            while ($row = $dataset->fetch_assoc()) {
+                $deals = json_decode($row['deals'], true);
+                $total_issued_api = 0;
+                $total_issued_deals = 0;
+
+                if ('55' == $row['client_id']) {
+                }
+
+                if (null == $deals) {
+                    continue;
+                }
+
+                foreach ($deals as $deal) {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
+
+                            //Check if cancelled
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
+                                    continue;
+                                }
+                            }
+
+                            if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                                $total_issued_api += $deal['issued_api'];
+                                $total_issued_deals++;
+                            }
+                        }
+                    }
+                }
+
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        $issued_apis = array_column($output, 'issued_api');
+
+        array_multisort($issued_apis, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['team'] <=> $b['team'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['team']) {
+                    $tmp_output[$team_flag_cnt]['issued_api'] += $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['team'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['issued_api'] <=> $a['issued_api'];
+        });
+
+        return $tmp_output; 
+    }
+
+    public function GetADRCumulativeAdvisers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $output['Others'] = $others;
+
+        //Get Active
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+
+        //Get Others
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            $deals = json_decode($row['deals'], true);
+            $total_issued_api = 0;
+            $total_issued_deals = 0;
+
+            if (null == $deals) {
+                continue;
+            }
+
+            foreach ($deals as $deal) {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
+                        //Check if cancelled
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
+                                continue;
+                            }
+                        }
+
+                        if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                            $total_issued_api += $deal['issued_api'];
+                            $total_issued_deals++;
+                        }
+                    }
+                }
+            }
+
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        //Ex advisers deals fetching
+        if (count($otherAdvisers) > 0) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+
+            $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+
+            while ($row = $dataset->fetch_assoc()) {
+                $deals = json_decode($row['deals'], true);
+                $total_issued_api = 0;
+                $total_issued_deals = 0;
+
+                if ('55' == $row['client_id']) {
+                }
+
+                if (null == $deals) {
+                    continue;
+                }
+
+                foreach ($deals as $deal) {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
+
+                            //Check if cancelled
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
+                                    continue;
+                                }
+                            }
+
+                            if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                                $total_issued_api += $deal['issued_api'];
+                                $total_issued_deals++;
+                            }
+                        }
+                    }
+                }
+
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        $issued_apis = array_column($output, 'issued_api');
+
+        array_multisort($issued_apis, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['team'] <=> $b['team'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['team']) {
+                    $tmp_output[$team_flag_cnt]['issued_api'] += $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['team'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['issued_api'] <=> $a['issued_api'];
+        });
+
+        return $tmp_output;
+    }
+
+    public function GetADRBiMonthlyAdvisersKiwiSavers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+
+        $from = $this->bimonthRange->from;
+        $to = $this->bimonthRange->to;
+
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['deals'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $output['Others'] = $others;
+
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            if ($row['deals'] > 0) {
+                if ('Sumit Monga' != $row['name']) {
+                    $output[$row['adviser_id']]['deals'] = $row['deals'];
+                }
+            }
+        }
+
+        //Ex advisers deals fetching
+        if (count($otherAdvisers) > 0) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+        }
+
+        $deals = array_column($output, 'deals');
+
+        array_multisort($deals, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['team'] <=> $b['team'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['team']) {
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['team'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['deals'] <=> $a['deals'];
+        });
+
+        return $tmp_output;
+    }
+
+    public function GetADRCumulativeAdvisersKiwiSavers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+
+        $from = $this->cumulativeRange->from;
+        $to = $this->cumulativeRange->to;
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['team'] = 'Ex-Advisers';
+        $others['deals'] = 0;
+        $output['Others'] = $others;
+
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['team']) {
+                $row['team'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            if ($row['deals'] > 0) {
+                if ('Sumit Monga' == $row['name']) {
+                    $output['Others']['deals'] = $row['deals'];
+                } else {
+                    $output[$row['adviser_id']]['deals'] = $row['deals'];
+                }
+            }
+        }
+
+        //Ex advisers deals fetching
+        if (count($otherAdvisers) > 0) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+
+            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+        }
+
+        $deals = array_column($output, 'deals');
+
+        array_multisort($deals, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['team'] <=> $b['team'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['team']) {
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['team'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['deals'] <=> $a['deals'];
+        });
+
+        return $tmp_output;
+    }
+    //END ADR
+
+    //START SADR
+    public function GetSADRBiMonthlyAdvisers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+        $dataset = $this->adviserController->getActiveAdvisers();
+        
+        $others = [];
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $output['Others'] = $others;
+
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['steam']) {
+                $row['steam'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            $deals = json_decode($row['deals'], true);
+            $total_issued_api = 0;
+            $total_issued_deals = 0;
+
+            if (null == $deals) {
+                continue;
+            }
+
+            foreach ($deals as $deal) {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
+
+                        //Check if cancelled
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
+                                continue;
+                            }
+                        }
+
+                        if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                            $total_issued_api += $deal['issued_api'];
+                            $total_issued_deals++;
+                        }
+                    }
+                }
+            }
+
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        //Ex advisers deals fetching
+        if ($otherAdvisers) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+
+            $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+
+            while ($row = $dataset->fetch_assoc()) {
+                $deals = json_decode($row['deals'], true);
+                $total_issued_api = 0;
+                $total_issued_deals = 0;
+
+                if ('55' == $row['client_id']) {
+                }
+
+                if (null == $deals) {
+                    continue;
+                }
+
+                foreach ($deals as $deal) {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
+
+                            //Check if cancelled
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
+                                    continue;
+                                }
+                            }
+
+                            if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
+                                $total_issued_api += $deal['issued_api'];
+                                $total_issued_deals++;
+                            }
+                        }
+                    }
+                }
+
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        $issued_apis = array_column($output, 'issued_api');
+
+        array_multisort($issued_apis, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['steam'] <=> $b['steam'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['steam']) {
+                    $tmp_output[$team_flag_cnt]['issued_api'] += $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                    $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['steam'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['issued_api'] <=> $a['issued_api'];
+        });
+
+        return $tmp_output; 
+    }
+
+    public function GetSADRCumulativeAdvisers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['issued_api'] = 0;
+        $others['deals'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $others['steam'] = 'Ex-Advisers';
+        $output['Others'] = $others;
+
+        //Get Active
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['steam']) {
+                $row['steam'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+
+        //Get Others
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            $deals = json_decode($row['deals'], true);
+            $total_issued_api = 0;
+            $total_issued_deals = 0;
+
+            if (null == $deals) {
+                continue;
+            }
+
+            foreach ($deals as $deal) {
+                if (isset($deal['status'])) {
+                    if ('Issued' == $deal['status']) {
+                        //Check if cancelled
+                        if (isset($deal['clawback_status'])) {
+                            if ('Cancelled' == $deal['clawback_status']) {
+                                continue;
+                            }
+                        }
+
+                        if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                            $total_issued_api += $deal['issued_api'];
+                            $total_issued_deals++;
+                        }
+                    }
+                }
+            }
+
+            if ('Sumit Monga' != $row['adviser_name']) {
+                $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
+                $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        //Ex advisers deals fetching
+        if (count($otherAdvisers) > 0) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+
+            $query = "SELECT c.id as client_id, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($otherAdvisersArrayString) order by a.name";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+
+            while ($row = $dataset->fetch_assoc()) {
+                $deals = json_decode($row['deals'], true);
+                $total_issued_api = 0;
+                $total_issued_deals = 0;
+
+                if ('55' == $row['client_id']) {
+                }
+
+                if (null == $deals) {
+                    continue;
+                }
+
+                foreach ($deals as $deal) {
+                    if (isset($deal['status'])) {
+                        if ('Issued' == $deal['status']) {
+
+                            //Check if cancelled
+                            if (isset($deal['clawback_status'])) {
+                                if ('Cancelled' == $deal['clawback_status']) {
+                                    continue;
+                                }
+                            }
+
+                            if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
+                                $total_issued_api += $deal['issued_api'];
+                                $total_issued_deals++;
+                            }
+                        }
+                    }
+                }
+
+                $output['Others']['issued_api'] += floatval($total_issued_api);
+                $output['Others']['deals'] += floatval($total_issued_deals);
+            }
+        }
+
+        $issued_apis = array_column($output, 'issued_api');
+
+        array_multisort($issued_apis, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['steam'] <=> $b['steam'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['steam']) {
+                    $tmp_output[$team_flag_cnt]['issued_api'] += $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                    $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['steam'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['issued_api'] <=> $a['issued_api'];
+        });
+
+        return $tmp_output;
+    }
+
+    public function GetSADRBiMonthlyAdvisersKiwiSavers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+
+        $from = $this->bimonthRange->from;
+        $to = $this->bimonthRange->to;
+
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['deals'] = 0;
+        $others['team'] = 'Ex-Advisers';
+        $others['steam'] = 'Ex-Advisers';
+        $output['Others'] = $others;
+
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['steam']) {
+                $row['steam'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            if ($row['deals'] > 0) {
+                if ('Sumit Monga' != $row['name']) {
+                    $output[$row['adviser_id']]['deals'] = $row['deals'];
+                }
+            }
+        }
+
+        //Ex advisers deals fetching
+        if (count($otherAdvisers) > 0) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, 'Ex-Advisers' as steam, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+        }
+
+        $deals = array_column($output, 'deals');
+
+        array_multisort($deals, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['steam'] <=> $b['steam'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['steam']) {
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['steam'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['deals'] <=> $a['deals'];
+        });
+
+        return $tmp_output;
+    }
+
+    public function GetSADRCumulativeAdvisersKiwiSavers()
+    {
+        $output = [];
+        $activeAdvisers = [];
+        $otherAdvisers = [];
+
+        $from = $this->cumulativeRange->from;
+        $to = $this->cumulativeRange->to;
+
+        $others = [];
+        $others['name'] = 'Others';
+        $others['team'] = 'Ex-Advisers';
+        $others['steam'] = 'Ex-Advisers';
+        $others['deals'] = 0;
+        $output['Others'] = $others;
+
+        $dataset = $this->adviserController->getActiveAdvisers();
+
+        while ($row = $dataset->fetch_assoc()) {
+            $activeAdvisers[] = $row['id'];
+
+            if ('' == $row['steam']) {
+                $row['steam'] = 'None';
+            }
+
+            if ('Sumit Monga' == $row['name']) {
+                $otherAdvisers[] = $row['id'];
+            } else {
+                $output[$row['id']] = $row;
+                $output[$row['id']]['issued_api'] = 0;
+                $output[$row['id']]['deals'] = 0;
+            }
+        }
+
+        //Register inactive advisers
+        $dataset = $this->adviserController->getExAdvisers();
+
+        while ($row = $dataset->fetch_assoc()) {
+            $otherAdvisers[] = $row['id'];
+        }
+
+        //Active Advisers deal fetching
+        $advisersArrayString = implode(',', $activeAdvisers);
+
+        $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        while ($row = $dataset->fetch_assoc()) {
+            if ($row['deals'] > 0) {
+                if ('Sumit Monga' == $row['name']) {
+                    $output['Others']['deals'] = $row['deals'];
+                } else {
+                    $output[$row['adviser_id']]['deals'] = $row['deals'];
+                }
+            }
+        }
+
+        //Ex advisers deals fetching
+        if (count($otherAdvisers) > 0) {
+            $otherAdvisersArrayString = implode(',', $otherAdvisers);
+
+            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, 'Ex-Advisers' as steam, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $statement = $this->prepare($query);
+            $dataset = $this->execute($statement);
+        }
+
+        $deals = array_column($output, 'deals');
+
+        array_multisort($deals, SORT_DESC, $output);
+
+        $key = array_search('Others', array_column($output, 'name'));
+
+        $this->moveElement($output, $key, count($output) - 1);
+
+        $output = $this->FilterOutput($output, 'deals');
+
+        usort($output, function($a, $b) {
+            return $a['steam'] <=> $b['steam'];
+        });
+
+        $team_flag = '';
+        $team_flag_cnt = 0;
+        $tmp_output = array();
+        foreach ($output as $k => $v) {
+            if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+            } else {
+                if($team_flag == $output[$k]['steam']) {
+                    $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                } else {
+                    $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                    $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                }
+            }
+            $team_flag = $output[$k]['steam'];
+        }
+
+        usort($tmp_output, function($a, $b) {
+            return $b['deals'] <=> $a['deals'];
+        });
+
+        return $tmp_output;
+    }
+    //END SADR
 
     public function GetWinnerBiMonthlyAdvisers($adviserId = null, $biMonthRange = null)
     {
@@ -1186,6 +2315,7 @@ class Magazine extends Database
         $advisersArrayString = implode(',', $activeAdvisers);
 
         $query = "SELECT a.name as name, a.id as adviser_id, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($advisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -2524,7 +3654,7 @@ class Magazine extends Database
                                     $query = "UPDATE winner_score SET `silver` = titanium + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);
-                                } elseif ('Platinum' == $adviser['scores']) {
+                                } elseif (isset($adviser['scores']) && 'Platinum' == $adviser['scores']) {
                                     $query = "UPDATE winner_score SET `silver` = platinum + 1, `platinum` = 0, `titanium` = 0, `gold` = 0, score = \"Silver\", bimonthly_range = '$bimonthly_range' WHERE adviser_id = {$adviser['id']}";
                                     $statement = $this->prepare($query);
                                     $dataset = $this->execute($statement);

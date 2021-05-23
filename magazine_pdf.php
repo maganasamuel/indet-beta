@@ -1,4 +1,5 @@
 <?php
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -1235,8 +1236,8 @@ class PDF extends PDF_MC_Table
 
             if (0 == $index % 2) {
                 $this->AddPage();
-
-                $this->Header1(15, $record['type'], 20);
+                $record_type = isset($record['type']) ? $record['type'] : null;
+                $this->Header1(15, $record_type, 20);
 
                 if (file_exists($image_path)) {
                     $this->Image($image_path, 20, 30, 90, 90);
@@ -1276,7 +1277,8 @@ class PDF extends PDF_MC_Table
                 $record_display = ('Count' == $record['record_type']) ? $record['record'] : '$' . number_format($record['record'], 2);
                 $this->Cell(50, 8, $record_display, '', '1', 'L');
             } else {
-                $this->Header1(140, $record['type'], 20);
+                $record_type = isset($record['type']) ? $record['type'] : null;
+                $this->Header1(140, $record_type, 20);
 
                 if (file_exists($image_path)) {
                     $this->Image($image_path, 110, 155, 90, 90);
@@ -1682,15 +1684,15 @@ class PDF extends PDF_MC_Table
                 $rowHeight = 0;
             }
 
-            if (($imgHeight + $labelHeight + $pointerY + $marginY) > $heightLimit) {
+            if (((float)$imgHeight + (float)$labelHeight + (float)$pointerY + (float)$marginY) > (float)$heightLimit) {
                 $this->AddPage();
                 $pointerX = $startingX;
                 $pointerY = $startingY;
                 $rowHeight = 0;
             }
 
-            if ($rowHeight < $photo['height'] + $labelHeight) {
-                $rowHeight = $photo['height'] + $labelHeight;
+            if ((float)$rowHeight < (float)$photo['height'] + (float)$labelHeight) {
+                $rowHeight = (float)$photo['height'] + (float)$labelHeight;
             }
 
             $this->Image($photo['filename'], $pointerX, $pointerY, $imgWidth, $imgHeight);
@@ -2311,8 +2313,305 @@ class PDF extends PDF_MC_Table
     }
 
     //End of pdf
-}
+    //START ADR page
+    public function ADRBiMonthlyPage($bimonthly)
+    {   
+        //page 2 BiMonthly API
+        $this->AddPage();
 
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'ADR Team Bi-Monthly Issued Policies Table');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY(($next_Y + 38));
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+        $total_api = 0;
+
+        foreach ($bimonthly as $team) {
+            if ($team['deals'] > 0) {
+                $total += $team['deals'];
+                $total_api += $team['issued_api'];
+                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+                // $this->Cell(50, 10, $team['deals'], 1, '0', 'C', true);
+                // $this->Cell(55, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        // $this->Cell(50, 10, $total, 1, '0', 'C', true);
+        // $this->Cell(55, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+    }
+
+    public function ADRCumulativePage($cumulative)
+    {   
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'ADR Team Cumulative Issued Policies Table');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY($next_Y + 38);
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+        $total_api = 0;
+
+        foreach ($cumulative as $team) {
+            if ($team['deals'] > 0) {
+                $total += $team['deals'];
+                $total_api += $team['issued_api'];
+                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+                // $this->Cell(50, 10, $team['deals'], 1, '0', 'C', true);
+                // $this->Cell(55, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        // $this->Cell(50, 10, $total, 1, '0', 'C', true);
+        // $this->Cell(55, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+    }
+
+    public function ADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
+    {   
+        //page 2 BiMonthly KiwiSavers
+        $this->AddPage();
+
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'ADR Team Bi-Monthly Table for Kiwisaver Enrolments');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY(($next_Y + 38));
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+
+        foreach ($bimonthlykiwisavers as $index => $bimonthlykiwisaver) {
+            if ($bimonthlykiwisaver['deals'] > 0) {
+                $total += $bimonthlykiwisaver['deals'];
+                $this->Cell(125, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+    }
+
+    public function ADRCumulativeKiwiSaversPage($cumulativekiwisavers)
+    {   
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'ADR Team Cumulative Table for Kiwisaver Enrolments');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY($next_Y + 38);
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+
+        foreach ($cumulativekiwisavers as $index => $cumulativekiwisaver) {
+            if ($cumulativekiwisaver['deals'] > 0) {
+                $total += $cumulativekiwisaver['deals'];
+                $this->Cell(125, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+    }
+    //END ADR page
+
+    //START SADR page
+    //SADR page
+    public function SADRBiMonthlyPage($bimonthly)
+    {   
+        //page 2 BiMonthly API
+        $this->AddPage();
+
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'SADR Team Bi-Monthly Issued Policies Table');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY($next_Y + 38);
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+        $total_api = 0;
+
+        foreach ($bimonthly as $team) {
+            if ($team['deals'] > 0) {
+                $total += $team['deals'];
+                $total_api += $team['issued_api'];
+                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+    }
+
+
+    public function SADRCumulativePage($cumulative)
+    {   
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'SADR Team Cumulative Issued Policies Table');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY($next_Y + 38);
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+        $total_api = 0;
+
+        foreach ($cumulative as $team) {
+            if ($team['deals'] > 0) {
+                $total += $team['deals'];
+                $total_api += $team['issued_api'];
+                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+    }
+
+    public function SADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
+    {   
+        //page 2 BiMonthly KiwiSavers
+        $this->AddPage();
+
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'SADR Team Bi-Monthly Table for Kiwisaver Enrolments');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY(($next_Y + 38));
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+
+        foreach ($bimonthlykiwisavers as $index => $bimonthlykiwisaver) {
+            if ($bimonthlykiwisaver['deals'] > 0) {
+                $total += $bimonthlykiwisaver['deals'];
+                $this->Cell(125, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+    }
+
+    public function SADRCumulativeKiwiSaversPage($cumulativekiwisavers)
+    {   
+        $next_Y = $this->GetY();
+        //Tables
+        $this->Header1(($next_Y+15), 'SADR Team Cumulative Table for Kiwisaver Enrolments');
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY($next_Y + 38);
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+
+        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+
+        $this->SetFont('Arial', '', 15);
+
+        $total = 0;
+
+        foreach ($cumulativekiwisavers as $index => $cumulativekiwisaver) {
+            if ($cumulativekiwisaver['deals'] > 0) {
+                $total += $cumulativekiwisaver['deals'];
+                $this->Cell(125, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(70, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
+            }
+        }
+
+        $this->SetFont('Arial', 'B', 15);
+        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+    }
+    //END SADR page
+}
 function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = true)
 {
     $magazineController = new MagazineController();
@@ -2370,7 +2669,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $pdf->SetX(85);
     $pdf->Cell(121, 8, $magazine_data->issue_number, 0, 1, 'L');
     $pdf->SetX(85);
-    $pdf->Cell(121, 8, $magazine_data->issue_number_line_2, 0, 1, 'L');
+    $pdf->Cell(121, 8, (isset($magazine_data->issue_number_line_2) ? $magazine_data->issue_number_line_2 : ""), 0, 1, 'L');
 
     $blue = [50, 143, 168];
     $darkblue = [50, 91, 168];
@@ -2383,40 +2682,42 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $g_array = [];
     $s_array = [];
 
-    foreach ($magazine_data->all_winner_score as $index => $adviser) {
-        if ('Titanium' == $adviser['score']) {
-            $adviser[`platinum`] = 0;
-            $adviser[`gold`] = 0;
-            $adviser[`silver`] = 0;
-
-            array_push($t_array, $adviser);
-            $titanium = array_column($t_array, 'titanium');
-        } else {
-            if ('Platinum' == $adviser['score']) {
-                $adviser[`titanium`] = 0;
+    if(isset($magazine_data->all_winner_score) && (is_array($magazine_data->all_winner_score) || is_object($magazine_data->all_winner_score))) {
+        foreach ($magazine_data->all_winner_score as $index => $adviser) {
+            if ('Titanium' == $adviser['score']) {
+                $adviser[`platinum`] = 0;
                 $adviser[`gold`] = 0;
                 $adviser[`silver`] = 0;
 
-                array_push($p_array, $adviser);
-                $platinum = array_column($p_array, 'platinum');
+                array_push($t_array, $adviser);
+                $titanium = array_column($t_array, 'titanium');
             } else {
-                if ('Gold' == $adviser['score']) {
+                if ('Platinum' == $adviser['score']) {
                     $adviser[`titanium`] = 0;
-                    $adviser[`platinum`] = 0;
+                    $adviser[`gold`] = 0;
                     $adviser[`silver`] = 0;
 
-                    array_push($g_array, $adviser);
-                    $gold = array_column($g_array, 'gold');
+                    array_push($p_array, $adviser);
+                    $platinum = array_column($p_array, 'platinum');
                 } else {
-                    if ('Silver' == $adviser['score']) {
-                        array_push($s_array, $adviser);
-                        $silver = array_column($s_array, 'silver');
+                    if ('Gold' == $adviser['score']) {
+                        $adviser[`titanium`] = 0;
+                        $adviser[`platinum`] = 0;
+                        $adviser[`silver`] = 0;
+
+                        array_push($g_array, $adviser);
+                        $gold = array_column($g_array, 'gold');
+                    } else {
+                        if ('Silver' == $adviser['score']) {
+                            array_push($s_array, $adviser);
+                            $silver = array_column($s_array, 'silver');
+                        }
                     }
                 }
             }
         }
     }
-
+        
     if ($t_array) {
         array_multisort($titanium, SORT_DESC, $t_array);
 
@@ -2449,7 +2750,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         }
     }
 
-    if (count($magazine_data->all_winner_score) > 0) {
+    if (isset($magazine_data->all_winner_score) && (is_array($magazine_data->all_winner_score) && count($magazine_data->all_winner_score) > 0)) {
         if ('Others' != $magazine_data->all_winner_score[0]['name']) {
             $pdf->SetDrawColor(50, 143, 168);
             $pdf->SetLineWidth(1);
@@ -2504,8 +2805,10 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     }
 
     //Featured Adviser
-    $featured_adviser = (count($magazine_data->bi_monthly_advisers) > 0) ? $magazine_data->bi_monthly_advisers[0] : $magazine_data->cumulative_advisers[0];
-    $featured_title = (count($magazine_data->bi_monthly_advisers) > 0) ? 'Top Adviser of the Period ' . date('j', strtotime($magazine_data->bimonthRange->from)) . '-' . date('j F Y', strtotime($magazine_data->bimonthRange->to)) : 'Top Adviser of the Period ' . date('j M', strtotime($magazine_data->cumulativeRange->from)) . '-' . date('j M Y', strtotime($magazine_data->cumulativeRange->to));
+    $featured_adviser = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ? 
+        (isset($magazine_data->bi_monthly_advisers[0]) ? $magazine_data->bi_monthly_advisers[0] : null) : 
+        (isset($magazine_data->cumulative_advisers[0]) ? $magazine_data->cumulative_advisers[0] : null);
+    $featured_title = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ? 'Top Adviser of the Period ' . date('j', strtotime($magazine_data->bimonthRange->from)) . '-' . date('j F Y', strtotime($magazine_data->bimonthRange->to)) : 'Top Adviser of the Period ' . date('j M', strtotime($magazine_data->cumulativeRange->from)) . '-' . date('j M Y', strtotime($magazine_data->cumulativeRange->to));
     $pdf->SetX(0);
     $pdf->SetX(190);
 
@@ -2531,10 +2834,10 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $pdf->Text(16.5, 222, $featured_title);
     $pdf->SetTextColor(0, 77, 115);
     $pdf->SetFont('Arial', 'B', 32);
-    $pdf->Text(16.5, 235, $featured_adviser['name']);
+    $pdf->Text(16.5, 235, (isset($featured_adviser['name']) ? $featured_adviser['name'] : null));
     $pdf->SetTextColor(115, 146, 161);
     $pdf->SetFont('Arial', 'B', 27);
-    $pdf->Text(16.5, 245, '$' . number_format($featured_adviser['issued_api'], 2) . ' Issued API');
+    $pdf->Text(16.5, 245, (isset($featured_adviser['issued_api']) ? ('$' . number_format($featured_adviser['issued_api'], 2) . ' Issued API') : null));
     $pdf->SetTextColor(0, 0, 0);
     $pdf->SetFont('Arial', 'B', 15);
     $pdf->Text(16.5, 255, $magazine_data->pages[0]['page']);
@@ -2543,63 +2846,120 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         $pdf->MessagePage($magazine_data->message);
     }
 
-    if (count($magazine_data->bi_monthly_advisers) > 0) {
+    if (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) {
         if ('Others' != $magazine_data->bi_monthly_advisers[0]['name']) {
             $pdf->BiMonthlyPage($magazine_data->bi_monthly_advisers);
         }
     }
 
-    if (count($magazine_data->cumulative_advisers) > 0) {
+    if (is_array($magazine_data->cumulative_advisers) && count($magazine_data->cumulative_advisers) > 0) {
         if ('Others' != $magazine_data->cumulative_advisers[0]['name']) {
             $pdf->CumulativePage($magazine_data->cumulative_advisers);
         }
     }
 
-    if (count($magazine_data->bi_monthly_advisers_kiwisavers) > 0) {
+    if (is_array($magazine_data->bi_monthly_advisers_kiwisavers) && count($magazine_data->bi_monthly_advisers_kiwisavers) > 0) {
         if ('Others' != $magazine_data->bi_monthly_advisers_kiwisavers[0]['name']) {
             $pdf->BiMonthlyKiwiSaversPage($magazine_data->bi_monthly_advisers_kiwisavers);
         }
     }
 
-    if (count($magazine_data->cumulative_advisers_kiwisavers) > 0) {
+    if (is_array($magazine_data->cumulative_advisers_kiwisavers) && count($magazine_data->cumulative_advisers_kiwisavers) > 0) {
         if ('Others' != $magazine_data->cumulative_advisers_kiwisavers[0]['name']) {
             $pdf->CumulativeKiwiSaversPage($magazine_data->cumulative_advisers_kiwisavers);
         }
     }
 
-    if (count($magazine_data->winner_score) > 0) {
+    if (isset($magazine_data->winner_score) && (is_array($magazine_data->winner_score) && count($magazine_data->winner_score) > 0)) {
         if ('Others' != $magazine_data->winner_score[0]['name']) {
             $pdf->WinnerScore($magazine_data->winner_score);
         }
     }
 
-    if (count($magazine_data->all_winner_score) > 0) {
+    if (isset($magazine_data->all_winner_score) && (is_array($magazine_data->all_winner_score) && count($magazine_data->all_winner_score) > 0)) {
         if ('Others' != $magazine_data->all_winner_score[0]['name']) {
             $pdf->Strings($magazine_data->all_winner_score);
         }
     }
 
-    if (count($magazine_data->rba_cumulative_advisers) > 0) {
+    if  (isset($magazine_data->rba_cumulative_advisers) && (is_array($magazine_data->rba_cumulative_advisers) && count($magazine_data->rba_cumulative_advisers) > 0)) {
         if ('Others' != $magazine_data->rba_cumulative_advisers[0]['name']) {
             $pdf->CumulativeRBAPage($magazine_data->rba_cumulative_advisers);
         }
     }
 
-    if (count($magazine_data->records_to_beat) > 0) {
+    if (is_array($magazine_data->records_to_beat) && count($magazine_data->records_to_beat) > 0) {
         $pdf->RecordsPage($magazine_data->records_to_beat);
     }
 
+    //start of ADR and SADR tables
+    if (isset($magazine_data->adr_bi_monthly_advisers) && is_array($magazine_data->adr_bi_monthly_advisers) && count($magazine_data->adr_bi_monthly_advisers) > 0) {
+        $pdf->ADRBiMonthlyPage($magazine_data->adr_bi_monthly_advisers);
+        
+        if (isset($magazine_data->adr_cumulative_advisers) && is_array($magazine_data->adr_cumulative_advisers) && count($magazine_data->adr_cumulative_advisers) > 0) {
+            $pdf->ADRCumulativePage($magazine_data->adr_cumulative_advisers);
+        }
+    } else {
+        if (isset($magazine_data->adr_cumulative_advisers) && is_array($magazine_data->adr_cumulative_advisers) && count($magazine_data->adr_cumulative_advisers) > 0) {
+            $pdf->AddPage();
+            $pdf->ADRCumulativePage($magazine_data->adr_cumulative_advisers);
+        }
+    }
+
+    if (isset($magazine_data->adr_bi_monthly_advisers_kiwisavers) && is_array($magazine_data->adr_bi_monthly_advisers_kiwisavers) && count($magazine_data->adr_bi_monthly_advisers_kiwisavers) > 0) {
+        $pdf->ADRBiMonthlyKiwiSaversPage($magazine_data->adr_bi_monthly_advisers_kiwisavers);
+
+        if (isset($magazine_data->adr_cumulative_advisers_kiwisavers) && is_array($magazine_data->adr_cumulative_advisers_kiwisavers) && count($magazine_data->adr_cumulative_advisers_kiwisavers) > 0) {
+            $pdf->ADRCumulativeKiwiSaversPage($magazine_data->adr_cumulative_advisers_kiwisavers);
+        }
+    } else {
+        if (isset($magazine_data->adr_cumulative_advisers_kiwisavers) && is_array($magazine_data->adr_cumulative_advisers_kiwisavers) && count($magazine_data->adr_cumulative_advisers_kiwisavers) > 0) {
+            $pdf->AddPage();
+            $pdf->ADRCumulativeKiwiSaversPage($magazine_data->adr_cumulative_advisers_kiwisavers);
+        }
+    }
+   
+    //end of ADR
+    //start of SADR
+    if (isset($magazine_data->sadr_bi_monthly_advisers) && is_array($magazine_data->sadr_bi_monthly_advisers) && count($magazine_data->sadr_bi_monthly_advisers) > 0) {
+        $pdf->SADRBiMonthlyPage($magazine_data->sadr_bi_monthly_advisers);
+
+        if (isset($magazine_data->sadr_cumulative_advisers) && is_array($magazine_data->sadr_cumulative_advisers) && count($magazine_data->sadr_cumulative_advisers) > 0) {
+            $pdf->SADRCumulativePage($magazine_data->sadr_cumulative_advisers);
+        }
+    } else {
+        if (isset($magazine_data->sadr_cumulative_advisers) && is_array($magazine_data->sadr_cumulative_advisers) && count($magazine_data->sadr_cumulative_advisers) > 0) {
+            $pdf->AddPage();
+            $pdf->SADRCumulativePage($magazine_data->sadr_cumulative_advisers);
+        }
+    }
+
+    if (isset($magazine_data->sadr_bi_monthly_advisers_kiwisavers) && is_array($magazine_data->sadr_bi_monthly_advisers_kiwisavers) && count($magazine_data->sadr_bi_monthly_advisers_kiwisavers) > 0) {
+        $pdf->SADRBiMonthlyKiwiSaversPage($magazine_data->sadr_bi_monthly_advisers_kiwisavers);
+
+        if (isset($magazine_data->sadr_cumulative_advisers_kiwisavers) && is_array($magazine_data->sadr_cumulative_advisers_kiwisavers) && count($magazine_data->sadr_cumulative_advisers_kiwisavers) > 0) {
+            $pdf->SADRCumulativeKiwiSaversPage($magazine_data->sadr_cumulative_advisers_kiwisavers);
+        }
+    } else {
+       if (isset($magazine_data->sadr_cumulative_advisers_kiwisavers) && is_array($magazine_data->sadr_cumulative_advisers_kiwisavers) && count($magazine_data->sadr_cumulative_advisers_kiwisavers) > 0) {
+            $pdf->AddPage();
+            $pdf->SADRCumulativeKiwiSaversPage($magazine_data->sadr_cumulative_advisers_kiwisavers);
+        } 
+    }
+    //end of ADR and SADR tables
+
     //UNCOMMENT IF WE NEED BDM DATA
 
-    if (count($magazine_data->bi_monthly_bdms) > 0) {
+    if (isset($magazine_data->bi_monthly_bdms) && (is_array($magazine_data->bi_monthly_bdms) && count($magazine_data->bi_monthly_bdms) > 0)) {
         if ('Others' != $magazine_data->bi_monthly_bdms[0]['name']) {
             $pdf->BDMBiMonthlyPage($magazine_data->bi_monthly_bdms);
         }
     }
 
-    if (count($magazine_data->bdm_performances) > 0) {
+    if (is_array($magazine_data->bdm_performances) && count($magazine_data->bdm_performances) > 0) {
         if ('Others' != $magazine_data->bdm_performances[0]['name']) {
-            $pdf->BDMCumulativePage($magazine_data->bdm_performances, $magazine_data->quarterTitle);
+            $quarterTitle = isset($magazine_data->quarterTitle) ? $magazine_data->quarterTitle : null;
+            $pdf->BDMCumulativePage($magazine_data->bdm_performances, $quarterTitle);
         }
     }
 
@@ -2626,7 +2986,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $path = '';
 
     if ($preview) {
-        $pdf->Output('I', 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . $magazine_data->issue_number_line_2 . '.pdf');
+        $pdf->Output('I', 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . (isset($magazine_data->issue_number_line_2) ? $magazine_data->issue_number_line_2 : "") . '.pdf');
     } else {
         $filename = (! $randomize_name) ? 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . $magazine_data->issue_number_line_2 . '.pdf' : 'EliteInsure Magazine ' . md5(uniqid()) . '.pdf';
         $path = 'files/' . $filename;

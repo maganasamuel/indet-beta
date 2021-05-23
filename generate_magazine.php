@@ -126,4 +126,16 @@
         $magazine_data->photos = ConvertToArray($magazine_data->photos);
 
         $magazine_data->bi_monthly_bdms = isset($magazine_data->bi_monthly_bdms) ? ConvertToArray($magazine_data->bi_monthly_bdms) : null;
+        $magazine_data->all_winner_score = isset($magazine_data->all_winner_score) ? ConvertToArray($magazine_data->all_winner_score) : null;
+        $magazine_data->winner_score = isset($magazine_data->winner_score) ? ConvertToArray($magazine_data->winner_score) : null;
+        $magazine_data->rba_cumulative_advisers = isset($magazine_data->rba_cumulative_advisers) ? ConvertToArray($magazine_data->rba_cumulative_advisers) : null;
+
+        $magazine_data->adr_bi_monthly_advisers = isset($magazine_data->adr_bi_monthly_advisers) ? ConvertToArray($magazine_data->adr_bi_monthly_advisers) : null;
+        $magazine_data->adr_cumulative_advisers = isset($magazine_data->adr_cumulative_advisers) ? ConvertToArray($magazine_data->adr_cumulative_advisers) : null;
+        $magazine_data->adr_bi_monthly_advisers_kiwisavers = isset($magazine_data->adr_bi_monthly_advisers_kiwisavers) ? ConvertToArray($magazine_data->adr_bi_monthly_advisers_kiwisavers) : null;
+        $magazine_data->adr_cumulative_advisers_kiwisavers = isset($magazine_data->adr_cumulative_advisers_kiwisavers) ? ConvertToArray($magazine_data->adr_cumulative_advisers_kiwisavers) : null;
+        $magazine_data->sadr_bi_monthly_advisers = isset($magazine_data->sadr_bi_monthly_advisers) ? ConvertToArray($magazine_data->sadr_bi_monthly_advisers) : null;
+        $magazine_data->sadr_cumulative_advisers = isset($magazine_data->sadr_cumulative_advisers) ? ConvertToArray($magazine_data->sadr_cumulative_advisers) : null;
+        $magazine_data->sadr_bi_monthly_advisers_kiwisavers = isset($magazine_data->sadr_bi_monthly_advisers_kiwisavers) ? ConvertToArray($magazine_data->sadr_bi_monthly_advisers_kiwisavers) : null;
+        $magazine_data->sadr_cumulative_advisers_kiwisavers = isset($magazine_data->sadr_cumulative_advisers_kiwisavers) ? ConvertToArray($magazine_data->sadr_cumulative_advisers_kiwisavers) : null;
     }

@@ -89,7 +89,11 @@
 
             <td><input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" data-toggle="tooltip" title="Edit Adviser Profile" value='<?php echo "$id" ?>'>
                          </td>
-                         <td><a href="adviser_profile.php<?php echo "?id=$id" ?>" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile"><i class="fas fa-search"></i></a></td>
+                         <td>
+                             <a href="adviser_profile.php<?php echo "?id=$id" ?>" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile"><i class="fas fa-search"></i></a>
+                             &nbsp;
+                             <a href="adviser_strings.php?adviser_id=<?php echo $id; ?>">View Strings</i></a>
+                        </td>
                      <?php
                                 echo "</tr>";
 
@@ -116,6 +120,31 @@
                                     <div class="col-sm-8">
                                         <div class="row">
                                             <div class="col">
+
+                                                <div class="row" style="margin-top: 10px !important;">
+                                                    <div class="col">
+                                                        <label for="inputTask" class="col-sm-4 control-label">Position</label>
+                                                        <div class="col-sm-8">
+                                                            <select id="position" class="form-control" name="position_id" required />
+                                                            <option value="0" selected>--Select Position--</option>
+                                                                <?php
+
+                                                                    $query = "SELECT * from positions ORDER BY name ASC";
+                                                                    $displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
+
+                                                                    while ($rows = mysqli_fetch_array($displayquery)) {
+                                                                        $id = $rows["id"];
+                                                                        $name = $rows["name"];
+                                                                        //echo "<option value='".$id."'>".$name."</option>";
+                                                                        if ($name != "EliteInsure Team")
+                                                                            echo "<option value='" . $id . "'>" . $name . "</option>";
+                                                                    }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                                 <div class="row" style="margin-top: 10px !important;">
                                                     <div class="col">
                                                         <label for="inputTask" class="col-sm-4 control-label">Name</label>
@@ -145,13 +174,37 @@
 
                                                 <div class="row" style="margin-top: 10px !important;">
                                                     <div class="col">
-                                                        <label for="inputTask" class="col-sm-4 control-label">Team</label>
+                                                        <label for="inputTask" class="col-sm-4 control-label">Team (ADR)</label>
                                                         <div class="col-sm-8">
                                                             <select id="team" class="form-control" name="team_id" required />
                                                             <option value="0" selected>None</option>
                                                                 <?php
 
                                                                     $query = "SELECT * from teams ORDER BY name ASC";
+                                                                    $displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
+
+                                                                    while ($rows = mysqli_fetch_array($displayquery)) {
+                                                                        $id = $rows["id"];
+                                                                        $name = $rows["name"];
+                                                                        //echo "<option value='".$id."'>".$name."</option>";
+                                                                        if ($name != "EliteInsure Team")
+                                                                            echo "<option value='" . $id . "'>" . $name . "</option>";
+                                                                    }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row" style="margin-top: 10px !important;">
+                                                    <div class="col">
+                                                        <label for="inputTask" class="col-sm-4 control-label">Team (SADR)</label>
+                                                        <div class="col-sm-8">
+                                                            <select id="steam" class="form-control" name="steam_id" required />
+                                                            <option value="0" selected>None</option>
+                                                                <?php
+
+                                                                    $query = "SELECT * from steams ORDER BY name ASC";
                                                                     $displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
 
                                                                     while ($rows = mysqli_fetch_array($displayquery)) {

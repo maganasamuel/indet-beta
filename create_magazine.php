@@ -257,7 +257,7 @@ if (!isset($_SESSION["myusername"])) {
                             button.prop("disabled", false);
                             $("#create_magazine_text").text("Create Magazine");
                             $("#create_magazine_spinner").hide();
-                            console.log(e);
+                            
                             var mydata = JSON.stringify(e.data);
                             var link = e['link'];
                             var htm = '<iframe src="' + link + '" style="width: 100%;height: 75%;"></iframe>';

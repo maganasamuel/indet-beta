@@ -34,17 +34,18 @@ if(session_id()==""){
 
   $_SESSION['LAST_ACTIVITY'] = $_SERVER['REQUEST_TIME'];  
 
-  $host="localhost";
+  // Production
+  /* $host="localhost";
   $username="onlinei1_user";
   $password="cW;h8Yjw@h_}";
-  $db="onlinei1_indet";
+  $db="onlinei1_indet"; */
  
-    /*
+  // Local Development
   $host="localhost";
   $username="root";
   $password="";
-  $db="onlineins_invoice";
-*/
+  $db="ei_indet";
+
 
   $con=mysqli_connect($host,$username,$password,$db)or die("could not connect to sql");
   if (!$con) {

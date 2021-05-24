@@ -1,3 +1,4 @@
 libs/api/classes/configurations
 libs/composer/vendor
 files
+error_log

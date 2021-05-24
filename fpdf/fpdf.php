@@ -1032,7 +1032,7 @@ function Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='')
 
 	if($x===null)
 		$x = $this->x;
-	$this->_out(sprintf('q %.2F 0 0 %.2F %.2F %.2F cm /I%d Do Q',$w*$this->k,$h*$this->k,$x*$this->k,($this->h-($y+$h))*$this->k,$info['i']));
+	$this->_out(sprintf('q %.2F 0 0 %.2F %.2F %.2F cm /I%d Do Q',(float)$w*$this->k,(float)$h*$this->k,(float)$x*$this->k,(float)($this->h-((float)$y+(float)$h))*(float)$this->k,(float)$info['i']));
 	if($link)
 		$this->Link($x,$y,$w,$h,$link);
 }
@@ -1151,8 +1151,14 @@ protected function _dochecks()
 	if(ini_get('mbstring.func_overload') & 2)
 		$this->Error('mbstring overloading must be disabled');
 	// Ensure runtime magic quotes are disabled
-	if(get_magic_quotes_runtime())
-		@set_magic_quotes_runtime(0);
+
+	/***
+	 * Turn off magic_quotes_runtime
+	 * this function serves no purpose
+	if (get_magic_quotes_runtime()) {
+	    @set_magic_quotes_runtime(0);
+	}
+	***/
 }
 
 protected function _checkoutput()

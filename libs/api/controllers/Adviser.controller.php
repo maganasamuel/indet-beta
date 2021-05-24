@@ -72,7 +72,7 @@ class AdviserController extends Database
      */
     public function getActiveAdvisers()
     {
-        $query = "Select a.*, t.name as team from adviser_tbl a LEFT JOIN teams t ON a.team_id = t.id  WHERE a.termination_date = '' ORDER BY a.name";
+        $query = "Select a.*, t.name as team, s.name as steam from adviser_tbl a LEFT JOIN teams t ON a.team_id = t.id LEFT JOIN steams s ON a.steam_id = s.id WHERE a.termination_date = '' ORDER BY a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 

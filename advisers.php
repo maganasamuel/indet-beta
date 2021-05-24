@@ -126,7 +126,7 @@
                                                         <label for="inputTask" class="col-sm-4 control-label">Position</label>
                                                         <div class="col-sm-8">
                                                             <select id="position" class="form-control" name="position_id" required />
-                                                            <option value="" selected disabled>--Select Position--</option>
+                                                            <option value="0" selected>--Select Position--</option>
                                                                 <?php
 
                                                                     $query = "SELECT * from positions ORDER BY name ASC";

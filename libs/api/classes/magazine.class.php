@@ -885,6 +885,7 @@ class Magazine extends Database
         $tmp_output = array();
         foreach ($output as $k => $v) {
             if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
                 $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
                 $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                 $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
@@ -894,6 +895,7 @@ class Magazine extends Database
                     $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                 } else {
                     $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
                     $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
                     $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
@@ -906,6 +908,36 @@ class Magazine extends Database
             return $b['issued_api'] <=> $a['issued_api'];
         });
 
+        $highest = [];
+        $advisers = [];
+        $index = 0;
+        if(isset($tmp_output)) {
+            if(($tmp_output[0]['team_id'] == null) || ($tmp_output[0]['team_id'] == 0)) {
+                $index = null;
+                if(isset($tmp_output[1]['team_id']))
+                    $index = 1;
+            }
+
+            if($index !== null) {
+                $query = "SELECT name FROM adviser_tbl WHERE team_id = ? ORDER BY name";
+                $statement = $this->prepare($query);
+                $statement->bind_param("i", $tmp_output[$index]['team_id']);
+                $dataset = $this->execute($statement);
+
+                while ($row = $dataset->fetch_assoc()) {
+                    $advisers[] = $row['name'];
+                }
+
+                $highest = array(
+                    "name" => $tmp_output[$index]['name'],
+                    "issued_api" => $tmp_output[$index]['issued_api'],
+                    "deals" => $tmp_output[$index]['deals'],
+                    "advisers" => $advisers
+                );
+            }
+        }
+
+        $tmp_output['highest'] = $highest;
         return $tmp_output; 
     }
 
@@ -920,7 +952,7 @@ class Magazine extends Database
         $others['name'] = 'Others';
         $others['issued_api'] = 0;
         $others['deals'] = 0;
-        $others['team'] = 'Ex-Advisers';
+        $others['team'] = 'Others';
         $output['Others'] = $others;
 
         //Get Active
@@ -1089,7 +1121,7 @@ class Magazine extends Database
         $others = [];
         $others['name'] = 'Others';
         $others['deals'] = 0;
-        $others['team'] = 'Ex-Advisers';
+        $others['team'] = 'Others';
         $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
@@ -1134,7 +1166,7 @@ class Magazine extends Database
         //Ex advisers deals fetching
         if (count($otherAdvisers) > 0) {
             $otherAdvisersArrayString = implode(',', $otherAdvisers);
-            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $query = "SELECT 'Others' as name, 'Others' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
         }
@@ -1158,15 +1190,20 @@ class Magazine extends Database
         $tmp_output = array();
         foreach ($output as $k => $v) {
             if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
                 $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
                 $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                $tmp_output[$team_flag_cnt]['team_count'] = 1;
             } else {
                 if($team_flag == $output[$k]['team']) {
                     $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                    $tmp_output[$team_flag_cnt]['team_count'] += 1;
                 } else {
                     $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
                     $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                    $tmp_output[$team_flag_cnt]['team_count'] = 1;
                 }
             }
             $team_flag = $output[$k]['team'];
@@ -1176,6 +1213,48 @@ class Magazine extends Database
             return $b['deals'] <=> $a['deals'];
         });
 
+        $highest = [];
+        $advisers = [];
+        $index = 0;
+        if(isset($tmp_output)) {
+            if(($tmp_output[0]['team_id'] == null) || ($tmp_output[0]['team_id'] == 0)) {
+                $index = null;
+                if(isset($tmp_output[1]['team_id']))
+                    $index = 1;
+            }
+
+            if($index !== null) {
+                $highest_arr = [];
+                $highest_deals = $tmp_output[$index]['deals'];
+                foreach ($tmp_output as $k => $v) {
+                    if($tmp_output[$k]['deals'] == $highest_deals)
+                        $highest_arr[] = $tmp_output[$k];
+                }
+
+                usort($highest_arr, function($a, $b) {
+                    return $b['team_count'] <=> $a['team_count'];
+                });
+
+                if(isset($highest_arr) && sizeof($highest_arr) >= 1) {
+                    $query = "SELECT name FROM adviser_tbl WHERE team_id = ? ORDER BY name";
+                    $statement = $this->prepare($query);
+                    $statement->bind_param("i", $highest_arr[0]['team_id']);
+                    $dataset = $this->execute($statement);
+
+                    while ($row = $dataset->fetch_assoc()) {
+                        $advisers[] = $row['name'];
+                    }
+
+                    $highest = array(
+                        "name" => $highest_arr[0]['name'],
+                        "deals" => $highest_arr[0]['deals'],
+                        "advisers" => $advisers
+                    );
+                }        
+            }           
+        }
+
+        $tmp_output['highest'] = $highest;
         return $tmp_output;
     }
 
@@ -1190,7 +1269,7 @@ class Magazine extends Database
 
         $others = [];
         $others['name'] = 'Others';
-        $others['team'] = 'Ex-Advisers';
+        $others['team'] = 'Others';
         $others['deals'] = 0;
         $output['Others'] = $others;
 
@@ -1240,7 +1319,7 @@ class Magazine extends Database
         if (count($otherAdvisers) > 0) {
             $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
-            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $query = "SELECT 'Others' as name, 'Others' as team, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
         }
@@ -1426,6 +1505,7 @@ class Magazine extends Database
         $tmp_output = array();
         foreach ($output as $k => $v) {
             if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
                 $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
                 $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                 $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
@@ -1435,6 +1515,7 @@ class Magazine extends Database
                     $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                 } else {
                     $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
                     $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
                     $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
@@ -1447,6 +1528,36 @@ class Magazine extends Database
             return $b['issued_api'] <=> $a['issued_api'];
         });
 
+        $highest = [];
+        $advisers = [];
+        $index = 0;
+        if(isset($tmp_output)) {
+            if(($tmp_output[0]['steam_id'] == null) || ($tmp_output[0]['steam_id'] == 0)) {
+                $index = null;
+                if(isset($tmp_output[1]['steam_id']))
+                    $index = 1;
+            }
+
+            if($index !== null) {
+                $query = "SELECT name FROM adviser_tbl WHERE steam_id = ? ORDER BY name";
+                $statement = $this->prepare($query);
+                $statement->bind_param("i", $tmp_output[$index]['steam_id']);
+                $dataset = $this->execute($statement);
+
+                while ($row = $dataset->fetch_assoc()) {
+                    $advisers[] = $row['name'];
+                }
+
+                $highest = array(
+                    "name" => $tmp_output[$index]['name'],
+                    "issued_api" => $tmp_output[$index]['issued_api'],
+                    "deals" => $tmp_output[$index]['deals'],
+                    "advisers" => $advisers
+                );
+            }
+        }
+
+        $tmp_output['highest'] = $highest;
         return $tmp_output; 
     }
 
@@ -1461,8 +1572,8 @@ class Magazine extends Database
         $others['name'] = 'Others';
         $others['issued_api'] = 0;
         $others['deals'] = 0;
-        $others['team'] = 'Ex-Advisers';
-        $others['steam'] = 'Ex-Advisers';
+        $others['team'] = 'Others';
+        $others['steam'] = 'Others';
         $output['Others'] = $others;
 
         //Get Active
@@ -1631,8 +1742,8 @@ class Magazine extends Database
         $others = [];
         $others['name'] = 'Others';
         $others['deals'] = 0;
-        $others['team'] = 'Ex-Advisers';
-        $others['steam'] = 'Ex-Advisers';
+        $others['team'] = 'Others';
+        $others['steam'] = 'Others';
         $output['Others'] = $others;
 
         while ($row = $dataset->fetch_assoc()) {
@@ -1677,7 +1788,7 @@ class Magazine extends Database
         //Ex advisers deals fetching
         if (count($otherAdvisers) > 0) {
             $otherAdvisersArrayString = implode(',', $otherAdvisers);
-            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, 'Ex-Advisers' as steam, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $query = "SELECT 'Others' as name, 'Others' as team, 'Others' as steam, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
         }
@@ -1701,15 +1812,20 @@ class Magazine extends Database
         $tmp_output = array();
         foreach ($output as $k => $v) {
             if($team_flag == '') {
+                $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
                 $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
                 $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                $tmp_output[$team_flag_cnt]['team_count'] = 1;
             } else {
                 if($team_flag == $output[$k]['steam']) {
                     $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
+                    $tmp_output[$team_flag_cnt]['team_count'] += 1;
                 } else {
                     $team_flag_cnt++;
+                    $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
                     $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
+                    $tmp_output[$team_flag_cnt]['team_count'] = 1;
                 }
             }
             $team_flag = $output[$k]['steam'];
@@ -1719,6 +1835,48 @@ class Magazine extends Database
             return $b['deals'] <=> $a['deals'];
         });
 
+        $highest = [];
+        $advisers = [];
+        $index = 0;
+        if(isset($tmp_output)) {
+            if(($tmp_output[0]['steam_id'] == null) || ($tmp_output[0]['steam_id'] == 0)) {
+                $index = null;
+                if(isset($tmp_output[1]['steam_id']))
+                    $index = 1;
+            }
+
+            if($index !== null) {
+                $highest_arr = [];
+                $highest_deals = $tmp_output[$index]['deals'];
+                foreach ($tmp_output as $k => $v) {
+                    if($tmp_output[$k]['deals'] == $highest_deals)
+                        $highest_arr[] = $tmp_output[$k];
+                }
+
+                usort($highest_arr, function($a, $b) {
+                    return $b['team_count'] <=> $a['team_count'];
+                });
+
+                if(isset($highest_arr) && sizeof($highest_arr) >= 1) {
+                    $query = "SELECT name FROM adviser_tbl WHERE steam_id = ? ORDER BY name";
+                    $statement = $this->prepare($query);
+                    $statement->bind_param("i", $highest_arr[0]['steam_id']);
+                    $dataset = $this->execute($statement);
+
+                    while ($row = $dataset->fetch_assoc()) {
+                        $advisers[] = $row['name'];
+                    }
+
+                    $highest = array(
+                        "name" => $highest_arr[0]['name'],
+                        "deals" => $highest_arr[0]['deals'],
+                        "advisers" => $advisers
+                    );
+                } 
+            }           
+        }
+
+        $tmp_output['highest'] = $highest;
         return $tmp_output;
     }
 
@@ -1733,8 +1891,8 @@ class Magazine extends Database
 
         $others = [];
         $others['name'] = 'Others';
-        $others['team'] = 'Ex-Advisers';
-        $others['steam'] = 'Ex-Advisers';
+        $others['team'] = 'Others';
+        $others['steam'] = 'Others';
         $others['deals'] = 0;
         $output['Others'] = $others;
 
@@ -1784,7 +1942,7 @@ class Magazine extends Database
         if (count($otherAdvisers) > 0) {
             $otherAdvisersArrayString = implode(',', $otherAdvisers);
 
-            $query = "SELECT 'Others' as name, 'Ex-Advisers' as team, 'Ex-Advisers' as steam, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
+            $query = "SELECT 'Others' as name, 'Others' as team, 'Others' as steam, COUNT(commission) as deals, SUM(commission) as total_commission, SUM(gst) as total_gst, SUM(balance) as total_balance FROM adviser_tbl a LEFT JOIN clients_tbl c ON c.assigned_to = a.id LEFT JOIN kiwisaver_profiles kp ON kp.client_id = c.id LEFT JOIN kiwisaver_deals kd ON kd.kiwisaver_profile_id = kp.id WHERE a.id IN ($otherAdvisersArrayString) AND kd.issue_date <= '$to' AND kd.issue_date >= '$from' AND kd.count = 'Yes' GROUP BY a.id";
             $statement = $this->prepare($query);
             $dataset = $this->execute($statement);
         }

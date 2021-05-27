@@ -73,15 +73,25 @@ class TeamController extends Database {
         $name = "",
         $leader = 0
     ) {
-        $name = $this->clean($name);
-        
+       $name = $this->clean($name);
+        //Clear Leader Assignment
+        // $query = "UPDATE teams SET leader = '0' WHERE leader = $leader";
+        // $statement = $this->prepare($query);
+        // $dataset = $this->execute($statement);
+
+        //Insert New Team
         $query = "INSERT INTO teams (name, leader) VALUES  ('$name',$leader)";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $insert_id = $this->mysqli->insert_id;  
         
+        //Update team_id of leader
+        $query = "UPDATE adviser_tbl SET team_id = $insert_id WHERE id = $leader";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
         $dataset = $this->getTeam($insert_id);
-		return $dataset;
+        return $dataset;
 	}	
     
 	/**
@@ -92,14 +102,18 @@ class TeamController extends Database {
         $name = "",
         $leader = ""
     ) {
-        $name = $this->clean($name);
+        //Update team_id of adviser
+        $query = "UPDATE adviser_tbl SET team_id = $id WHERE id = $leader";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
 
+        $name = $this->clean($name);
         $query = "UPDATE teams SET leader = $leader, name = '$name' WHERE id = $id";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         
         $dataset = $this->getTeam($id);
-		return $dataset;
+        return $dataset;
 	}	
     
 	/**
@@ -108,10 +122,15 @@ class TeamController extends Database {
 	public function deleteTeam (
         $id = 0    //
     ) {
+        //Update team_id of adviser
+        $query = "UPDATE adviser_tbl SET team_id = NULL WHERE team_id = $id";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        //Delete Team
         $query = "DELETE from teams WHERE id = $id";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
-        
-		return $dataset;
+        return $dataset;
 	}	
 }

@@ -83,7 +83,9 @@
 
 								?>
 
- 					<td><input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" value='<?php echo "$id" ?>'>
+ 					<td>
+ 						<input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" value='<?php echo "$id" ?>'>
+ 						<input type='image' class='delete' src='delete.png' data-toggle="tooltip" title="Delete Team" data-id="<?php echo $id ?>">
  					</td>
  					<td><a href="team_members<?php echo "?id=$id" ?>" class="btn btn-primary"><i class="fas fa-search"></i></a></td>
  					<?php

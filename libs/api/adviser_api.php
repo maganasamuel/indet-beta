@@ -187,7 +187,8 @@ function CreateAdviser()
         $bonus,
         $image,
         $date_hired,
-        $termination_date
+        $termination_date,
+        ''
     );
 
     $data = $data->fetch_assoc();

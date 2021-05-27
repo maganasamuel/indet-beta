@@ -57,7 +57,7 @@ if (!isset($_SESSION["myusername"])) {
 			if ($team["team_name"] == "EliteInsure Team") {
 				$query = "SELECT * FROM adviser_tbl";
 			} else {
-				$query = "SELECT * FROM adviser_tbl WHERE team_id = $team_id ORDER BY name";
+				$query = "SELECT * FROM adviser_tbl WHERE steam_id = $team_id ORDER BY name";
 			}
 			$displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
 			?>

@@ -98,7 +98,8 @@ $(document).ready(function () {
                 var newData = [
                     data.name,
                     data.adviser_name,
-                    '<input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" value="'+ data.id + '">',
+                    '<input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" value="'+ data.id + '">' +
+                    '<input type="image" class="delete" src="delete.png" data-toggle="tooltip" title="Delete Team" data-id="'+ data.id +'">',
                     '<a href="team_members?id='+ data.id + '" class="btn btn-primary"><i class="fas fa-search"></i></a>'
                 ];
 
@@ -123,4 +124,34 @@ $(document).ready(function () {
 
     });
 
+    //delete button
+    $(document).on('click','.delete',function() {
+        var id = $(this).data("id");
+        data = {
+            action: 'delete_team',
+            team_id: id
+        };
+
+        $.confirm({
+            title: 'Confirm',
+            content: 'Are you sure you want to delete this?',
+            buttons: {
+                confirm: function() {
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        type: 'POST',
+                        success: function(e) {
+                            console.log(e);
+                            table.row("#team" + id).remove().draw(false);
+                        },
+                        error: function(e) {
+                            console.log(e);
+                        }
+                    });
+                },
+                cancel: function() {}
+            }
+        });
+    });
 });

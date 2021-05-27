@@ -566,7 +566,8 @@ class AdviserController extends Database
         $bonus = 50,
         $image = "",
         $date_hired = "",
-        $termination_date = ""
+        $termination_date = "",
+        $ird_num = ""
     ) {
 
         $date_helper = new INDET_DATES_HELPER();
@@ -591,8 +592,9 @@ class AdviserController extends Database
         }
 
         $query = "INSERT INTO adviser_tbl 
-        (team_id, steam_id, position_id, name, company_name, payroll_name, fsp_num, address, email, birthday, leads, bonus, image, date_hired, termination_date) VALUES 
-        ($team_id, $steam_id, $position_id, '$name','$company_name','$payroll_name','$fsp_num','$address','$email','$birthday','$leads','$bonus', '$image', '$date_hired', '$termination_date')";
+        (team_id, steam_id, position_id, name, company_name, payroll_name, fsp_num, address, ird_num, email, birthday, leads, bonus, image, date_hired, termination_date) VALUES 
+        ($team_id, $steam_id, $position_id, '$name','$company_name','$payroll_name','$fsp_num','$address','$ird_num','$email','$birthday','$leads','$bonus', '$image', '$date_hired', '$termination_date')";
+
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $review_id = $this->mysqli->insert_id;

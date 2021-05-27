@@ -74,12 +74,22 @@ class STeamController extends Database {
         $leader = 0
     ) {
         $name = $this->clean($name);
-        
+        //Clear Leader Assignment
+        // $query = "UPDATE steams SET leader = '0' WHERE leader = $leader";
+        // $statement = $this->prepare($query);
+        // $dataset = $this->execute($statement);
+
+        //Insert New Team
         $query = "INSERT INTO steams (name, leader) VALUES  ('$name',$leader)";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $insert_id = $this->mysqli->insert_id;  
         
+        //Update steam_id of leader
+        $query = "UPDATE adviser_tbl SET steam_id = $insert_id WHERE id = $leader";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
         $dataset = $this->getTeam($insert_id);
 		return $dataset;
 	}	
@@ -92,8 +102,12 @@ class STeamController extends Database {
         $name = "",
         $leader = ""
     ) {
-        $name = $this->clean($name);
+        //Update steam_id of adviser
+        $query = "UPDATE adviser_tbl SET steam_id = $id WHERE id = $leader";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
 
+        $name = $this->clean($name);
         $query = "UPDATE steams SET leader = $leader, name = '$name' WHERE id = $id";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
@@ -108,10 +122,15 @@ class STeamController extends Database {
 	public function deleteTeam (
         $id = 0    //
     ) {
+        //Update steam_id of adviser
+        $query = "UPDATE adviser_tbl SET steam_id = NULL WHERE steam_id = $id";
+        $statement = $this->prepare($query);
+        $dataset = $this->execute($statement);
+
+        //Delete Team
         $query = "DELETE from steams WHERE id = $id";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
-        
 		return $dataset;
 	}	
 }

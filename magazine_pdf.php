@@ -2075,7 +2075,7 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
                                 $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
                             }
@@ -2092,9 +2092,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2109,9 +2109,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2126,9 +2126,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2141,7 +2141,6 @@ class PDF extends PDF_MC_Table
                     }
                 }
             } elseif ($adviser['deals'] >= 2 && $adviser['issued_api'] >= 2000) {
-                $this->AddPage();
                 $this->SetFont('Arial', '', 7);
                 $this->SetXY(10, $this->GetPageHeight() - 37);
                 $this->Write(0, 'CRITERIA: ');
@@ -2155,6 +2154,8 @@ class PDF extends PDF_MC_Table
                 $this->Write(0, 'c. 4 policies and over $6000 API for Platinum; and ');
                 $this->Ln(3.3);
                 $this->Write(0, 'd. 5 policies and over $7500 APIfor Titanium ');
+
+                $this->AddPage();
 
                 if ($adviser['deals'] > 0) {
                     $total += $adviser['deals'];
@@ -2170,9 +2171,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2187,9 +2188,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2204,9 +2205,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2221,9 +2222,9 @@ class PDF extends PDF_MC_Table
                             }
 
                             if (file_exists($image_path)) {
-                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($image_path, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             } else {
-                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
+                                $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
                             $this->SetFont('Calibri', '', 15);
@@ -2316,10 +2317,75 @@ class PDF extends PDF_MC_Table
     //START ADR page
     public function ADRBiMonthlyPage($bimonthly)
     {   
+
+        $highest = [];
+        if(isset($bimonthly['highest'])) {
+            $highest = $bimonthly['highest'];
+            unset($bimonthly['highest']);
+        }
+
+        $highest_team = "";
+        $highest_issued_api = "";
+        $highest_deals = "";
+        $highest_team_advisers = [];
+        if(isset($highest) && sizeof($highest) >= 1) {
+            $highest_team = $highest['name'];
+            $highest_issued_api = $highest['issued_api'];
+            $highest_deals = $highest['deals'];
+            $highest_team_advisers = $highest['advisers'];
+        }
+
         //page 2 BiMonthly API
         $this->AddPage();
 
+        if(is_array($highest_team_advisers) && sizeof($highest_team_advisers) >= 1) {
+            $this->Header1(15, 'ADR Team with Highest Total API from Policies Issued');
+
+            $this->SetFillColor(255, 255, 255);
+
+            // $this->Rect(11, 35, 100, 65, 'DF');
+            // $this->SetTextColor(0, 0, 0);
+            $this->SetY(38);
+            // $this->SetX(14);
+
+            $this->Cell(0, 3, '', 'L,T,R', '1', 'L', true);
+            //Team Name
+            $this->SetFont('Calibri', 'B', 25);
+            $this->Cell(1, 8, '', 'L', '', '', true);
+            $this->Cell(0, 8, 'Team: '.$highest_team, 'R', '1', 'C', true);
+            $this->Cell(0, 5, '', 'L,R', '1', 'L', true);
+
+            //Advisers list
+            $this->SetFont('Calibri', 'B', 20);
+            $this->Cell(10, 8, '', 'L', '', '', true);
+            $this->Cell(90, 8, 'Advisers: ', '0', '0', 'L', true);
+            $this->Cell(50, 8, 'Policies Issued: ', '0', '0', 'L', true);
+            $this->SetFont('Calibri', '', 20);
+            $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
+            
+            foreach ($highest_team_advisers as $k => $v) {
+                if($k == 0) {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(88, 8, $highest_team_advisers[$k], '0', '0', 'L', true); 
+                    $this->SetFont('Calibri', 'B', 20);
+                    $this->Cell(50, 8, 'Total API: ', '0', '0', 'L', true);
+                    $this->SetFont('Calibri', '', 20);
+                    $this->Cell(0, 8, number_format($highest_issued_api, 2), 'R', '1', 'L', true);
+                } else {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true); 
+                }     
+            }
+        
+            $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
+        }
+
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
+
         //Tables
         $this->Header1(($next_Y+15), 'ADR Team Bi-Monthly Issued Policies Table');
 
@@ -2331,7 +2397,7 @@ class PDF extends PDF_MC_Table
         $this->SetFillColor(255, 255, 255);
 
         $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
         // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
@@ -2361,6 +2427,11 @@ class PDF extends PDF_MC_Table
     public function ADRCumulativePage($cumulative)
     {   
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
+
         //Tables
         $this->Header1(($next_Y+15), 'ADR Team Cumulative Issued Policies Table');
 
@@ -2371,7 +2442,7 @@ class PDF extends PDF_MC_Table
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
         $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
         // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
@@ -2400,10 +2471,64 @@ class PDF extends PDF_MC_Table
 
     public function ADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
     {   
-        //page 2 BiMonthly KiwiSavers
+        $highest = [];
+        if(isset($bimonthlykiwisavers['highest'])) {
+            $highest = $bimonthlykiwisavers['highest'];
+            unset($bimonthlykiwisavers['highest']);
+        }
+
+        $highest_team = "";
+        $highest_issued_api = "";
+        $highest_deals = "";
+        $highest_team_advisers = [];
+        if(isset($highest) && sizeof($highest) >= 1) {
+            $highest_team = $highest['name'];
+            $highest_deals = $highest['deals'];
+            $highest_team_advisers = $highest['advisers'];
+        }
+
+        //page 2 BiMonthly API
         $this->AddPage();
 
+        if(is_array($highest_team_advisers) && sizeof($highest_team_advisers) >= 1) {
+            $this->Header1(15, 'ADR Team with Highest Total Kiwisaver Enrolments');
+
+            $this->SetFillColor(255, 255, 255);
+
+            // $this->Rect(11, 35, 100, 65, 'DF');
+            // $this->SetTextColor(0, 0, 0);
+            $this->SetY(38);
+            // $this->SetX(14);
+
+            $this->Cell(0, 3, '', 'L,T,R', '1', 'L', true);
+            //Team Name
+            $this->SetFont('Calibri', 'B', 25);
+            $this->Cell(1, 8, '', 'L', '', '', true);
+            $this->Cell(0, 8, 'Team: '.$highest_team, 'R', '1', 'C', true);
+            $this->Cell(0, 5, '', 'L,R', '1', 'L', true);
+
+            //Advisers list
+            $this->SetFont('Calibri', 'B', 20);
+            $this->Cell(10, 8, '', 'L', '', '', true);
+            $this->Cell(90, 8, 'Advisers: ', '0', '0', 'L', true);
+            $this->Cell(50, 8, 'Enrolled: ', '0', '0', 'L', true);
+            $this->SetFont('Calibri', '', 20);
+            $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
+            
+            foreach ($highest_team_advisers as $k => $v) {
+                $this->Cell(12, 8, '', 'L', '', '', true);
+                $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);   
+            }
+        
+            $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
+        }
+        
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
+
         //Tables
         $this->Header1(($next_Y+15), 'ADR Team Bi-Monthly Table for Kiwisaver Enrolments');
 
@@ -2472,10 +2597,73 @@ class PDF extends PDF_MC_Table
     //SADR page
     public function SADRBiMonthlyPage($bimonthly)
     {   
+        $highest = [];
+        if(isset($bimonthly['highest'])) {
+            $highest = $bimonthly['highest'];
+            unset($bimonthly['highest']);
+        }
+
+        $highest_team = "";
+        $highest_issued_api = "";
+        $highest_deals = "";
+        $highest_team_advisers = [];
+        if(isset($highest) && sizeof($highest) >= 1) {
+            $highest_team = $highest['name'];
+            $highest_issued_api = $highest['issued_api'];
+            $highest_deals = $highest['deals'];
+            $highest_team_advisers = $highest['advisers'];
+        }
+
         //page 2 BiMonthly API
         $this->AddPage();
+        if(is_array($highest_team_advisers) && sizeof($highest_team_advisers) >= 1) {
+            $this->Header1(15, 'SADR Team with Highest Total API from Policies Issued');
+
+            $this->SetFillColor(255, 255, 255);
+
+            // $this->Rect(11, 35, 100, 65, 'DF');
+            // $this->SetTextColor(0, 0, 0);
+            $this->SetY(38);
+            // $this->SetX(14);
+
+            $this->Cell(0, 3, '', 'L,T,R', '1', 'L', true);
+            //Team Name
+            $this->SetFont('Calibri', 'B', 25);
+            $this->Cell(1, 8, '', 'L', '', '', true);
+            $this->Cell(0, 8, 'Team: '.$highest_team, 'R', '1', 'C', true);
+            $this->Cell(0, 5, '', 'L,R', '1', 'L', true);
+
+            //Advisers list
+            $this->SetFont('Calibri', 'B', 20);
+            $this->Cell(10, 8, '', 'L', '', '', true);
+            $this->Cell(90, 8, 'Advisers: ', '0', '0', 'L', true);
+            $this->Cell(50, 8, 'Policies Issued: ', '0', '0', 'L', true);
+            $this->SetFont('Calibri', '', 20);
+            $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
+            
+            foreach ($highest_team_advisers as $k => $v) {
+                if($k == 0) {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(88, 8, $highest_team_advisers[$k], '0', '0', 'L', true); 
+                    $this->SetFont('Calibri', 'B', 20);
+                    $this->Cell(50, 8, 'Total API: ', '0', '0', 'L', true);
+                    $this->SetFont('Calibri', '', 20);
+                    $this->Cell(0, 8, number_format($highest_issued_api, 2), 'R', '1', 'L', true);
+                } else {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true); 
+                }     
+            }
+            
+            $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
+        }
 
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
+
         //Tables
         $this->Header1(($next_Y+15), 'SADR Team Bi-Monthly Issued Policies Table');
 
@@ -2511,6 +2699,10 @@ class PDF extends PDF_MC_Table
     public function SADRCumulativePage($cumulative)
     {   
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
         //Tables
         $this->Header1(($next_Y+15), 'SADR Team Cumulative Issued Policies Table');
 
@@ -2544,10 +2736,64 @@ class PDF extends PDF_MC_Table
 
     public function SADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
     {   
-        //page 2 BiMonthly KiwiSavers
+        $highest = [];
+        if(isset($bimonthlykiwisavers['highest'])) {
+            $highest = $bimonthlykiwisavers['highest'];
+            unset($bimonthlykiwisavers['highest']);
+        }
+
+        $highest_team = "";
+        $highest_issued_api = "";
+        $highest_deals = "";
+        $highest_team_advisers = [];
+        if(isset($highest) && sizeof($highest) >= 1) {
+            $highest_team = $highest['name'];
+            $highest_deals = $highest['deals'];
+            $highest_team_advisers = $highest['advisers'];
+        }
+
+        //page 2 BiMonthly API
         $this->AddPage();
 
+        if(is_array($highest_team_advisers) && sizeof($highest_team_advisers) >= 1) {
+            $this->Header1(15, 'SADR Team with Highest Total Kiwisaver Enrolments');
+
+            $this->SetFillColor(255, 255, 255);
+
+            // $this->Rect(11, 35, 100, 65, 'DF');
+            // $this->SetTextColor(0, 0, 0);
+            $this->SetY(38);
+            // $this->SetX(14);
+
+            $this->Cell(0, 3, '', 'L,T,R', '1', 'L', true);
+            //Team Name
+            $this->SetFont('Calibri', 'B', 25);
+            $this->Cell(1, 8, '', 'L', '', '', true);
+            $this->Cell(0, 8, 'Team: '.$highest_team, 'R', '1', 'C', true);
+            $this->Cell(0, 5, '', 'L,R', '1', 'L', true);
+
+            //Advisers list
+            $this->SetFont('Calibri', 'B', 20);
+            $this->Cell(10, 8, '', 'L', '', '', true);
+            $this->Cell(90, 8, 'Advisers: ', '0', '0', 'L', true);
+            $this->Cell(50, 8, 'Enrolled: ', '0', '0', 'L', true);
+            $this->SetFont('Calibri', '', 20);
+            $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
+            
+            foreach ($highest_team_advisers as $k => $v) {
+                $this->Cell(12, 8, '', 'L', '', '', true);
+                $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);   
+            }
+        
+            $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
+        }
+        
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
+
         //Tables
         $this->Header1(($next_Y+15), 'SADR Team Bi-Monthly Table for Kiwisaver Enrolments');
 

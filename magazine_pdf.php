@@ -2366,7 +2366,7 @@ class PDF extends PDF_MC_Table
             foreach ($highest_team_advisers as $k => $v) {
                 if($k == 0) {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(88, 8, $highest_team_advisers[$k], '0', '0', 'L', true); 
+                    $this->Cell(88, 8, $highest_team_advisers[$k].' (ADR)', '0', '0', 'L', true); 
                     $this->SetFont('Calibri', 'B', 20);
                     $this->Cell(50, 8, 'Total API: ', '0', '0', 'L', true);
                     $this->SetFont('Calibri', '', 20);
@@ -2516,8 +2516,13 @@ class PDF extends PDF_MC_Table
             $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
             
             foreach ($highest_team_advisers as $k => $v) {
-                $this->Cell(12, 8, '', 'L', '', '', true);
-                $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);   
+                if($k == 0) {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(0, 8, $highest_team_advisers[$k].' (ADR)', 'R', '1', 'L', true);  
+                } else {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);  
+                }         
             }
         
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
@@ -2562,6 +2567,10 @@ class PDF extends PDF_MC_Table
     public function ADRCumulativeKiwiSaversPage($cumulativekiwisavers)
     {   
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
         //Tables
         $this->Header1(($next_Y+15), 'ADR Team Cumulative Table for Kiwisaver Enrolments');
 
@@ -2644,7 +2653,7 @@ class PDF extends PDF_MC_Table
             foreach ($highest_team_advisers as $k => $v) {
                 if($k == 0) {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(88, 8, $highest_team_advisers[$k], '0', '0', 'L', true); 
+                    $this->Cell(88, 8, $highest_team_advisers[$k].' (SADR)', '0', '0', 'L', true); 
                     $this->SetFont('Calibri', 'B', 20);
                     $this->Cell(50, 8, 'Total API: ', '0', '0', 'L', true);
                     $this->SetFont('Calibri', '', 20);
@@ -2781,8 +2790,13 @@ class PDF extends PDF_MC_Table
             $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
             
             foreach ($highest_team_advisers as $k => $v) {
-                $this->Cell(12, 8, '', 'L', '', '', true);
-                $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);   
+                if($k == 0) {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(0, 8, $highest_team_advisers[$k].' (SADR)', 'R', '1', 'L', true);   
+                } else {
+                    $this->Cell(12, 8, '', 'L', '', '', true);
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);   
+                }  
             }
         
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
@@ -2827,6 +2841,10 @@ class PDF extends PDF_MC_Table
     public function SADRCumulativeKiwiSaversPage($cumulativekiwisavers)
     {   
         $next_Y = $this->GetY();
+        if(($next_Y + 15) >= 200) {
+            $this->AddPage();
+            $next_Y = $this->GetY();
+        }
         //Tables
         $this->Header1(($next_Y+15), 'SADR Team Cumulative Table for Kiwisaver Enrolments');
 

@@ -175,8 +175,8 @@ function ConvertToLeadTrackerClientData($row){
     $row["appt_date_and_time_order"] = $row["appt_date_order"] . date("Hi", strtotime($row["time"])); 
     $row["appt_date_and_time"] = $row["appt_date"] . " " . $row["appt_time"]; 
 
-    $row["appt_date_and_time_timestamp"] = strtotime($row["appt_date_and_time_order"]) + 18000; 
-
+    // $row["appt_date_and_time_timestamp"] = strtotime($row["appt_date_and_time_order"]) + 18000; 
+    $row["appt_date_and_time_timestamp"] = strtotime($row["appt_date_and_time_order"]); 
     $row["date_assigned_order"] = $row["assigned_date"]; 
     $row["date_assigned"] = date("d/m/Y", strtotime($row["assigned_date"])); 
     $row["created_at"] = strtotime($row["creation_date"]);

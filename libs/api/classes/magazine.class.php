@@ -1307,7 +1307,7 @@ class Magazine extends Database
 
         $highest = [];
         $advisers = [];
-        if(isset($tmp_output)) {
+        if(isset($tmp_output) && sizeof($tmp_output) >= 1) {
             $highest_arr = [];
             $highest_deals = $tmp_output[0]['deals'];
             foreach ($tmp_output as $k => $v) {
@@ -1683,7 +1683,7 @@ class Magazine extends Database
         $highest = [];
         $advisers = [];
         $index = 0;
-        if(isset($tmp_output)) {
+        if(isset($tmp_output) && sizeof($tmp_output) >= 1) {
             $query = "SELECT name, IF(EXISTS(SELECT leader FROM steams WHERE id = adviser_tbl.steam_id AND leader = adviser_tbl.id),1,0) AS leader FROM adviser_tbl WHERE steam_id = ? ORDER BY leader DESC, name ASC";
             $statement = $this->prepare($query);
             $statement->bind_param("i", $tmp_output[0]['steam_id']);
@@ -2048,7 +2048,7 @@ class Magazine extends Database
 
         $highest = [];
         $advisers = [];
-        if(isset($tmp_output)) {
+        if(isset($tmp_output) && sizeof($tmp_output) >= 1) {
             $highest_arr = [];
             $highest_deals = $tmp_output[0]['deals'];
             foreach ($tmp_output as $k => $v) {

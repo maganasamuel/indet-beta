@@ -137,8 +137,8 @@ if(!empty($_GET['id'])){
     c.*, 
     l.name as leadgen_name, 
     a.name as adviser_name,
-    (SELECT instructions FROM online1_appointment_setter.appointments WHERE online1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS instructions,
-    (SELECT additional_notes FROM online1_appointment_setter.appointments WHERE online1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS additional_notes 
+    (SELECT instructions FROM onlinei1_appointment_setter.appointments WHERE onlinei1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS instructions,
+    (SELECT additional_notes FROM onlinei1_appointment_setter.appointments WHERE onlinei1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS additional_notes 
   FROM 
     `clients_tbl` c LEFT JOIN 
     `leadgen_tbl` l ON c.leadgen = l.id LEFT JOIN 

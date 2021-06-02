@@ -314,8 +314,11 @@ class ClientController extends Database
         $six_months_ago = date("Ymd", strtotime(date("Ymd") . " -6 months"));
         $four_months_ago = date("Ymd", strtotime(date("Ymd") . " -4 months"));
 
-        //Fetch all clients assigned to adviser 
-        $query = "Select c.*, a.name as adviser_name, a.email as adviser_email, l.name as leadgen_name from clients_tbl c LEFT JOIN adviser_tbl a ON c.assigned_to = a.id LEFT JOIN leadgen_tbl l ON l.id = c.leadgen WHERE c.assigned_to = $adviser_id";
+        //Fetch all clients assigned to adviser (localhost)
+        // $query = "Select c.*, a.name as adviser_name, a.email as adviser_email, l.name as leadgen_name, IFNULL((SELECT instructions FROM appointment_setter.appointments WHERE appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)),'N/A') AS instructions,IFNULL((SELECT additional_notes FROM appointment_setter.appointments WHERE appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)),'N/A') AS additional_notes from clients_tbl c LEFT JOIN adviser_tbl a ON c.assigned_to = a.id LEFT JOIN leadgen_tbl l ON l.id = c.leadgen WHERE c.assigned_to = $adviser_id";
+        
+        //Fetch all clients assigned to adviser (server)
+        $query = "Select c.*, a.name as adviser_name, a.email as adviser_email, l.name as leadgen_name, IFNULL((SELECT instructions FROM online1_appointment_setter.appointments WHERE online1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)),'N/A') AS instructions,IFNULL((SELECT additional_notes FROM online1_appointment_setter.appointments WHERE online1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)),'N/A') AS additional_notes from clients_tbl c LEFT JOIN adviser_tbl a ON c.assigned_to = a.id LEFT JOIN leadgen_tbl l ON l.id = c.leadgen WHERE c.assigned_to = $adviser_id";
         
         //Remove clients that have submissions and/or have kiwisaver enrollments
         $query .= " AND c.id NOT IN (SELECT client_id FROM submission_clients) AND c.id NOT IN (SELECT client_id FROM kiwisaver_profiles)";

@@ -46,7 +46,26 @@ $(document).ready(function () {
             }
 
             $("#assigned_to").val(data.assigned_to);
-            $("#notes").val(data.notes);
+            
+            var instructions_tmp = '';
+            var anotes_tmp = '';
+            var notes_disp = '';
+
+            if (data.instructions != null) 
+                instructions_tmp = "\r\nInstructions: "+data.instructions;
+            if (data.additional_notes != null) 
+                anotes_tmp = "\r\nAdditional Notes: "+data.additional_notes;
+            if (data.notes != null) 
+                notes_disp = data.notes;
+            
+
+            if (!(notes_disp.indexOf("Instructions: ") >= 0)) 
+                notes_disp = notes_disp+instructions_tmp;
+            if (!(notes_disp.indexOf("Additional Notes: ") >= 0)) 
+                notes_disp = notes_disp+anotes_tmp;
+            
+
+            $("#notes").val(notes_disp);
             $("#status").val(data.status);
             $('#date_status_updated').val(date_status_updated);
 

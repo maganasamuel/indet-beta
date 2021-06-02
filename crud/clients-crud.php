@@ -117,7 +117,36 @@ if(!empty($_POST['formtype'])){
 
 //GET ROUTE
 if(!empty($_GET['id'])){
-  $sql = "SELECT c.*, l.name as leadgen_name, a.name as adviser_name FROM `clients_tbl` c LEFT JOIN `leadgen_tbl` l ON c.leadgen = l.id LEFT JOIN `adviser_tbl` a ON c.assigned_to = a.id WHERE c.id = " . $_GET['id'] . " LIMIT 1";
+  //for localhost
+  // $sql = "SELECT 
+  //   c.*, 
+  //   l.name as leadgen_name, 
+  //   a.name as adviser_name,
+  //   (SELECT instructions FROM appointment_setter.appointments WHERE appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS instructions,
+  //   (SELECT additional_notes FROM appointment_setter.appointments WHERE appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS additional_notes 
+  // FROM 
+  //   `clients_tbl` c LEFT JOIN 
+  //   `leadgen_tbl` l ON c.leadgen = l.id LEFT JOIN 
+  //   `adviser_tbl` a ON c.assigned_to = a.id 
+  // WHERE 
+  //   c.id = " . $_GET['id'] . " 
+  // LIMIT 1";
+
+  //for server
+  $sql = "SELECT 
+    c.*, 
+    l.name as leadgen_name, 
+    a.name as adviser_name,
+    (SELECT instructions FROM online1_appointment_setter.appointments WHERE online1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS instructions,
+    (SELECT additional_notes FROM online1_appointment_setter.appointments WHERE online1_appointment_setter.appointments.indet_id IN (SELECT c.id FROM clients_tbl)) AS additional_notes 
+  FROM 
+    `clients_tbl` c LEFT JOIN 
+    `leadgen_tbl` l ON c.leadgen = l.id LEFT JOIN 
+    `adviser_tbl` a ON c.assigned_to = a.id 
+  WHERE 
+    c.id = " . $_GET['id'] . " 
+  LIMIT 1";
+
   $result = mysqli_query($con,$sql);
   $row = mysqli_fetch_assoc($result);
   $data = json_encode($row);

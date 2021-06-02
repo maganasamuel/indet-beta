@@ -51,11 +51,11 @@ $(document).ready(function () {
             var anotes_tmp = '';
             var notes_disp = '';
 
-            if (data.instructions != null) 
+            if (data.instructions != null && data.instructions != '') 
                 instructions_tmp = "\r\nInstructions: "+data.instructions;
-            if (data.additional_notes != null) 
+            if (data.additional_notes != null && data.additional_notes != '') 
                 anotes_tmp = "\r\nAdditional Notes: "+data.additional_notes;
-            if (data.notes != null) 
+            if (data.notes != null && data.notes != '') 
                 notes_disp = data.notes;
             
 

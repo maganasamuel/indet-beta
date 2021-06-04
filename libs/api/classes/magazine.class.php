@@ -2363,15 +2363,15 @@ class Magazine extends Database
             }
         }
 
-        $deals_winner = array_column($output, 'deals');
+        $filteredOutput = collect($output)->where('deals', '>=', 2)
+            ->where('issued_api', '>=', 2000)
+            ->sortByDesc([
+                ['deals', 'desc'],
+                ['issued_api', 'desc'],
+            ])
+            ->all();
 
-        array_multisort($deals_winner, SORT_DESC, $output);
-
-        $key = array_search('Others', array_column($output, 'name'));
-
-        $this->moveElement($output, $key, count($output) - 1);
-
-        return $this->FilterOutput($output, 'deals');
+        return $filteredOutput;
     }
 
     public function GetCumulativeAdvisers()
@@ -3827,7 +3827,7 @@ class Magazine extends Database
         if ($this->runAdviserId) {
             $winner_adviser = collect($winner_adviser)->where('id', $this->runAdviserId);
         } else {
-            $winner_adviser = collect($winner_adviser)->slice(0, 5);
+            $winner_adviser = collect($winner_adviser);
         }
 
         foreach ($winner_adviser as $adviser) {

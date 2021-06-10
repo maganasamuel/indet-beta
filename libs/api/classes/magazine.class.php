@@ -2859,11 +2859,12 @@ class Magazine extends Database
                     if ('Issued' == $deal['status']) {
 
                         //Check if cancelled
-                        if (isset($deal['clawback_status'])) {
+                        // Temporary comment
+                        /* if (isset($deal['clawback_status'])) {
                             if ('Cancelled' == $deal['clawback_status']) {
                                 continue;
                             }
-                        }
+                        } */
 
                         if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
                             $total_issued_api += $deal['issued_api'];

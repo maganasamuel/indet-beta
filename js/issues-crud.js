@@ -414,7 +414,7 @@ $(document).ready(function () {
             confirm: {
               text: 'Confirm',
               btnClass: 'btn-green',
-              action: function () {}
+              action: function () { }
 
             }
           }
@@ -448,7 +448,7 @@ $(document).ready(function () {
       $('#issued_api_' + dealCount).prop('required', true);
       $('#issued_div_' + dealCount).slideDown();
       $('#issued_div_extra_' + dealCount).slideDown();
-      $('#clawback_status_'+ dealCount).trigger("change");
+      $('#clawback_status_' + dealCount).trigger("change");
       $('#status_date_' + dealCount).slideUp();
     } else {
       $('#status_date_' + dealCount).prop('required', true);
@@ -540,6 +540,7 @@ $(document).ready(function () {
 
 
         $('#audit_status_' + syncCtr).val(deal.audit_status);
+        $('#record_keeping_' + syncCtr).val(deal.record_keeping);
 
         //Set a value for the email if not set
         if (typeof deal.email === 'undefined') {
@@ -596,7 +597,7 @@ $(document).ready(function () {
         if (deal.refund_status == null)
           deal.refund_status = "No";
 
-        if (deal.refund_status_2 == null){
+        if (deal.refund_status_2 == null) {
           // deal.refund_status = "No";
           deal.refund_amount_2 = "";
         }
@@ -607,7 +608,7 @@ $(document).ready(function () {
 
         $('#refund_amount_2_' + syncCtr).val(deal.refund_amount_2);
 
-        if (deal.refund_status_2 == "Yes"){
+        if (deal.refund_status_2 == "Yes") {
           $('#refund_amount_2_' + syncCtr).slideDown();
         }
         else {
@@ -1114,6 +1115,11 @@ $(document).ready(function () {
 
     //Add Audit Status Options
     $('#audit_status_' + dealsCount).append($('<option>', {
+      value: 'For Checking',
+      text: 'For Checking'
+    }));
+
+    $('#audit_status_' + dealsCount).append($('<option>', {
       value: 'Passed',
       text: 'Passed'
     }));
@@ -1124,25 +1130,14 @@ $(document).ready(function () {
     }));
 
     $('#audit_status_' + dealsCount).append($('<option>', {
-      value: 'No Answer',
-      text: 'No Answer'
-    }));
-
-    $('#audit_status_' + dealsCount).append($('<option>', {
       value: 'Exempted',
       text: 'Exempted'
     }));
 
-    $('#audit_status_' + dealsCount).append($('<option>', {
-      value: 'Did not Call',
-      text: 'Did not Call'
-    }));
-
-    $('#audit_status_' + dealsCount).append($('<option>', {
-      selected: true,
-      value: 'Pending',
-      text: 'Pending'
-    }));
+    // Add Record Keeping Options
+    ['For Checking', 'Complete', 'Incomplete', 'Exempted'].forEach((option) => {
+      $('#record_keeping_' + dealsCount).append($('<option>', { value: option, text: option, }));
+    });
   }
 
 
@@ -1321,7 +1316,19 @@ function AddDeal(dealsCount) {
                 <br>\
                 <div class="row">\
                   <div class="col-sm-4">\
-                    Compliance Status \
+                    Record Keeping \
+                  </div>\
+                  <div class="col-sm-8">\
+                    <div class="input-group">\
+                      <span class="input-group-addon"><i class="fas fa-question-circle"></i></span>\
+                      <select data-dc="' + dealsCount + '" class="form-control record_keeping_options" name="record_keeping_' + dealsCount + '" id="record_keeping_' + dealsCount + '"></select>\
+                    </div>\
+                  </div>\
+                </div>\
+                <br>\
+                <div class="row">\
+                  <div class="col-sm-4">\
+                    Compliance Check Admin \
                   </div>\
                   <div class="col-sm-8">\
                     <div class="input-group">\
@@ -1334,7 +1341,7 @@ function AddDeal(dealsCount) {
                 <br>\
                 <div class="row">\
                   <div class="col-sm-4">\
-                    Audit Status \
+                    Compliance Check CO \
                   </div>\
                   <div class="col-sm-8">\
                     <div class="input-group">\

@@ -10,6 +10,8 @@
 @returnType:
 	JSON
  */
+// error_reporting(E_ALL ^ E_WARNING); 
+
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -334,6 +336,7 @@ class DealController extends Database
                 $deal->status = ${"status_" . $i};
                 //Extra
                 $deal->audit_status = ${"audit_status_" . $i};
+                $deal->record_keeping = ${"record_keeping_" . $i};
                 $deal->replacement_business = ${"replacement_business_" . $i};
                 $deal->email = ${"email_" . $i};
                 $deal->birthday = ${"birthday_" . $i};
@@ -382,7 +385,7 @@ class DealController extends Database
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
-        $query = "INSERT INTO issued_clients_tbl (name,leadgen,assigned_to,issued, date_issued) VALUES ($client_id, $leadgen, $assigned_to, $total_issued, '$first_issued_date')";
+        $query = "INSERT INTO issued_clients_tbl (appt_date,appt_time,address,assigned_date,type_of_lead,name,leadgen,assigned_to,issued, date_issued) VALUES ('', '', '', '', '', $client_id, $leadgen, $assigned_to, $total_issued, '$first_issued_date')";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -773,6 +776,7 @@ class DealController extends Database
                 $deal->status = ${"status_" . $i};
                 //Extra
                 $deal->audit_status = ${"audit_status_" . $i};
+                $deal->record_keeping = ${"record_keeping_" . $i};
                 $deal->replacement_business = ${"replacement_business_" . $i};
                 $deal->email = ${"email_" . $i};
                 $deal->birthday = ${"birthday_" . $i};

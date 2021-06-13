@@ -20,7 +20,7 @@ class Database {
         @desc: init the class
     */
     public function __construct () {
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        // mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
         date_default_timezone_set('Pacific/Auckland');
         $conf_array = parse_ini_file("configurations/config.ini");

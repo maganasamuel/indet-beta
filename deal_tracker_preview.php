@@ -521,7 +521,7 @@ if (count($report_data->issued_deals) > 0) {
                 $source,
                 NZEntryToDateTime($date),
                 '$' . number_format($api, 2),
-				$record_keeping,
+				$deal['record_keeping'],
                 $compliance_status,
                 $audit_status,
                 str_replace('<br>', "\r\n", $notes),

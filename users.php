@@ -121,6 +121,7 @@
                                  <div class="col-sm-9">
                                      <select class="form-control has-error" id="type" name="type" required>
                                          <option>User</option>
+                                         <option>Face-to-Face Marketer</option>
                                          <option>Telemarketer</option>
                                          <option>Adviser</option>
                                          <option>Admin</option>
@@ -154,6 +155,16 @@
                                                 ?>
                                      </select>
 
+                                     <select class="form-control has-error linked_ids" id="f2fmarketer_linked" name="f2fmarketer_linked" style="display:none;" required>
+                                         <option disabled hidden selected value="0">Select Face to face Marketer</option>
+                                         <?php
+                                                $marketerquery = "Select * from leadgen_tbl where type='Face-to-Face Marketer' ORDER BY name";
+                                                $marketerresult = mysqli_query($con, $marketerquery);
+                                                while ($marketerrow = mysqli_fetch_assoc($marketerresult)) {
+                                                    echo "<option value='" . $marketerrow['id'] . "'>" . $marketerrow['name'] . "</option>";
+                                                }
+                                                ?>
+                                     </select>
 
                                      <select class="form-control has-error linked_ids" id="adviser_linked" name="adviser_linked" style="display:none;" required>
                                          <option disabled hidden selected value="0">Select Adviser</option>
@@ -226,17 +237,21 @@
                      $("#telemarketer_linked").hide();
                      $("#adviser_linked").hide();
                      $("#personal_data_linked").hide();
+                     $("#f2fmarketer_linked").hide();
                      if (usertype == "Adviser") {
                          $("#adviser_linked").show();
                      } else if (usertype == "Telemarketer") {
                          $("#telemarketer_linked").show();
                      } else if (usertype == "Admin" || usertype == "User") {
                          $("#personal_data_linked").show();
-                     }
+                     } else if (usertype == "Face-to-Face Marketer") {
+                         $("#f2fmarketer_linked").show();
+                     } 
 
                      $("#linked_id_div").slideDown();
 
                      $("#telemarketer_linked").val("0");
+                     $("#f2fmarketer_linked").val("0");
                      $("#adviser_linked").val("0");
                  });
 

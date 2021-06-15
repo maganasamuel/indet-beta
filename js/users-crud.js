@@ -20,6 +20,7 @@ $(document).ready(function(){
             
             var usertype = data.type;
             $("#telemarketer_linked").hide();
+            $("#f2fmarketer_linked").hide();
             $("#adviser_linked").hide();
             $("#personal_data_linked").hide();
 
@@ -34,8 +35,10 @@ $(document).ready(function(){
             } else if (usertype == "Admin" || usertype == "User") {
                 $("#personal_data_linked").show();
                 $('#personal_data_linked').val(data.linked_id);
-            }
-            else{
+            } else if (usertype == "Face-to-Face Marketer") {
+                $("#f2fmarketer_linked").show();
+                $('#f2fmarketer_linked').val(data.linked_id);
+            } else {
                 $('#telemarketer_linked').val("0");
                 $("#adviser_linked").val("0");
                 $("#personal_data_linked").val("0");

@@ -72,7 +72,7 @@ if(!empty($_POST['formtype'])){
   $type_of_lead=isset($_POST["type_of_lead"])?$_POST["type_of_lead"]:'';
   $issued=isset($_POST["issued"])?$_POST["issued"]:'';
   $date_issued=isset($_POST["date_issued"])?$_POST["date_issued"]:'';
-  $status=isset($_POST["status"])?$_POST["status"]:'Seen';
+  $status=isset($_POST["status"])?$_POST["status"]:'Pending';
   $date_status_updated=isset($_POST["date_status_updated"])?$_POST["date_status_updated"]:$_POST["date_submitted"];
   $notes=htmlspecialchars($_POST["notes"]);
 

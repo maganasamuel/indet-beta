@@ -26,7 +26,7 @@ if (!empty($_POST['formtype'])) {
     $password = password_hash($password, PASSWORD_BCRYPT);
 
   if ($formtype == "add") {
-    if ($type != "Telemarketer" && $type != "Adviser") {
+    if ($type != "Telemarketer" && $type != "Adviser" && $type != "Face-to-Face Marketer") {
       $linked_id = 0;
     }
     $sql = "INSERT INTO users (username,password,type,created_at,created_by,updated_at,updated_by,linked_id) VALUES ('$username','$password','$type','$date','$currentUser','$date','$currentUser','$linked_id')";

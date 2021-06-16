@@ -293,6 +293,7 @@
                                              <label for="inputTask" class="col-sm-2 control-label">Status</label>
                                              <div class="col-sm-4">
                                                  <select name="status" id="status" class="form-control" required />
+                                                 <option>Pending</option>
                                                  <option>Seen</option>
                                                  <option>Agreement</option>
                                                  <option>Cancelled</option>

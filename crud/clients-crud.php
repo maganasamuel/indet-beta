@@ -149,6 +149,6 @@ if(!empty($_GET['id'])){
 
   $result = mysqli_query($con,$sql);
   $row = mysqli_fetch_assoc($result);
-  $data = json_encode($row);
+  $data = json_encode($row, JSON_INVALID_UTF8_IGNORE | JSON_INVALID_UTF8_SUBSTITUTE);
   print $data;
 }

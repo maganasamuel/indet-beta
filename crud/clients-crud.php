@@ -90,7 +90,7 @@ if(!empty($_POST['formtype'])){
 
     if($formtype=="add"){
       $sql="INSERT INTO clients_tbl (name,email,appt_date,date_submitted,appt_time,time,address,city,zipcode,lead_by,leadgen,assigned_to,assigned_date,type_of_lead,issued,date_issued,notes,status,date_status_updated,creation_date) 
-      VALUES ('$name','$email','$appt_date','$date_submitted','$phone','$time','$address','$city','$zipcode','$leadby','$leadgen','$assigned_to','$assigned_date','','','','$notes','$status','$date_status_updated','$creation_date')"; 
+      VALUES ('$name','$email','$appt_date','$date_submitted','$phone','$time','$address','$city','$zipcode','$leadby','$leadgen','$assigned_to','$assigned_date','','','','$notes','Pending','$date_status_updated','$creation_date')"; 
       
       $row = mysqli_query($con,$sql);
       $id = mysqli_insert_id($con);

@@ -6,7 +6,8 @@ error_reporting(E_ALL);
 
 date_default_timezone_set('Pacific/Auckland');
 ob_start();
-require('fpdf/mc_table.php');
+// require('fpdf/mc_table.php');
+require('fpdf/cellfit.php');
 
 require('database.php');
 
@@ -16,7 +17,7 @@ require_once 'libs/api/classes/general.class.php';
 require_once 'libs/api/controllers/Magazine.controller.php';
 require_once 'libs/api/controllers/User.controller.php';
 
-class PDF extends PDF_MC_Table
+class PDF extends FPDF_CellFit
 {
     public $uploads_folder = '../indet_photos_stash/';
 
@@ -3028,9 +3029,9 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
             $pdf->Cell(80, 3, 'Top String Writer: ', '0', '1', 'L');
             $pdf->Cell(5, 5, '', '0', '1', 'L');
             $pdf->Cell(5, 5, '', '0', '0', 'L');
-            $pdf->SetFont('Arial', 'BU', 20);
+            $pdf->SetFont('Arial', 'B', 20);
             $pdf->SetTextColor(0, 102, 153);
-            $pdf->Cell(80, 10, strtoupper($sorted_advisers[0]['name']), '0', '1', 'L');
+            $pdf->CellFitScale(75, 10, strtoupper($sorted_advisers[0]['name']), 'B', '1', 'L');
             $pdf->SetTextColor(0, 0, 0);
             $pdf->Cell(5, 3, '', '0', '1', 'L');
             $pdf->Cell(5, 3, '', '0', '', 'L');

@@ -286,7 +286,7 @@ class PDF extends PDF_MC_Table
         $total_api = 0;
 
         foreach ($advisers as $adviser) {
-            if ($adviser['deals'] > 0) {
+            if ($adviser['deals'] > 0 && $adviser['issued_api'] > 0) {
                 $total += $adviser['deals'];
                 $total_api += $adviser['issued_api'];
                 $this->Cell(90, 10, $adviser['name'], 1, '0', 'L', true);

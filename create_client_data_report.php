@@ -7,12 +7,18 @@ if (! isset($_SESSION['myusername'])) {
     session_destroy();
     header('Refresh:0; url=index.php');
 } else {
-    ?>
+    require_once('libs/api/classes/database.class.php');
+    $db = new Database();
+
+    $due = date('d/m/Y', strtotime('+7 days'));
+    $now_ = date('Ymd');
+
+    $leadGens = $db->execute($db->prepare('SELECT * FROM leadgen_tbl ORDER BY name'));
+    $advisers = $db->execute($db->prepare('SELECT * FROM adviser_tbl ORDER BY name')); ?>
 	<html>
 	<head>
 		<!--nav bar-->
 		<?php include 'partials/nav_bar.html'; ?>
-		<?php require 'database.php'; ?>
 		<!--nav bar end-->
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -174,7 +180,7 @@ if (! isset($_SESSION['myusername'])) {
 					var year_from = $("#yearFrom").val();
 					var year_to = $("#yearTo").val();
 					var specific_month = $("#specificMonth").val();
-					var date_now = $("#date_now").val();
+					var date_now = $("#source_date_now").val();
 					var clienttype = $("#clienttype").val();
 					var leadgens = JSON.stringify($("#leadgens").val());
 					var advisers = JSON.stringify($("#advisers").val());
@@ -307,13 +313,7 @@ if (! isset($_SESSION['myusername'])) {
 			<div class="jumbotron">
 				<h2 class="slide">Generate Client Data</h2>
 			</div>
-			<?php require 'database.php'; ?>
 			<form method="POST" action="excelOP1.php" autocomplete="off" class="margined" id="reportForm">
-				<?php
-				date_default_timezone_set('Pacific/Auckland');
-				$due = date('d/m/Y', strtotime('+7 days'));
-				$now_ = date('Ymd');
-				?>
 				<div>
 					<div class="row">
 						<div class='col-sm-2 center'>
@@ -334,7 +334,7 @@ if (! isset($_SESSION['myusername'])) {
 						<div class="col-sm-3"></div>
 						<div class='col-sm-2'>
 							<label style="width: 100%" ;>Source:
-								<input class="form-control" value="<?php echo $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="date_now" />
+								<input class="form-control" value="<?php echo $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="source_date_now" />
 								<select name="source" class="form-control source_selectpicker" id="source" data-actions-box="true">
 									<option value="">Don't Filter</option>
 									<option>Telemarketer</option>
@@ -346,33 +346,25 @@ if (! isset($_SESSION['myusername'])) {
 							<label style="width: 100%" ;>Lead Generator(s):
 								<select name="leadgens" class="form-control leadgen_selectpicker" id="leadgens" data-actions-box="true" multiple="multiple">
 									<?php
-									$query = 'SELECT * FROM leadgen_tbl ORDER BY name';
-									$displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
-
-									while ($rows = mysqli_fetch_array($displayquery)) {
-										$id = $rows['id'];
-										$name = $rows['name'];
-										echo "<option value=$id>$name</option>";
-									}
-									?>
+                                    while ($leadGen = $leadGens->fetch_assoc()) {
+                                        ?>
+										<option value="<?php echo $leadGen['id']; ?>"><?php echo $leadGen['name']; ?></option>
+										<?php
+                                    } ?>
 								</select>
 							</label>
 						</div>
 						<div class='col-sm-2'>
 							<label style="width: 100%" ;>Adviser(s):
-								<input class="form-control" value="<?php echo $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="date_now" />
+								<input class="form-control" value="<?php echo $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="adviser_date_now" />
 								<select name="advisers" class="form-control adviser_selectpicker" id="advisers" data-actions-box="true" multiple="multiple">
 									<optgroup label="Lead Generators">
 										<?php
-										$query = 'SELECT * FROM adviser_tbl ORDER BY name';
-										$displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
-										
-										while ($rows = mysqli_fetch_array($displayquery)) {
-											$id = $rows['id'];
-											$name = $rows['name'];
-											echo "<option value=$id>$name</option>";
-										}
-										?>
+                                        while ($adviser = $advisers->fetch_assoc()) {
+                                            ?>
+											<option value="<?php echo $adviser['id']; ?>"><?php echo $adviser['name']; ?></option>
+											<?php
+                                        } ?>
 									</optgroup>
 								</select>
 							</label>

@@ -2462,8 +2462,10 @@ class PDF extends FPDF_CellFit
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
+        $this->Cell(58, 10, 'ADR', 1, '0', 'C', true);
+        $this->Cell(57, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(40, 10, 'Policies Issued', 1, '0', 'C', true);
+        $this->Cell(40, 10, 'Issued API', 1, '1', 'C', true);
         // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
@@ -2476,16 +2478,18 @@ class PDF extends FPDF_CellFit
             if ($team['deals'] > 0) {
                 $total += $team['deals'];
                 $total_api += $team['issued_api'];
-                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
-                // $this->Cell(50, 10, $team['deals'], 1, '0', 'C', true);
+                $this->Cell(58, 10, $team['adr'], 1, '0', 'L', true);
+                $this->Cell(57, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(40, 10, $team['deals'], 1, '0', 'C', true);
+                $this->Cell(40, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
                 // $this->Cell(55, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        $this->Cell(115, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(40, 10, number_format($total), 1, '0', 'C', true);
+        $this->Cell(40, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
         // $this->Cell(50, 10, $total, 1, '0', 'C', true);
         // $this->Cell(55, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }

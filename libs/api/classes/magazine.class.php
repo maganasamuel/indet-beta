@@ -1200,6 +1200,12 @@ class Magazine extends Database
             array_push($tmp_output, $tmp_others_adr);
         }
 
+        foreach ($tmp_output as $key => $team) {
+            $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN teams t on t.leader = a.id WHERE t.name = "' . $team['name'] . '"'))->fetch_assoc();
+
+            $tmp_output[$key]['adr'] = $adviser['name'] ?? 'N/A';
+        }
+
         return $tmp_output;
     }
 

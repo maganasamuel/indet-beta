@@ -2631,38 +2631,8 @@ class Magazine extends Database
 
     public function getOverallCumulativeRBA()
     {
-        $issuedClients = $this->execute($this->prepare('SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to AND a.termination_date = "" IS NOT NULL order by a.name'));
-
-        $issuedPolicyCount = 0;
-        $replacementBusinessCount = 0;
-
-        while ($issuedClient = $issuedClients->fetch_assoc()) {
-            $deals = json_decode($issuedClient['deals'], true);
-
-            if (null == $deals) {
-                continue;
-            }
-
-            foreach ($deals as $deal) {
-                if (($deal['status'] ?? '') != 'Issued') {
-                    continue;
-                }
-
-                if (($deal['clawback_status'] ?? '') == 'Cancelled') {
-                    continue;
-                }
-
-                if (! $this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
-                    continue;
-                }
-
-                $issuedPolicyCount++;
-
-                if (($deal['replacement_business'] ?? 0) == '1') {
-                    $replacementBusinessCount++;
-                }
-            }
-        }
+        $issuedPolicyCount = collect($this->rba_cumulative_advisers)->sum('deals');
+        $replacementBusinessCount = collect($this->rba_cumulative_advisers)->sum('rba');
 
         $rbaPercentage = ($issuedPolicyCount <= 0 || $replacementBusinessCount <= 0) ? 0 : (($replacementBusinessCount / $issuedPolicyCount) * 100);
 

@@ -2523,6 +2523,7 @@ class Magazine extends Database
                 $output[$row['id']] = $row;
                 $output[$row['id']]['issued_api'] = 0;
                 $output[$row['id']]['deals'] = 0;
+                $output[$row['id']]['rba'] = 0;
             }
         }
 
@@ -2545,6 +2546,7 @@ class Magazine extends Database
             $deals = json_decode($row['deals'], true);
             $total_issued_api = 0;
             $total_issued_deals = 0;
+            $total_rba = 0;
 
             if (null == $deals) {
                 continue;
@@ -2563,6 +2565,12 @@ class Magazine extends Database
                         if ($this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)) {
                             $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
+
+                            if (isset($deal['replacement_business'])) {
+                                if ('1' == $deal['replacement_business']) {
+                                    $total_rba++;
+                                }
+                            }
                         }
                     }
                 }
@@ -2571,6 +2579,7 @@ class Magazine extends Database
             if ('Sumit Monga' != $row['adviser_name']) {
                 $output[$row['adviser_id']]['issued_api'] += floatval($total_issued_api);
                 $output[$row['adviser_id']]['deals'] += floatval($total_issued_deals);
+                $output[$row['adviser_id']]['rba'] += floatval($total_rba);
             }
         }
 
@@ -2631,8 +2640,8 @@ class Magazine extends Database
 
     public function getOverallCumulativeRBA()
     {
-        $issuedPolicyCount = collect($this->rba_cumulative_advisers)->sum('deals');
-        $replacementBusinessCount = collect($this->rba_cumulative_advisers)->sum('rba');
+        $issuedPolicyCount = collect($this->cumulative_advisers)->sum('deals');
+        $replacementBusinessCount = collect($this->cumulative_advisers)->sum('rba');
 
         $rbaPercentage = ($issuedPolicyCount <= 0 || $replacementBusinessCount <= 0) ? 0 : (($replacementBusinessCount / $issuedPolicyCount) * 100);
 
@@ -2785,7 +2794,7 @@ class Magazine extends Database
 
         foreach ($output as $index => $data) {
             if ('Others' != $index) {
-                $output[$data['id']]['percent_rba'] = ($data['rba'] / $data['deals']) * 100;
+                $output[$data['id']]['percent_rba'] = ($data['rba'] <= 0 || $data['deals'] <= 0) ? 0 : ($data['rba'] / $data['deals']) * 100;
             }
         }
 

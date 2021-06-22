@@ -1,66 +1,59 @@
 <?php
 session_start();
 date_default_timezone_set('Pacific/Auckland');
-$_SESSION["x"] = 1;
-if (!isset($_SESSION["myusername"])) {
-	session_destroy();
-	header("Refresh:0; url=index.php");
+$_SESSION['x'] = 1;
+
+if (! isset($_SESSION['myusername'])) {
+    session_destroy();
+    header('Refresh:0; url=index.php');
 } else {
-	?>
+    require_once('libs/api/classes/database.class.php');
+    $db = new Database();
+
+    $due = date('d/m/Y', strtotime('+7 days'));
+    $now_ = date('Ymd');
+
+    $leadGens = $db->execute($db->prepare('SELECT * FROM leadgen_tbl ORDER BY name'));
+    $advisers = $db->execute($db->prepare('SELECT * FROM adviser_tbl ORDER BY name')); ?>
 	<html>
-
-
 	<head>
 		<!--nav bar-->
-		<?php include "partials/nav_bar.html"; ?>
-
-
-
-		<?php require "database.php"; ?>
+		<?php include 'partials/nav_bar.html'; ?>
 		<!--nav bar end-->
+
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 		<link rel="stylesheet" href="styles.css">
 		<link id="favicon" rel="icon" href="Logo_ImageOnly.png" type="image/png" sizes="16x16">
 		<title>INDET</title>
+
 		<style>
 			.bootstrap-select .dropdown-toggle .filter-option {
 				position: relative;
-
 			}
-
 			.bootstrap-select li a {
 				color: #333 !important;
 			}
 		</style>
 
-
-
-
 		<script>
 			$(function() {
-
 				var lp = $('.leadgen_selectpicker').selectpicker();
 				var sp = $('.adviser_selectpicker').selectpicker();
 				var ss = $('.source_selectpicker').selectpicker();
 
 				lp.on("changed.bs.select", function(e, clickedIndex, newValue, oldValue) {
 					var selectedD = $(this).find('option').eq(clickedIndex).val();
-					// console.log('selectedD: ' + selectedD + '  newValue: ' + newValue + ' oldValue: ' + oldValue);
 					var arr = lp.val();
-
 					if (arr.length == 0) {
 						$('.leadgen_selectpicker').parent().find('.filter-option-inner-inner').html('No lead generator selected');
 					} else {
 						$('.leadgen_selectpicker').parent().find('.filter-option-inner-inner').html('Selected ' + arr.length + ' lead generators');
 					}
-					console.log(arr);
 				});
 
 				ss.on("changed.bs.select", function(e, clickedIndex, newValue, oldValue) {
-					// console.log('selectedD: ' + selectedD + '  newValue: ' + newValue + ' oldValue: ' + oldValue);
 					var leadby = $(this).val();
-					console.log(leadby);
 					var formData = {
 						leadby: leadby,
 					}
@@ -73,12 +66,12 @@ if (!isset($_SESSION["myusername"])) {
 						success: function(e) {
 							var rows = $.parseJSON(JSON.stringify(e));
 							$('#leadgens option').remove();
-
-							//console.log(rows);
 							$('#leadgens').append('<option value="" disabled hidden selected> Select Lead Generator </option>');
+
 							$.each(rows, function(i, d) {
 								$('#leadgens').append('<option value="' + d.id + '"> ' + d.name + ' </option>');
 							});
+
 							$('#leadgens').selectpicker("refresh");
 						},
 						error: function(x) {
@@ -89,7 +82,6 @@ if (!isset($_SESSION["myusername"])) {
 
 				sp.on("changed.bs.select", function(e, clickedIndex, newValue, oldValue) {
 					var selectedD = $(this).find('option').eq(clickedIndex).val();
-					// console.log('selectedD: ' + selectedD + '  newValue: ' + newValue + ' oldValue: ' + oldValue);
 					var arr = sp.val();
 
 					if (arr.length == 0) {
@@ -97,15 +89,7 @@ if (!isset($_SESSION["myusername"])) {
 					} else {
 						$('.adviser_selectpicker').parent().find('.filter-option-inner-inner').html('Selected ' + arr.length + ' advisers');
 					}
-					console.log(arr);
 				});
-
-
-
-
-
-
-				
 
 				$('#me').dataTable({
 					"order": [
@@ -119,13 +103,15 @@ if (!isset($_SESSION["myusername"])) {
 
 				$('#filterby').on('change', function(e) {
 					var filter = $(this).val();
+
 					if (filter != "none") {
 						document.getElementById("filterDiv").style.display = "block";
-						if (filter == "city")
+
+						if (filter == "city"){
 							document.getElementById("filterVariable").innerHTML = "cities";
-						else if (filter == "zipcode")
+						}else if (filter == "zipcode"){
 							document.getElementById("filterVariable").innerHTML = "zipcodes";
-						console.log(filter);
+						}
 					} else {
 						document.getElementById("filterDiv").style.display = "none";
 					}
@@ -151,12 +137,15 @@ if (!isset($_SESSION["myusername"])) {
 							$("#datepicker").datepicker({
 								dateFormat: 'dd/mm/yy'
 							});
+
 							$("#datepicker2").datepicker({
 								dateFormat: 'dd/mm/yy'
 							});
+
 							break;
 						case 'Specific Month':
 							$('#filteredDate').empty();
+
 							$('#filteredDate').append($(`
 								<div class="row">
 									<div class='col-sm-3'></div>
@@ -169,8 +158,8 @@ if (!isset($_SESSION["myusername"])) {
 									<div class='col-sm-2'>Year To:
 										<input name="year_to" class="form-control" autocomplete="off" type="text" id="yearTo" />
 									</div>
-								</div>`).hide().fadeIn(500));							
-							
+								</div>`).hide().fadeIn(500));
+
 							datepicker_initializer_year("#yearFrom");
 							datepicker_initializer_year("#yearTo");
 							datepicker_initializer_month("#specificMonth");
@@ -183,7 +172,6 @@ if (!isset($_SESSION["myusername"])) {
 
 				//Create Button
 				$('#create').on('click', function(e) {
-
 					e.preventDefault();
 
 					var customErrorLog = "";
@@ -192,7 +180,7 @@ if (!isset($_SESSION["myusername"])) {
 					var year_from = $("#yearFrom").val();
 					var year_to = $("#yearTo").val();
 					var specific_month = $("#specificMonth").val();
-					var date_now = $("#date_now").val();
+					var date_now = $("#source_date_now").val();
 					var clienttype = $("#clienttype").val();
 					var leadgens = JSON.stringify($("#leadgens").val());
 					var advisers = JSON.stringify($("#advisers").val());
@@ -219,7 +207,6 @@ if (!isset($_SESSION["myusername"])) {
 						specific_month,
 					};
 
-					console.log("Form:" + JSON.stringify(formData));
 					$.ajax({
 						dataType: 'json',
 						type: 'POST',
@@ -239,7 +226,6 @@ if (!isset($_SESSION["myusername"])) {
 							});
 						},
 						error: function(x) {
-							//var res = x.responseText.split("\n");
 							$.confirm({
 								title: 'Creating Report Unsuccessful',
 								content: customErrorLog,
@@ -254,55 +240,54 @@ if (!isset($_SESSION["myusername"])) {
 				});
 			});
 
-			function datepicker_initializer_year($id){
+			function datepicker_initializer_year($id) {
 				$($id).datepicker({
 					dateFormat: 'yy',
-	        changeYear: true,
-	        showButtonPanel: true,
+	        		changeYear: true,
+	        		showButtonPanel: true,
+	        		onClose: function(dateText, inst) {
+						var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
 
-	        onClose: function(dateText, inst) {
-	            // var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-	            var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-	            $(this).val($.datepicker.formatDate('yy', new Date(year)));
-	        }
+						$(this).val($.datepicker.formatDate('yy', new Date(year)));
+	        		}
 				});
 
-				 $($id).focus(function () {
-		        $(".ui-datepicker-calendar").hide();
-		        $(".ui-datepicker-prev").hide();
-		        $(".ui-datepicker-next").hide();
-		        $(".ui-datepicker-month").hide();
-		        $("#ui-datepicker-div").position({
-		            my: "center top",
-		            at: "center bottom",
-		            of: $(this)
-		        });
-		    });
+				$($id).focus(function () {
+					$(".ui-datepicker-calendar").hide();
+					$(".ui-datepicker-prev").hide();
+					$(".ui-datepicker-next").hide();
+					$(".ui-datepicker-month").hide();
+					$("#ui-datepicker-div").position({
+						my: "center top",
+						at: "center bottom",
+						of: $(this)
+					});
+				});
 			}
 
 			function datepicker_initializer_month($id){
 				$($id).datepicker({
 					dateFormat: 'MM',
-	        changeMonth: true,
-	        showButtonPanel: true,
-	        onClose: function(dateText, inst) {
-	            var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-	            // var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-	            $(this).val($.datepicker.formatDate('MM', new Date(1, month, 1)));
-	        }
+					changeMonth: true,
+					showButtonPanel: true,
+					onClose: function(dateText, inst) {
+						var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+
+						$(this).val($.datepicker.formatDate('MM', new Date(1, month, 1)));
+					}
 				});
 
-				 $($id).focus(function () {
-		        $(".ui-datepicker-calendar").hide();
-		        $(".ui-datepicker-prev").hide();
-		        $(".ui-datepicker-next").hide();
-		        $(".ui-datepicker-year").hide();
-		        $("#ui-datepicker-div").position({
-		            my: "center top",
-		            at: "center bottom",
-		            of: $(this)
-		        });
-		    });
+				$($id).focus(function () {
+					$(".ui-datepicker-calendar").hide();
+					$(".ui-datepicker-prev").hide();
+					$(".ui-datepicker-next").hide();
+					$(".ui-datepicker-year").hide();
+					$("#ui-datepicker-div").position({
+						my: "center top",
+						at: "center bottom",
+						of: $(this)
+					});
+				});
 			}
 
 			function filter_array(test_array) {
@@ -323,29 +308,12 @@ if (!isset($_SESSION["myusername"])) {
 			}
 		</script>
 	</head>
-
 	<body>
-		<!--nav bar end-->
-
-		<!--label-->
 		<div align="center">
 			<div class="jumbotron">
 				<h2 class="slide">Generate Client Data</h2>
 			</div>
-
-
-			<?php require "database.php";
-				?>
-
-
 			<form method="POST" action="excelOP1.php" autocomplete="off" class="margined" id="reportForm">
-				<?php
-					date_default_timezone_set('Pacific/Auckland');
-					$due = date('d/m/Y', strtotime('+7 days'));
-					$now_ = date('Ymd');
-
-					?>
-
 				<div>
 					<div class="row">
 						<div class='col-sm-2 center'>
@@ -362,14 +330,11 @@ if (!isset($_SESSION["myusername"])) {
 							</label>
 						</div>
 					</div>
-
 					<div class="row">
 						<div class="col-sm-3"></div>
-
 						<div class='col-sm-2'>
 							<label style="width: 100%" ;>Source:
-								<input class="form-control" value="<?= $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="date_now" />
-
+								<input class="form-control" value="<?php echo $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="source_date_now" />
 								<select name="source" class="form-control source_selectpicker" id="source" data-actions-box="true">
 									<option value="">Don't Filter</option>
 									<option>Telemarketer</option>
@@ -377,50 +342,37 @@ if (!isset($_SESSION["myusername"])) {
 								</select>
 							</label>
 						</div>
-
 						<div class='col-sm-2'>
 							<label style="width: 100%" ;>Lead Generator(s):
 								<select name="leadgens" class="form-control leadgen_selectpicker" id="leadgens" data-actions-box="true" multiple="multiple">
 									<?php
-										$query = "SELECT * FROM leadgen_tbl ORDER BY name";
-										$displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
-
-										while ($rows = mysqli_fetch_array($displayquery)) {
-											$id = $rows["id"];
-											$name = $rows["name"];
-											echo "<option value=$id>$name</option>";
-										}
-										?>
+                                    while ($leadGen = $leadGens->fetch_assoc()) {
+                                        ?>
+										<option value="<?php echo $leadGen['id']; ?>"><?php echo $leadGen['name']; ?></option>
+										<?php
+                                    } ?>
 								</select>
 							</label>
 						</div>
-
 						<div class='col-sm-2'>
 							<label style="width: 100%" ;>Adviser(s):
-								<input class="form-control" value="<?= $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="date_now" />
-
+								<input class="form-control" value="<?php echo $now_; ?>" readonly='' autocomplete="off" type="hidden" name="date_now" id="adviser_date_now" />
 								<select name="advisers" class="form-control adviser_selectpicker" id="advisers" data-actions-box="true" multiple="multiple">
 									<optgroup label="Lead Generators">
 										<?php
-											$query = "SELECT * FROM adviser_tbl ORDER BY name";
-											$displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
-
-											while ($rows = mysqli_fetch_array($displayquery)) {
-												$id = $rows["id"];
-												$name = $rows["name"];
-												echo "<option value=$id>$name</option>";
-											}
-											?>
+                                        while ($adviser = $advisers->fetch_assoc()) {
+                                            ?>
+											<option value="<?php echo $adviser['id']; ?>"><?php echo $adviser['name']; ?></option>
+											<?php
+                                        } ?>
 									</optgroup>
 								</select>
 							</label>
 						</div>
 					</div>
-
 					<div class="row">
 						<div class="col-lg-12">&nbsp;</div>
 					</div>
-
 					<div class="row">
 						<div class="col-sm-4"></div>
 						<div class="col-sm-4 my-3">Filter Date By:
@@ -431,11 +383,7 @@ if (!isset($_SESSION["myusername"])) {
 							</select>
 						</div>
 					</div>
-
-					<div id="filteredDate">
-						
-					</div>
-
+					<div id="filteredDate"></div>
 					<div class="row">
 						<div class='col-sm-2 center'>
 							<label style="width: 100%" ;>Filter By:
@@ -464,24 +412,11 @@ if (!isset($_SESSION["myusername"])) {
 							<input name="enter" type="submit" id='create' value="Create Report" style='margin-top: 30px;width: 100%;' class="btn btn-danger center" />
 						</div>
 					</div>
-
 				</div>
-
-
-
-
-
-
-
+			</form>
 		</div>
-		</form>
 		<hr>
-
-
-
-
 		<div class="container">
-
 			<!-- Modal -->
 			<div class="modal fade" id="myModal" role="dialog" style="z-index:10000;width: 100%;">
 				<div class="modal-dialog modal-lg">
@@ -491,7 +426,6 @@ if (!isset($_SESSION["myusername"])) {
 							<h2 class="modal-title" style="float: left;">Summary Preview</h2>
 						</div>
 						<div class="modal-body">
-
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-info" id='save_pdf'>Save</button>
@@ -501,13 +435,8 @@ if (!isset($_SESSION["myusername"])) {
 				</div>
 			</div>
 		</div>
-
-
 	</body>
-
 	</html>
-
 <?php
-
 }
 ?>

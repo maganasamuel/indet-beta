@@ -274,11 +274,11 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(90, 10, 'Name Of Adviser', 1, '0', 'C', true);
-        $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        $this->Cell(80, 10, 'Name Of Adviser', 1, '0', 'C', true);
+        $this->Cell(60, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -290,15 +290,15 @@ class PDF extends FPDF_CellFit
             if ($adviser['deals'] > 0 && $adviser['issued_api'] > 0) {
                 $total += $adviser['deals'];
                 $total_api += $adviser['issued_api'];
-                $this->Cell(90, 10, $adviser['name'], 1, '0', 'L', true);
-                $this->Cell(50, 10, $adviser['deals'], 1, '0', 'C', true);
+                $this->Cell(80, 10, $adviser['name'], 1, '0', 'L', true);
+                $this->Cell(60, 10, $adviser['deals'], 1, '0', 'C', true);
                 $this->Cell(55, 10, '$' . number_format($adviser['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(90, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(50, 10, $total, 1, '0', 'C', true);
+        $this->Cell(80, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(60, 10, $total, 1, '0', 'C', true);
         $this->Cell(55, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
@@ -359,12 +359,12 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(90, 10, 'Name Of Adviser', 1, '0', 'C', true);
-        $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        $this->Cell(80, 10, 'Name Of Adviser', 1, '0', 'C', true);
+        $this->Cell(60, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -375,15 +375,15 @@ class PDF extends FPDF_CellFit
             if ($adviser['deals'] > 0) {
                 $total += $adviser['deals'];
                 $total_api += $adviser['issued_api'];
-                $this->Cell(90, 10, $adviser['name'], 1, '0', 'L', true);
-                $this->Cell(50, 10, $adviser['deals'], 1, '0', 'C', true);
+                $this->Cell(80, 10, $adviser['name'], 1, '0', 'L', true);
+                $this->Cell(60, 10, $adviser['deals'], 1, '0', 'C', true);
                 $this->Cell(55, 10, '$' . number_format($adviser['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(90, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(50, 10, $total, 1, '0', 'C', true);
+        $this->Cell(80, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(60, 10, $total, 1, '0', 'C', true);
         $this->Cell(55, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
@@ -397,7 +397,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(30);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
@@ -451,13 +451,13 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(190);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(85, 10, 'Name Of Adviser', 1, '0', 'C', true);
-        $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
-        $this->Cell(60, 10, '% Replacement Business', 1, '1', 'C', true);
+        $this->Cell(65, 10, 'Name Of Adviser', 1, '0', 'C', true);
+        $this->Cell(60, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        $this->Cell(70, 10, '% Replacement Business', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -468,9 +468,9 @@ class PDF extends FPDF_CellFit
             if ($adviser['deals'] > 0) {
                 $total += $adviser['deals'];
                 $total_api += $adviser['issued_api'];
-                $this->Cell(85, 10, $adviser['name'], 1, '0', 'L', true);
-                $this->Cell(50, 10, $adviser['deals'], 1, '0', 'C', true);
-                $this->Cell(60, 10, number_format($adviser['percent_rba'], 2) . '%', 1, '1', 'C', true);
+                $this->Cell(65, 10, $adviser['name'], 1, '0', 'L', true);
+                $this->Cell(60, 10, $adviser['deals'], 1, '0', 'C', true);
+                $this->Cell(70, 10, number_format($adviser['percent_rba'], 2) . '%', 1, '1', 'C', true);
             }
         }
 
@@ -538,7 +538,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
@@ -622,7 +622,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
@@ -696,11 +696,11 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(80, 10, 'Name Of BDM', 1, '0', 'C', true);
-        $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Name Of BDM', 1, '0', 'C', true);
+        $this->Cell(60, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         $this->Cell(60, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -725,15 +725,15 @@ class PDF extends FPDF_CellFit
                     $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
                 }
 
-                $this->Cell(65, 15, $bdm['name'], 1, '0', 'L', true);
-                $this->Cell(50, 15, $bdm['deals'], 1, '0', 'C', true);
+                $this->Cell(55, 15, $bdm['name'], 1, '0', 'L', true);
+                $this->Cell(60, 15, $bdm['deals'], 1, '0', 'C', true);
                 $this->Cell(60, 15, '$' . number_format($bdm['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(80, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(110, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        $this->Cell(70, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(120, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
     public function BDMCumulativePage($bdms)
@@ -786,11 +786,11 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(80, 10, 'Name Of BDM', 1, '0', 'C', true);
-        $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Name Of BDM', 1, '0', 'C', true);
+        $this->Cell(60, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         $this->Cell(60, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -815,15 +815,15 @@ class PDF extends FPDF_CellFit
                     $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
                 }
 
-                $this->Cell(65, 15, $bdm['name'], 1, '0', 'L', true);
-                $this->Cell(50, 15, $bdm['deals'], 1, '0', 'C', true);
+                $this->Cell(55, 15, $bdm['name'], 1, '0', 'L', true);
+                $this->Cell(60, 15, $bdm['deals'], 1, '0', 'C', true);
                 $this->Cell(60, 15, '$' . number_format($bdm['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(80, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(110, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        $this->Cell(70, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(120, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
     public function BDMPage($bdms, $quarterTitle)
@@ -2065,7 +2065,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(140);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
         $this->Cell(110, 15, 'Adviser', 1, '0', 'C', true);
@@ -2080,7 +2080,7 @@ class PDF extends FPDF_CellFit
                 if ($adviser['deals'] > 0) {
                     $total += $adviser['deals'];
                     $total_api += $adviser['issued_api'];
-                    $this->SetFont('Calibri', 'B', 15);
+                    $this->SetFont('Arial', 'B', 15);
 
                     if ('Others' !== $adviser['name']) {
                         if ($adviser['deals'] >= 5 && $adviser['issued_api'] >= 7500) {
@@ -2096,7 +2096,7 @@ class PDF extends FPDF_CellFit
                                 $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
-                            $this->SetFont('Calibri', '', 15);
+                            $this->SetFont('Arial', '', 15);
                             $this->SetFillColor(102, 163, 194);
                             $this->Cell(85, 15, 'Titanium', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2113,7 +2113,7 @@ class PDF extends FPDF_CellFit
                                 $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
-                            $this->SetFont('Calibri', '', 15);
+                            $this->SetFont('Arial', '', 15);
                             $this->setFillColor(212, 91, 91);
                             $this->Cell(85, 15, 'Platinum', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2130,7 +2130,7 @@ class PDF extends FPDF_CellFit
                                 $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
-                            $this->SetFont('Calibri', '', 15);
+                            $this->SetFont('Arial', '', 15);
                             $this->setFillColor(255, 239, 148);
                             $this->Cell(85, 15, 'Gold', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2147,7 +2147,7 @@ class PDF extends FPDF_CellFit
                                 $this->Cell(15, 15, $this->Image($this->default_image, $this->GetX(), $this->GetY(), 15, 15), 1, '0', 'L', false);
                             }
                             $this->Cell(95, 15, $adviser['name'], 1, '0', 'C', true);
-                            $this->SetFont('Calibri', '', 15);
+                            $this->SetFont('Arial', '', 15);
                             $this->setFillColor(192, 192, 192);
                             $this->Cell(85, 15, 'Silver', 1, '1', 'C', true);
                             $this->setFillColor(255, 255, 255);
@@ -2410,7 +2410,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(($next_Y + 38));
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
@@ -2459,7 +2459,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY($next_Y + 38);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
         $this->Cell(58, 10, 'ADR', 1, '0', 'C', true);
@@ -2567,13 +2567,13 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(($next_Y + 38));
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
         $this->Cell(65, 10, 'ADR', 1, '0', 'C', true);
-        $this->Cell(65, 10, 'Team Name', 1, '0', 'C', true);
-        $this->Cell(65, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(55, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(75, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2583,14 +2583,14 @@ class PDF extends FPDF_CellFit
             if ($bimonthlykiwisaver['deals'] > 0) {
                 $total += $bimonthlykiwisaver['deals'];
                 $this->Cell(65, 10, $bimonthlykiwisaver['adr'], 1, '0', 'L', true);
-                $this->Cell(65, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
-                $this->Cell(65, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
+                $this->Cell(55, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(75, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(65, 10, $total, 1, '1', 'C', true);
+        $this->Cell(120, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(75, 10, $total, 1, '1', 'C', true);
     }
 
     public function ADRCumulativeKiwiSaversPage($cumulativekiwisavers)
@@ -2606,13 +2606,13 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY($next_Y + 38);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
         $this->Cell(65, 10, 'ADR', 1, '0', 'C', true);
-        $this->Cell(65, 10, 'Team Name', 1, '0', 'C', true);
-        $this->Cell(65, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(55, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(75, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2622,14 +2622,14 @@ class PDF extends FPDF_CellFit
             if ($cumulativekiwisaver['deals'] > 0) {
                 $total += $cumulativekiwisaver['deals'];
                 $this->Cell(65, 10, $cumulativekiwisaver['adr'], 1, '0', 'L', true);
-                $this->Cell(65, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
-                $this->Cell(65, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
+                $this->Cell(55, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(75, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(65, 10, $total, 1, '1', 'C', true);
+        $this->Cell(120, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(75, 10, $total, 1, '1', 'C', true);
     }
     //END ADR page
 
@@ -2712,7 +2712,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY($next_Y + 38);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
         $this->Cell(58, 10, 'SADR', 1, '0', 'C', true);
@@ -2756,7 +2756,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY($next_Y + 38);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
         $this->Cell(58, 10, 'SADR', 1, '0', 'C', true);
@@ -2859,7 +2859,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY(($next_Y + 38));
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
@@ -2898,7 +2898,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
         $this->SetY($next_Y + 38);
-        $this->SetFont('Calibri', 'B', 15);
+        $this->SetFont('Arial', 'B', 14);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 

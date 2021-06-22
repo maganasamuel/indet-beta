@@ -2569,8 +2569,9 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(65, 10, 'ADR', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2579,14 +2580,15 @@ class PDF extends FPDF_CellFit
         foreach ($bimonthlykiwisavers as $index => $bimonthlykiwisaver) {
             if ($bimonthlykiwisaver['deals'] > 0) {
                 $total += $bimonthlykiwisaver['deals'];
-                $this->Cell(125, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
+                $this->Cell(65, 10, $bimonthlykiwisaver['adr'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+        $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(65, 10, $total, 1, '1', 'C', true);
     }
 
     public function ADRCumulativeKiwiSaversPage($cumulativekiwisavers)
@@ -2606,8 +2608,9 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(65, 10, 'ADR', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2616,14 +2619,15 @@ class PDF extends FPDF_CellFit
         foreach ($cumulativekiwisavers as $index => $cumulativekiwisaver) {
             if ($cumulativekiwisaver['deals'] > 0) {
                 $total += $cumulativekiwisaver['deals'];
-                $this->Cell(125, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
+                $this->Cell(65, 10, $cumulativekiwisaver['adr'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+        $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(65, 10, $total, 1, '1', 'C', true);
     }
     //END ADR page
 
@@ -2709,8 +2713,10 @@ class PDF extends FPDF_CellFit
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
+        $this->Cell(58, 10, 'SADR', 1, '0', 'C', true);
+        $this->Cell(57, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(40, 10, 'Policies Issued', 1, '0', 'C', true);
+        $this->Cell(40, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2721,14 +2727,17 @@ class PDF extends FPDF_CellFit
             if ($team['deals'] > 0) {
                 $total += $team['deals'];
                 $total_api += $team['issued_api'];
-                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+                $this->Cell(58, 10, $team['sadr'], 1, '0', 'L', true);
+                $this->Cell(57, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(40, 10, number_format($team['deals']), 1, '0', 'C', true);
+                $this->Cell(40, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        $this->Cell(115, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(40, 10, number_format($total), 1, '0', 'C', true);
+        $this->Cell(40, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
 
@@ -2748,8 +2757,10 @@ class PDF extends FPDF_CellFit
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
+        $this->Cell(58, 10, 'SADR', 1, '0', 'C', true);
+        $this->Cell(57, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(40, 10, 'Policies Issued', 1, '0', 'C', true);
+        $this->Cell(40, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2760,14 +2771,17 @@ class PDF extends FPDF_CellFit
             if ($team['deals'] > 0) {
                 $total += $team['deals'];
                 $total_api += $team['issued_api'];
-                $this->Cell(125, 10, $team['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
+                $this->Cell(58, 10, $team['sadr'], 1, '0', 'L', true);
+                $this->Cell(57, 10, $team['name'], 1, '0', 'L', true);
+                $this->Cell(40, 10, number_format($team['deals']), 1, '0', 'C', true);
+                $this->Cell(40, 10, '$' . number_format($team['issued_api'], 2), 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
+        $this->Cell(115, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(40, 10, number_format($total), 1, '0', 'C', true);
+        $this->Cell(40, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
     public function SADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
@@ -2845,8 +2859,9 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(65, 10, 'SADR', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2855,14 +2870,15 @@ class PDF extends FPDF_CellFit
         foreach ($bimonthlykiwisavers as $index => $bimonthlykiwisaver) {
             if ($bimonthlykiwisaver['deals'] > 0) {
                 $total += $bimonthlykiwisaver['deals'];
-                $this->Cell(125, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
+                $this->Cell(65, 10, $bimonthlykiwisaver['sadr'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $bimonthlykiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $bimonthlykiwisaver['deals'], 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+        $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(65, 10, $total, 1, '1', 'C', true);
     }
 
     public function SADRCumulativeKiwiSaversPage($cumulativekiwisavers)
@@ -2882,8 +2898,9 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
+        $this->Cell(65, 10, 'SADR', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'Team Name', 1, '0', 'C', true);
+        $this->Cell(65, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2892,14 +2909,15 @@ class PDF extends FPDF_CellFit
         foreach ($cumulativekiwisavers as $index => $cumulativekiwisaver) {
             if ($cumulativekiwisaver['deals'] > 0) {
                 $total += $cumulativekiwisaver['deals'];
-                $this->Cell(125, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
-                $this->Cell(70, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
+                $this->Cell(65, 10, $cumulativekiwisaver['sadr'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $cumulativekiwisaver['name'], 1, '0', 'L', true);
+                $this->Cell(65, 10, $cumulativekiwisaver['deals'], 1, '1', 'C', true);
             }
         }
 
         $this->SetFont('Arial', 'B', 15);
-        $this->Cell(125, 10, 'Total', 1, '0', 'L', true);
-        $this->Cell(70, 10, $total, 1, '1', 'C', true);
+        $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
+        $this->Cell(65, 10, $total, 1, '1', 'C', true);
     }
     //END SADR page
 }

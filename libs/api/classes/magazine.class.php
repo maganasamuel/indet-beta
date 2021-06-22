@@ -1387,6 +1387,16 @@ class Magazine extends Database
 
         $tmp_output['highest'] = $highest;
 
+        foreach ($tmp_output as $key => $team) {
+            if (! isset($team['team_id'])) {
+                $tmp_output[$key]['adr'] = 'N/A';
+            } else {
+                $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN teams t on t.leader = a.id WHERE t.id = ' . $team['team_id']))->fetch_assoc();
+
+                $tmp_output[$key]['adr'] = $adviser['name'];
+            }
+        }
+
         return $tmp_output;
     }
 
@@ -1526,6 +1536,12 @@ class Magazine extends Database
 
         if (isset($tmp_others_adr) && sizeof($tmp_others_adr) >= 1) {
             array_push($tmp_output, $tmp_others_adr);
+        }
+
+        foreach ($tmp_output as $key => $team) {
+            $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN teams t on t.leader = a.id WHERE t.name = "' . $team['name'] . '"'))->fetch_assoc();
+
+            $tmp_output[$key]['adr'] = $adviser['name'] ?? 'N/A';
         }
 
         return $tmp_output;
@@ -1761,6 +1777,16 @@ class Magazine extends Database
 
         $tmp_output['highest'] = $highest;
 
+        foreach ($tmp_output as $key => $team) {
+            if (! isset($team['steam_id'])) {
+                $tmp_output[$key]['sadr'] = 'N/A';
+            } else {
+                $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN steams t on t.leader = a.id WHERE t.id = ' . $team['steam_id']))->fetch_assoc();
+
+                $tmp_output[$key]['sadr'] = $adviser['name'];
+            }
+        }
+
         return $tmp_output;
     }
 
@@ -1969,6 +1995,12 @@ class Magazine extends Database
             array_push($tmp_output, $tmp_others_adr);
         }
 
+        foreach ($tmp_output as $key => $team) {
+            $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN steams t on t.leader = a.id WHERE t.name = "' . $team['name'] . '"'))->fetch_assoc();
+
+            $tmp_output[$key]['sadr'] = $adviser['name'] ?? 'N/A';
+        }
+
         return $tmp_output;
     }
 
@@ -2151,6 +2183,16 @@ class Magazine extends Database
 
         $tmp_output['highest'] = $highest;
 
+        foreach ($tmp_output as $key => $team) {
+            if (! isset($team['steam_id'])) {
+                $tmp_output[$key]['sadr'] = 'N/A';
+            } else {
+                $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN steams t on t.leader = a.id WHERE t.id = ' . $team['steam_id']))->fetch_assoc();
+
+                $tmp_output[$key]['sadr'] = $adviser['name'];
+            }
+        }
+
         return $tmp_output;
     }
 
@@ -2291,6 +2333,12 @@ class Magazine extends Database
 
         if (isset($tmp_others_adr) && sizeof($tmp_others_adr) >= 1) {
             array_push($tmp_output, $tmp_others_adr);
+        }
+
+        foreach ($tmp_output as $key => $team) {
+            $adviser = $this->execute($this->prepare('SELECT a.name FROM adviser_tbl a LEFT JOIN steams t on t.leader = a.id WHERE t.name = "' . $team['name'] . '"'))->fetch_assoc();
+
+            $tmp_output[$key]['sadr'] = $adviser['name'] ?? 'N/A';
         }
 
         return $tmp_output;

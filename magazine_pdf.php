@@ -387,12 +387,27 @@ class PDF extends FPDF_CellFit
         $this->Cell(55, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
-    public function CumulativeRBAPage($advisers)
+    public function CumulativeRBAPage($advisers, $overallCumulativeRBA)
     {
         //page 2 BiMonthly API
         $this->AddPage();
 
-        $this->Header1(15, 'Adviser with the Lowest Cumulative Percentage of Replacement Business', 17);
+        $this->Header1(15, 'EliteInsure Overall Cumulative Table for Percentage of Replacement Business', 16);
+
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetX(8);
+        $this->SetY(30);
+        $this->SetFont('Calibri', 'B', 15);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetFillColor(255, 255, 255);
+
+        $this->Cell(97, 10, 'No. of Policies Issued', 1, '0', 'C', true);
+        $this->Cell(98, 10, '% Replacement Business', 1, '0', 'C', true);
+        $this->Ln();
+        $this->Cell(97, 10, $overallCumulativeRBA['issuedPolicyCount'], 1, '0', 'C', true);
+        $this->Cell(98, 10, number_format($overallCumulativeRBA['rbaPercentage'], 2) . '%', 1, '0', 'C', true);
+
+        $this->Header1(/* 15 */65, 'Adviser with the Lowest Cumulative Percentage of Replacement Business', 17);
 
         $image_path = '';
 
@@ -403,16 +418,16 @@ class PDF extends FPDF_CellFit
         }
 
         if (file_exists($image_path)) {
-            $this->Image($image_path, 20, 30, 75, 75);
+            $this->Image($image_path, 20, 80, 75, 75);
         } else {
-            $this->Image($this->default_image, 20, 30, 75, 75);
+            $this->Image($this->default_image, 20, 80, 75, 75);
         }
 
         $this->SetFillColor(255, 255, 255);
 
-        $this->Rect(100, 35, 100, 65, 'DF');
+        $this->Rect(100, 85, 100, 65, 'DF');
         $this->SetTextColor(0, 0, 0);
-        $this->SetY(38);
+        $this->SetY(88);
         //Name
         $this->SetFont('Calibri', 'B', 20);
         $this->Cell(92, 8, '', '', '0', 'L');
@@ -431,11 +446,11 @@ class PDF extends FPDF_CellFit
         $this->Cell(50, 8, number_format($advisers[0]['percent_rba'], 2) . '%', '', '1', 'L');
 
         //Tables
-        $this->Header1(125, 'Cumulative Table for Percentage of Replacement Business', 20);
+        $this->Header1(175, 'Cumulative Table for Percentage of Replacement Business', 20);
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
-        $this->SetY(140);
+        $this->SetY(190);
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
@@ -2337,7 +2352,8 @@ class PDF extends FPDF_CellFit
         }
 
         //page 2 BiMonthly API
-        $this->AddPage();
+        // begin comment - as per requested by Sir Sumit
+        /* $this->AddPage();
 
         if(is_array($highest_team_advisers) && sizeof($highest_team_advisers) >= 1) {
             $this->Header1(15, 'ADR Team with Highest Total API from Policies Issued');
@@ -2379,7 +2395,8 @@ class PDF extends FPDF_CellFit
             }
         
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
-        }
+        } */
+        // end comment
 
         $next_Y = $this->GetY();
         if(($next_Y + 15) >= 200) {
@@ -2397,8 +2414,8 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
+        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
         // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
@@ -2442,8 +2459,8 @@ class PDF extends FPDF_CellFit
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
+        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
         // $this->Cell(50, 10, 'No. of Policies Issued', 1, '0', 'C', true);
         // $this->Cell(55, 10, 'Issued API', 1, '1', 'C', true);
 
@@ -2545,7 +2562,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
         $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -2582,7 +2599,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(125, 10, 'ADR Teams', 1, '0', 'C', true);
         $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -2683,8 +2700,8 @@ class PDF extends FPDF_CellFit
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
+        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2722,8 +2739,8 @@ class PDF extends FPDF_CellFit
         $this->SetFont('Calibri', 'B', 15);
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
-        $this->Cell(70, 10, 'Issued', 1, '1', 'C', true);
+        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
+        $this->Cell(70, 10, 'Issued API', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
 
@@ -2819,7 +2836,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
         $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -2856,7 +2873,7 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetFillColor(255, 255, 255);
 
-        $this->Cell(125, 10, 'Teams', 1, '0', 'C', true);
+        $this->Cell(125, 10, 'SADR Teams', 1, '0', 'C', true);
         $this->Cell(70, 10, 'No. of  KiwiSavers Enrolled', 1, '1', 'C', true);
 
         $this->SetFont('Arial', '', 15);
@@ -3149,7 +3166,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
 
     if  (isset($magazine_data->rba_cumulative_advisers) && (is_array($magazine_data->rba_cumulative_advisers) && count($magazine_data->rba_cumulative_advisers) > 0)) {
         if ('Others' != $magazine_data->rba_cumulative_advisers[0]['name']) {
-            $pdf->CumulativeRBAPage($magazine_data->rba_cumulative_advisers);
+            $pdf->CumulativeRBAPage($magazine_data->rba_cumulative_advisers, $magazine_data->overallCumulativeRBA);
         }
     }
 

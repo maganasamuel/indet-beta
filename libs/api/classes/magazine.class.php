@@ -113,6 +113,8 @@ class Magazine extends Database
 
     public $sadr_cumulative_advisers_kiwisavers = [];
 
+    public $overallCumulativeRBA = [];
+
     /**
      * @desc: init the class
      *
@@ -300,6 +302,9 @@ class Magazine extends Database
             $this->last_page_index++;
             $this->PushToPages('Photos', "Page {$this->last_page_index}");
         }
+
+        // Overall Cumulative Percentage of Replacement Business
+        $this->overallCumulativeRBA = $this->getOverallCumulativeRBA();
     }
 
     //Return empty if the only rows left are others
@@ -652,7 +657,7 @@ class Magazine extends Database
         //Active Advisers deal fetching
         $advisersArrayString = implode(',', $activeAdvisers);
 
-        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
+        $query = "SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals, i.assigned_to FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to IN ($advisersArrayString) order by a.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -679,6 +684,11 @@ class Magazine extends Database
                         if ($this->WithinDateRange($deal['date_issued'], $this->bimonthRange)) {
                             $total_issued_api += $deal['issued_api'];
                             $total_issued_deals++;
+
+                            // Trace Glen Gonzales' Client with zero issued api
+                            /* if($row['assigned_to'] == 55){
+                                echo json_encode($row);
+                            } */
                         }
                     }
                 }
@@ -2506,6 +2516,50 @@ class Magazine extends Database
         $this->moveElement($output, $key, count($output) - 1);
 
         return $this->FilterOutput($output, 'deals');
+    }
+
+    public function getOverallCumulativeRBA()
+    {
+        $issuedClients = $this->execute($this->prepare('SELECT c.id as client_id, a.name as adviser_name, a.id as adviser_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN adviser_tbl a ON i.assigned_to = a.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.assigned_to AND a.termination_date = "" IS NOT NULL order by a.name'));
+
+        $issuedPolicyCount = 0;
+        $replacementBusinessCount = 0;
+
+        while($issuedClient = $issuedClients->fetch_assoc()){
+            $deals = json_decode($issuedClient['deals'], true);
+
+            if($deals == null){
+                continue;
+            }
+
+            foreach($deals as $deal){
+                if(($deal['status'] ?? '') != 'Issued'){
+                    continue;
+                }
+                
+                if(($deal['clawback_status'] ?? '') == 'Cancelled'){
+                    continue;
+                }
+
+                if(!$this->WithinDateRange($deal['date_issued'], $this->cumulativeRange)){
+                    continue;
+                }
+
+                $issuedPolicyCount++;
+
+                if(($deal['replacement_business'] ?? 0) == '1'){
+                    $replacementBusinessCount++;
+                }
+            }
+        }
+
+        $rbaPercentage = ($issuedPolicyCount <= 0 || $replacementBusinessCount <= 0) ? 0 : (($replacementBusinessCount / $issuedPolicyCount) * 100);
+
+        return [
+            'issuedPolicyCount' => $issuedPolicyCount,
+            'replacementBusinessCount' => $replacementBusinessCount,
+            'rbaPercentage' => $rbaPercentage,
+        ];
     }
 
     public function GetCumulativeRBAAdvisers()

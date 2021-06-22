@@ -2642,7 +2642,8 @@ class PDF extends FPDF_CellFit
         }
 
         //page 2 BiMonthly API
-        $this->AddPage();
+        // begin comment - requested by Sir Leif
+        /* $this->AddPage();
         if(is_array($highest_team_advisers) && sizeof($highest_team_advisers) >= 1) {
             $this->Header1(15, 'SADR Team with Highest Total API from Policies Issued');
 
@@ -2683,7 +2684,8 @@ class PDF extends FPDF_CellFit
             }
             
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
-        }
+        } */
+        // end comment
 
         $next_Y = $this->GetY();
         if(($next_Y + 15) >= 200) {

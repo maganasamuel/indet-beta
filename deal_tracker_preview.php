@@ -551,7 +551,7 @@ if (count($report_data->cancelled_deals) > 0) {
     $pdf->SetTextColor(0, 0, 0);
     $pdf->Cell(330, 10, 'CLAWBACKS', 0, 1, 'C', 'true');
 
-    $pdf->SetWidths([70, 30, 30, 30, 30, 50, 90]);
+    $pdf->SetWidths([50, 25, 25, 25, 25, 40, 140]);
 
     $pdf->SetFont('Helvetica', 'U', 12);
     $pdf->SetFillColor(0, 0, 0);
@@ -575,9 +575,9 @@ if (count($report_data->cancelled_deals) > 0) {
 
     $pdf->SetDrawColor(0, 0, 0);
     $pdf->SetFont('Helvetica', 'B', 11);
-    $pdf->Cell(160, 10, 'Total Paid API', 'T', 0, 'L');
-    $pdf->Cell(30, 10, '$' . number_format($report_data->total_cancelled_api, 2), 'T', 0, 'C');
-    $pdf->Cell(140, 10, '', 'T', 1, 'C');
+    $pdf->Cell(125, 10, 'Total Paid API', 'T', 0, 'L');
+    $pdf->Cell(25, 10, '$' . number_format($report_data->total_cancelled_api, 2), 'T', 0, 'C');
+    $pdf->Cell(180, 10, '', 'T', 1, 'C');
 }
 /*
 if (isset($report_data->kiwisaver_deals)) {

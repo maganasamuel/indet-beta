@@ -70,9 +70,9 @@ while ($issuedClient = $issuedClients->fetch_assoc()) {
             'insurer' => $deal['company'],
             'policy_number' => $deal['policy_number'],
             'adviser_name' => $issuedClient['adviser_name'],
-            'issued_date' => (int) $deal['date_issued'],
-            'issued_month' => (int) substr($deal['date_issued'], 4, 2),
-            'issued_year' => (int) substr($deal['date_issued'], 0, 4),
+            'issued_date' => $deal['date_issued'],
+            'issued_month' => substr($deal['date_issued'], 4, 2),
+            'issued_year' => substr($deal['date_issued'], 0, 4),
             'issued_date_formatted' => formatDate($deal['date_issued']),
             'api' => $deal['issued_api'],
             'status' => $deal['status'],
@@ -94,7 +94,7 @@ if ('date' == $filterBy) {
 
     $filenameSuffix = str_replace('/', '-', formatDate($dateFrom) . '-to-' . formatDate($dateTo));
 } elseif ('month' == $filterBy) {
-    $policies = $policies->where('issued_month', $value);
+    $policies = $policies->where('issued_month', str_pad($value, 2, '0', STR_PAD_LEFT));
 
     $filenameSuffix = date('F', mktime(0, 0, 0, $value));
 } elseif ('year' == $filterBy) {

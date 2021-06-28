@@ -61,10 +61,6 @@ $policies = [];
 
 while ($issuedClient = $issuedClients->fetch_assoc()) {
     foreach (json_decode($issuedClient['deals'], true) as $deal) {
-        if (($deal['status'] ?? '') != 'Issued') {
-            continue 2;
-        }
-
         $policies[] = [
             'client_name' => $issuedClient['client_name'],
             'insurer' => $deal['company'],
@@ -81,7 +77,7 @@ while ($issuedClient = $issuedClients->fetch_assoc()) {
     }
 }
 
-$policies = collect($policies);
+$policies = collect($policies)->where('status', 'Issued');
 
 if ('date' == $filterBy) {
     $dates = explode('|', $value);

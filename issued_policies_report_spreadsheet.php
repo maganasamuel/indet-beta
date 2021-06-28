@@ -85,7 +85,6 @@ if ('date' == $filterBy) {
     $dateFrom = $dates[0];
     $dateTo = $dates[1];
 
-    // $policies = $policies->where('issued_date', '>=', $dateFrom)->where('issued_date', '<=', $dateTo);
     $policies = $policies->whereBetween('issued_date', [$dateFrom, $dateTo]);
 
     $filenameSuffix = str_replace('/', '-', formatDate($dateFrom) . '-to-' . formatDate($dateTo));

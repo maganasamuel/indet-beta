@@ -28,7 +28,7 @@ $excel = new PHPExcel();
 $filterBy = $_GET['filter_by'];
 $value = $_GET['value'];
 
-$sheet = $excel->createSheet(0);
+$sheet = $excel->getActiveSheet();
 $sheet->setTitle('Issued Policies List');
 $sheet->fromArray([
     'Name of Client',

@@ -28,7 +28,7 @@ $excel = new PHPExcel();
 $filterBy = $_GET['filter_by'];
 $value = $_GET['value'];
 
-$sheet = $excel->createSheet(0);
+$sheet = $excel->getActiveSheet();
 $sheet->setTitle('Issued Policies List');
 $sheet->fromArray([
     'Name of Client',
@@ -85,7 +85,6 @@ if ('date' == $filterBy) {
     $dateFrom = $dates[0];
     $dateTo = $dates[1];
 
-    // $policies = $policies->where('issued_date', '>=', $dateFrom)->where('issued_date', '<=', $dateTo);
     $policies = $policies->whereBetween('issued_date', [$dateFrom, $dateTo]);
 
     $filenameSuffix = str_replace('/', '-', formatDate($dateFrom) . '-to-' . formatDate($dateTo));

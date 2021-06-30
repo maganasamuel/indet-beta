@@ -17,26 +17,16 @@ $db = new Database();
 <html lang="en">
 <head>
 	<?php include 'partials/nav_bar.html'; ?>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>INDENT - Issued Policies List</title>
-
-	<link id="favicon" rel="icon" href="Logo_ImageOnly.png" type="image/png" sizes="16x16">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-
 	<link rel="stylesheet" href="styles.css">
+	<link id="favicon" rel="icon" href="Logo_ImageOnly.png" type="image/png" sizes="16x16">
+	<title>INDENT - Issued Policies List</title>
+	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap3.min.css" integrity="sha512-MNbWZRRuTPBahfBZBeihNr9vTJJnggW3yw+/wC3Ev1w6Z8ioesQYMS1MtlHgjSOEKBpIlx43GeyLM2QGSIzBDg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js" integrity="sha512-pF+DNRwavWMukUv/LyzDyDMn8U2uvqYQdJN0Zvilr6DDo/56xPDZdDoyPDYZRSL4aOKO/FGKXTpzDyQJ8je8Qw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-	<style>
-		.mx-auto{
-			margin-left: auto;
-			margin-right: auto;
-		}
-	</style>
 </head>
 <body>
 	<div class="jumbotron">
@@ -130,17 +120,17 @@ $db = new Database();
 			});
 
 			$.ajax({
-				url: '/libs/api/adviser_api.php',
+				url: '<?php echo 'onlineinsure.co.nz' == $_SERVER['SERVER_NAME'] ? '/indet-beta' : ''; ?>/libs/api/adviser_api.php',
 				type: 'POST',
 				data: {
 					action: 'get_advisers'
-				},	
+				},
 				error: function(){
 					inputError('#adviser', 'Could not fetch advisers. Please try again.');
 				},
 				success: function(response){
 					let advisers = JSON.parse(response);
-					
+
 					advisers.forEach((adviser) => {
 						$('#adviser').append(
 							$('<option>', {
@@ -154,7 +144,7 @@ $db = new Database();
 				}
 			});
 
-			
+
 
 			$('#filter_by').focus();
 
@@ -250,7 +240,7 @@ $db = new Database();
 				}
 
 				let advisers = $('#adviser').val().join(',');
-				
+
 				url += value + '&advisers=' + advisers;
 
 				window.open(url, '_blank');

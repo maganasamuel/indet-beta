@@ -2,21 +2,22 @@
 
 session_start();
 
-include_once "libs/api/classes/general.class.php";
-include_once "libs/api/controllers/Adviser.controller.php";
+include_once 'libs/api/classes/general.class.php';
+include_once 'libs/api/controllers/Adviser.controller.php';
 
-$_SESSION["x"] = 1;
+$_SESSION['x'] = 1;
 unset($_SESSION['adviser_id']);
-if (!isset($_SESSION["myusername"])) {
+
+if (! isset($_SESSION['myusername'])) {
     session_destroy();
-    header("Refresh:0; url=index.php");
+    header('Refresh:0; url=index.php');
 } else {
     ?>
     <html>
 
     <head>
         <!--nav bar-->
-        <?php include "partials/nav_bar.html";?>
+        <?php include 'partials/nav_bar.html'; ?>
 
         <!--nav bar end-->
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -88,11 +89,8 @@ if (!isset($_SESSION["myusername"])) {
                     contentType: false,
 
                     success: function(data, textStatus, jqXHR) {
-                        console.log(data);
                         let link = uploads_url + data;
-                        console.log(link);
                         let fn = data.split(".")[0];
-
 
                         $('#image_preview').append("\
                         <div class='row nopadding' id='" + fn + "'>\
@@ -240,7 +238,6 @@ if (!isset($_SESSION["myusername"])) {
                     formData.append("output", true);
                     formData.append("random_filename", true);
 
-                    //console.log(formData.getAll("photos"));
                     $.ajax({
                         dataType: 'json',
                         type: 'POST',
@@ -282,13 +279,12 @@ if (!isset($_SESSION["myusername"])) {
                                         $("#save_pdf").prop("disabled", false);
                                         $("#save_magazine_text").text("Create Magazine");
                                         $("#save_magazine_spinner").hide();
-                                        console.log(x);
+                                        
                                         $.confirm({
                                             title: 'Success!',
                                             content: 'You have successfully created a magazine ',
                                             buttons: {
                                                 Ok: function() {
-                                                    console.log(x);
                                                     window.location = 'create_magazine.php';
                                                 },
                                             }
@@ -327,10 +323,9 @@ if (!isset($_SESSION["myusername"])) {
             <!--label end-->
 
             <?php
-require "database.php";
+require 'database.php';
     $adviserController = new AdviserController();
-    $generalController = new General();
-    ?>
+    $generalController = new General(); ?>
 
             <form method="POST" action="create_customized_invoice.php" id="form" autocomplete="off" class="margined">
                 <div class="row">
@@ -444,7 +439,6 @@ require "database.php";
     </html>
 
 <?php
-
 }
 
 ?>

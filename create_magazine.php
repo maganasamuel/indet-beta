@@ -32,7 +32,7 @@ if (! isset($_SESSION['myusername'])) {
                 padding-top: 0px !important;
             }
 
-            .modal-dialog {
+            #myModal .modal-dialog {
                 min-width: 100%;
                 min-height: 100%;
                 height: auto;
@@ -41,7 +41,7 @@ if (! isset($_SESSION['myusername'])) {
                 padding: 0;
             }
 
-            .modal-content {
+            #mymodal .modal-content {
                 width: 100% !important;
                 height: auto;
                 min-height: 100%;
@@ -62,11 +62,70 @@ if (! isset($_SESSION['myusername'])) {
                 cursor:pointer;
             }
 
+            #canvas{
+                background-color: #ffffff;
+                border: 1px solid #cccccc;
+            }
+
         </style>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/451/fabric.min.js" integrity="sha512-qeu8RcLnpzoRnEotT3r1CxB17JtHrBqlfSTOm4MQzb7efBdkcL03t343gyRmI6OTUW6iI+hShiysszISQ/IahA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
         <script>
+            window.onload = function(){
+            
             let api = "libs/api/magazine_api.php";
             let photosList = [];
             var uploads_url = "../indet_photos_stash/";
+
+            var canvas = new fabric.Canvas('canvas');
+            var currentImage;
+
+            canvas.on('mouse:down', function(options){
+                if(options.target){
+                    $('#removeImage').removeClass('hidden');
+                }else{
+                    $('#removeImage').addClass('hidden');
+                }
+            });
+
+            $('#removeImage').on('click', function(){
+                var activeObject = canvas.getActiveObject();
+
+                var filename = activeObject.filename;
+
+                $.ajax({
+                    url: "libs/api/magazine_image_deleter",
+                    type: 'POST',
+                    data: {
+                        filename,
+                    },
+                    success: function(response) {
+                        console.log(response);
+
+                        canvas.remove(activeObject);
+
+                        $('#removeImage').addClass('hidden');
+                    }
+                });
+            });
+
+            function addImageUrlToCanvas(link, filename){
+                fabric.Image.fromURL(link, function(image){
+                    var object = image.set({
+                        top: currentImage ? currentImage.top + 15 : 0,
+                        left: currentImage ? currentImage.left + 15 : 0,
+                        filename: filename
+                    });
+
+                    object.scaleToHeight((canvas.height / 2) * 0.75);
+                    object.scaleToWidth((canvas.width / 2) * 0.75);
+
+                    currentImage = object;
+
+                    canvas.add(object);
+                });
+            }
 
             function preview_image() {
                 var total_file = document.getElementById("photos").files.length;
@@ -80,76 +139,80 @@ if (! isset($_SESSION['myusername'])) {
                 }
 
                 for (var i = 0; i < total_file; i++) {
-                formData.append("fileToUpload", fileUpload.files[i], fileUpload.files[i].name);
-                $.ajax({
-                    url: "libs/api/uploader",
-                    type: 'POST',
-                    data: formData,
-                processData: false,
-                    contentType: false,
+                    formData.append("fileToUpload", fileUpload.files[i], fileUpload.files[i].name);
 
-                    success: function(data, textStatus, jqXHR) {
-                        let link = uploads_url + data;
-                        let fn = data.split(".")[0];
+                    $.ajax({
+                        url: "libs/api/uploader",
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
 
-                        $('#image_preview').append("\
-                        <div class='row nopadding' id='" + fn + "'>\
-                            <div class='col-md-4' >\
-                                <img class='img img-thumbnail' style='min-height:20vh; max-height:20vh; min-width:100%; max-width:100%;' src='" + link + "'>\
-                            </div>\
-                            <div class='col-md-8'>\
-                                <div class='row nopadding'>\
-                                    <div class='col-sm-2'>\
-                                        <h4 class='nopadding'>Label:</h4>\
-                                    </div>\
-                                    <div class='col-sm-10'>\
-                                         <input type='text' class='form-control labels' placeholder='' id='label" + i + "' name='label" + i + "'>\
-                                        <input type='hidden' class='form-control filenames' placeholder='filenames' id='filename" + i + "' value='" + link + "' name='filename" + i + "'>\
-                                    </div>\
-                                </div>\
-                                <div class='row nopadding'>\
-                                    <div class='col-sm-2'>\
-                                        <h4 class='nopadding'>Width:</h4>\
-                                    </div>\
-                                    <div class='col-sm-10'>\
-                                         <input type='text' class='form-control widths' placeholder='' id='width" + i + "' name='width" + i + "'>\
-                                    </div>\
-                                </div>\
-                                <div class='row nopadding'>\
-                                    <div class='col-sm-2'>\
-                                        <h4 class='nopadding'>Height:</h4>\
-                                    </div>\
-                                    <div class='col-sm-10'>\
-                                         <input type='text' class='form-control heights' placeholder='' id='height" + i + "' name='height" + i + "'>\
-                                    </div>\
-                                </div>\
-                                <div class='row nopadding'>\
-                                    <div class='col-sm-4 text-left'>\
-                                        <button type='button' class='btn btn-primary form-control sort_handle'>Sort <i class='fas fa-sort'></i></button>\
-                                    </div>\
-                                    <div class='col-sm-4'>\
-                                    </div>\
-                                    <div class='col-sm-4'>\
-                                        <button type='button' class='btn btn-danger form-control delete_img' data-name='" + fn + "' >Delete <i class='fas fa-trash'></i></button>\
-                                    </div>\
-                                </div>\
-                            </div>\
-                        </div>");
+                        success: function(data, textStatus, jqXHR) {
+                            let link = uploads_url + data;
+                            let fn = data.split(".")[0];
 
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log(errorThrown);
-                        alert('An error occurred when uploading the file!');
-                    }
-                });
+                            /* $('#image_preview').append("\
+                            <div class='row nopadding' id='" + fn + "'>\
+                                <div class='col-md-4' >\
+                                    <img class='img img-thumbnail' style='min-height:20vh; max-height:20vh; min-width:100%; max-width:100%;' src='" + link + "'>\
+                                </div>\
+                                <div class='col-md-8'>\
+                                    <div class='row nopadding'>\
+                                        <div class='col-xs-2'>\
+                                            <h4 class='nopadding'>Label:</h4>\
+                                        </div>\
+                                        <div class='col-xs-10'>\
+                                            <input type='text' class='form-control labels' placeholder='' id='label" + i + "' name='label" + i + "'>\
+                                            <input type='hidden' class='form-control filenames' placeholder='filenames' id='filename" + i + "' value='" + link + "' name='filename" + i + "'>\
+                                        </div>\
+                                    </div>\
+                                    <div class='row nopadding'>\
+                                        <div class='col-xs-2'>\
+                                            <h4 class='nopadding'>Width:</h4>\
+                                        </div>\
+                                        <div class='col-xs-10'>\
+                                            <input type='text' class='form-control widths' placeholder='' id='width" + i + "' name='width" + i + "'>\
+                                        </div>\
+                                    </div>\
+                                    <div class='row nopadding'>\
+                                        <div class='col-xs-2'>\
+                                            <h4 class='nopadding'>Height:</h4>\
+                                        </div>\
+                                        <div class='col-xs-10'>\
+                                            <input type='text' class='form-control heights' placeholder='' id='height" + i + "' name='height" + i + "'>\
+                                        </div>\
+                                    </div>\
+                                    <div class='row nopadding'>\
+                                        <div class='col-xs-4 text-left'>\
+                                            <button type='button' class='btn btn-primary form-control sort_handle'>Sort <i class='fas fa-sort'></i></button>\
+                                        </div>\
+                                        <div class='col-xs-4'>\
+                                        </div>\
+                                        <div class='col-xs-4'>\
+                                            <button type='button' class='btn btn-danger form-control delete_img' data-name='" + fn + "' >Delete <i class='fas fa-trash'></i></button>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>"); */
+
+                            addImageUrlToCanvas(link, data);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(errorThrown);
+                            alert('An error occurred when uploading the file!');
+                        }
+                    });
                 }
-
-
 
                 fileUpload.value = '';
             }
 
             $(document).ready(function() {
+                $('#photos').on('change', function(){
+                    preview_image();
+                });
+
                 $('#image_preview').sortable({
                     handle: 'button.sort_handle',
                     cancel: ''
@@ -310,6 +373,8 @@ if (! isset($_SESSION['myusername'])) {
                 });
 
             });
+
+            }
         </script>
     </head>
 
@@ -323,26 +388,26 @@ if (! isset($_SESSION['myusername'])) {
             <!--label end-->
 
             <?php
-require 'database.php';
+            require 'database.php';
     $adviserController = new AdviserController();
     $generalController = new General(); ?>
 
             <form method="POST" action="create_customized_invoice.php" id="form" autocomplete="off" class="margined">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-xs-6">
 
                         <div class='row'>
-                            <div class='col-sm-2 text-right'>
+                            <div class='col-xs-2 text-right'>
                                 <h4>Date</h4>
                             </div>
-                            <div class='col-sm-4'>
+                            <div class='col-xs-4'>
                                 <input type='text' class="form-control datepicker" name='date' id='date'>
                             </div>
 
-                            <div class='col-sm-2 text-right'>
+                            <div class='col-xs-2 text-right'>
                                 <h4>Series</h4>
                             </div>
-                            <div class='col-sm-4'>
+                            <div class='col-xs-4'>
                                 <input type='text' readonly class="form-control" name='series' id='series'>
                                 <input type='hidden' readonly class="form-control" name='magazine_date' id='magazine_date'>
                                 <input type='hidden' readonly class="form-control" name='magazine_data' id='magazine_data'>
@@ -350,69 +415,79 @@ require 'database.php';
                         </div>
 
                         <div class='row'>
-                            <div class='col-sm-2 text-right'>
+                            <div class='col-xs-2 text-right'>
                                 <h4>Quote </h4>
                             </div>
-                            <div class='col-sm-10'>
+                            <div class='col-xs-10'>
                                 <input type='text' class="form-control" name='quote' id='quote'>
                             </div>
                         </div>
 
                         <div class='row'>
-                            <div class='col-sm-12 text-center'>
+                            <div class='col-xs-12 text-center'>
                                 <h3> Message <i data-toggle="tooltip" data-placement="top" title="You can enter '{indent}' to add an indentations to the first line of your paragraph." class="fas fa-question-circle"></i> </h3>
                             </div>
                         </div>
 
                         <div class='row'>
-                            <div class='col-sm-12'>
-                                <textarea class="form-control" name='message' id='message' style="height:20vh">Team EliteInsure,
-
-</textarea>
+                            <div class='col-xs-12'>
+                                <textarea class="form-control" name='message' id='message' style="height:20vh">Team EliteInsure,</textarea>
                             </div>
                         </div>
+
                         <br>
 
                         <div class='row'>
-                            <div class='col-sm-12 text-center'>
+                            <div class='col-xs-12 text-center'>
                                 <h3> Announcement <i data-toggle="tooltip" data-placement="top" title="You can enter '{indent}' to add an indentations to the first line of your paragraph." class="fas fa-question-circle"></i> </h3>
                             </div>
                         </div>
 
                         <div class='row'>
-                            <div class='col-sm-12'>
+                            <div class='col-xs-12'>
                                 <textarea class="form-control" name='announcement' id='announcement' style="height:20vh"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+
+                    <div class="col-xs-6">
                         <div class='row'>
-                            <div class='col-sm-12 text-center'>
+                            <div class='col-xs-12 text-center'>
                                 <h3> Photos <i id="photos_tooltip" data-toggle="tooltip" data-html="true" title="Adjust the width (w) and height (h) accordingly. Not setting the w/h will set it to 30 by default. Maximum width is 196, maximum height is 259." data-placement="top" class="fas fa-question-circle"></i> </h3>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col-sm-12" id="photosDiv">
-                            <!--
+                            <div class="col-xs-12" id="photosDiv">
+                                <!--
                                 <div class="form-group" for="photos" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="background-color:#EEEEEE; padding:30px; border-style:dashed; border-color: #CCCCFF;">
                                     <h3 class="text-center">Drop images here</h3>
                                 </div>
                                 -->
-                                    <input type="file" id="photos" name="photos[]" class="form-control" onchange="preview_image();" style="text-align:center;padding-top:30px; padding-bottom:50px; background-color:white; border-style:dashed; border-color:#00A;" multiple />
+                                <input type="file" id="photos" name="photos[]" class="form-control" style="text-align:center;padding-top:30px; padding-bottom:50px; background-color:white; border-style:dashed; border-color:#00A;" multiple accept="image/jpeg,image/png,image/bmp" />
                             </div>
                         </div>
 
-                        <div id="image_preview" style="max-height:60vh; overflow-x:auto;" class="row"></div>
+                        <!-- <div id="image_preview" style="max-height:60vh; overflow-x:auto;" class="row"></div> -->
+
+                        <div class="row">
+                            <br>
+                            <div class="col-xs-12 text-left">
+                                <canvas id="canvas" width="622" height="526"></canvas>
+                                <br>
+                                <button type="button" id="removeImage" class="btn btn-sm btn-danger hidden">Remove Image</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-        </div>
 
-        <div class="row">
-            <div class="col-sm-2 center">
-                <button name="enter" type="button" id='create' style='margin-top: 30px;width: 100%;' class="btn btn-danger center" /><i id="create_magazine_spinner" style="display:none;" class="fas fa-spinner fa-spin"></i> <span id="create_magazine_text">Create Magazine</span></button>
-            </div>
+                <div class="row">
+                    <div class="col-xs-2 center">
+                        <button name="enter" type="button" id='create' style='margin-top: 30px;width: 100%;' class="btn btn-danger center" /><i id="create_magazine_spinner" style="display:none;" class="fas fa-spinner fa-spin"></i> <span id="create_magazine_text">Create Magazine</span></button>
+                    </div>
+                </div>
+            </form>
         </div>
-        </form>
 
         <div class="container">
             <!-- Modal -->

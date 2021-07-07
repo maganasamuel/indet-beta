@@ -99,7 +99,7 @@ if (! isset($_SESSION['myusername'])) {
                     canvas.remove(activeObject);
 
                     $('#removeObject').addClass('hidden');
-                    
+
                     return false;
                 }
 
@@ -154,6 +154,7 @@ if (! isset($_SESSION['myusername'])) {
                 var text = new fabric.Text($('#photoText').val(), {
                     top: currentObject ? currentObject.top + 15 : 0,
                     left: currentObject ? currentObject.left + 15 : 0,
+                    fontFamily: 'Calibri, Arial',
                 });
 
                 currentObject = text;

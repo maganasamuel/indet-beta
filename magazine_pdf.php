@@ -1824,7 +1824,12 @@ class PDF extends FPDF_CellFit
         }
 
         $this->AddPage();
-        $this->Header1(15, 'Strings', 20);
+
+        $from = date_create_from_format('Ymd', $bimonthRange->from);
+        $to = date_create_from_format('Ymd', $bimonthRange->to);
+        $range = $from->format('j') . '-' . $to->format('j F Y');
+        
+        $this->Header1(15, 'Strings as of ' . $range, 20);
         $this->Ln(6);
         $this->SetFillColor(102, 163, 194);
         $this->SetDrawColor(102, 163, 194);
@@ -1839,22 +1844,63 @@ class PDF extends FPDF_CellFit
         $this->SetDrawColor(0, 0, 0);
         $this->SetTextColor(0, 0, 0);
 
-        // Table title
-        $from = date_create_from_format('Ymd', $bimonthRange->from);
-        $to = date_create_from_format('Ymd', $bimonthRange->to);
-        $range = $from->format('j') . '-' . $to->format('j F Y');
-
-        $this->Cell(195, 15, 'Strings as of ' . $range, 1, 0, 'C', true);
-        $this->Ln();
-
         // Table header
+        $this->SetDrawColor(0 , 0, 0);
         $this->SetFont('Arial', 'B', 12);
+        $this->SetFillColor(255, 255, 255);
+        $this->SetTextColor(0, 0, 0);
         $this->Cell(95, 15, 'Adviser', 1, 0, 'C', true);
         $this->Cell(25, 15, 'Silver', 1, 0, 'C', true);
         $this->Cell(25, 15, 'Gold', 1, 0, 'C', true);
         $this->Cell(25, 15, 'Platinum', 1, 0, 'C', true);
         $this->Cell(25, 15, 'Titanium', 1, 0, 'C', true);
         $this->Ln();
+
+        $fillColors = [
+            'Silver' => [
+                'red' => 192,
+                'green' => 192,
+                'blue' => 192,
+            ],
+            'Gold' => [
+                'red' => 255,
+                'green' => 239,
+                'blue' => 148,
+            ],
+            'Platinum' => [
+                'red' => 212,
+                'green' => 91,
+                'blue' => 91,
+            ],
+            'Titanium' => [
+                'red' => 102,
+                'green' => 163,
+                'blue' => 194,
+            ],
+        ];
+
+        $drawColors = [
+            'Silver' => [
+                'red' => 163,
+                'green' => 163,
+                'blue' => 163,
+            ],
+            'Gold' => [
+                'red' => 214,
+                'green' => 181,
+                'blue' => 0,
+            ],
+            'Platinum' => [
+                'red' => 207,
+                'green' => 21,
+                'blue' => 21,
+            ],
+            'Titanium' => [
+                'red' => 102,
+                'green' => 163,
+                'blue' => 200,
+            ],
+        ];
 
         // Table first row
 
@@ -1866,11 +1912,14 @@ class PDF extends FPDF_CellFit
             $image_path = $this->uploads_folder . $sorted_advisers[0]['image'];
         }
 
-        $adviserName = strtoupper($sorted_advisers[0]['name']);
+        $score = $sorted_advisers[0]['score'];
 
+        $this->SetTextColor(0, 0, 0);
+        $this->SetFillColor($fillColors[$score]['red'], $fillColors[$score]['green'], $fillColors[$score]['blue']);
+        // $this->SetDrawColor($drawColors[$score]['red'], $drawColors[$score]['green'], $drawColors[$score]['blue']);
         $this->SetFont('Arial', 'B', 20);
         $this->Cell(40, 40, $this->Image($image_path, $this->GetX(), $this->GetY(), 40, 40), 1, 0, 'C', false);
-        $this->CellFitScale(55, 40, $adviserName, 1, 0, 'C', true);
+        $this->CellFitScale(55, 40, strtoupper($sorted_advisers[0]['name']), 1, 0, 'C', true);
         $this->Cell(25, 40, $sorted_advisers[0]['silver'], 1, 0, 'C', true);
         $this->Cell(25, 40, $sorted_advisers[0]['gold'], 1, 0, 'C', true);
         $this->Cell(25, 40, $sorted_advisers[0]['platinum'], 1, 0, 'C', true);
@@ -1887,6 +1936,10 @@ class PDF extends FPDF_CellFit
                 $image = $this->uploads_folder . $adviser['image'];
             }
 
+            $score = $adviser['score'];
+
+            $this->SetFillColor($fillColors[$score]['red'], $fillColors[$score]['green'], $fillColors[$score]['blue']);
+            // $this->SetDrawColor($drawColors[$score]['red'], $drawColors[$score]['green'], $drawColors[$score]['blue']);
             $this->Cell(15, 15, $this->Image($image, $this->GetX(), $this->GetY(), 15, 15), 1, 0, 'C');
             $this->CellFitScale(80, 15, strtoupper($adviser['name']), 1, 0, 'C', true);
             $this->Cell(25, 15, $adviser['silver'], 1, 0, 'C', true);

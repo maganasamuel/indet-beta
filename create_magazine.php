@@ -18,13 +18,14 @@ if (! isset($_SESSION['myusername'])) {
     <head>
         <!--nav bar-->
         <?php include 'partials/nav_bar.html'; ?>
-
         <!--nav bar end-->
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
+
         <link id="favicon" rel="icon" href="Logo_ImageOnly.png" type="image/png" sizes="16x16">
+        
         <title>INDET</title>
 
         <style>
@@ -79,20 +80,28 @@ if (! isset($_SESSION['myusername'])) {
             var uploads_url = "../indet_photos_stash/";
 
             var canvas = new fabric.Canvas('canvas');
-            var currentImage;
+            var currentObject;
 
             canvas.on('mouse:down', function(options){
                 if(options.target){
-                    $('#removeImage').removeClass('hidden');
+                    $('#removeObject').removeClass('hidden');
                 }else{
-                    $('#removeImage').addClass('hidden');
+                    $('#removeObject').addClass('hidden');
                 }
             });
 
-            $('#removeImage').on('click', function(){
+            $('#removeObject').on('click', function(){
                 var activeObject = canvas.getActiveObject();
 
                 var filename = activeObject.filename;
+
+                if(!filename){
+                    canvas.remove(activeObject);
+
+                    $('#removeObject').addClass('hidden');
+                    
+                    return false;
+                }
 
                 $.ajax({
                     url: "libs/api/magazine_image_deleter",
@@ -105,7 +114,7 @@ if (! isset($_SESSION['myusername'])) {
 
                         canvas.remove(activeObject);
 
-                        $('#removeImage').addClass('hidden');
+                        $('#removeObject').addClass('hidden');
                     }
                 });
             });
@@ -113,19 +122,44 @@ if (! isset($_SESSION['myusername'])) {
             function addImageUrlToCanvas(link, filename){
                 fabric.Image.fromURL(link, function(image){
                     var object = image.set({
-                        top: currentImage ? currentImage.top + 15 : 0,
-                        left: currentImage ? currentImage.left + 15 : 0,
+                        top: currentObject ? currentObject.top + 15 : 0,
+                        left: currentObject ? currentObject.left + 15 : 0,
                         filename: filename
                     });
 
                     object.scaleToHeight((canvas.height / 2) * 0.75);
                     object.scaleToWidth((canvas.width / 2) * 0.75);
 
-                    currentImage = object;
+                    currentObject = object;
 
                     canvas.add(object);
                 });
             }
+
+            $('#photoText').on('keydown', function(event){
+                if(event.keyCode == 13){
+                    $('#addText').trigger('click');
+                }
+            });
+
+            $('#addText').on('click', function(){
+                if(!$('#photoText').val().trim()){
+                    alert('Please write a text to add in the photo.');
+
+                    $('#photoText').focus();
+
+                    return false;
+                }
+
+                var text = new fabric.Text($('#photoText').val(), {
+                    top: currentObject ? currentObject.top + 15 : 0,
+                    left: currentObject ? currentObject.left + 15 : 0,
+                });
+
+                currentObject = text;
+
+                canvas.add(text);
+            });
 
             function preview_image() {
                 var total_file = document.getElementById("photos").files.length;
@@ -151,50 +185,6 @@ if (! isset($_SESSION['myusername'])) {
                         success: function(data, textStatus, jqXHR) {
                             let link = uploads_url + data;
                             let fn = data.split(".")[0];
-
-                            /* $('#image_preview').append("\
-                            <div class='row nopadding' id='" + fn + "'>\
-                                <div class='col-md-4' >\
-                                    <img class='img img-thumbnail' style='min-height:20vh; max-height:20vh; min-width:100%; max-width:100%;' src='" + link + "'>\
-                                </div>\
-                                <div class='col-md-8'>\
-                                    <div class='row nopadding'>\
-                                        <div class='col-xs-2'>\
-                                            <h4 class='nopadding'>Label:</h4>\
-                                        </div>\
-                                        <div class='col-xs-10'>\
-                                            <input type='text' class='form-control labels' placeholder='' id='label" + i + "' name='label" + i + "'>\
-                                            <input type='hidden' class='form-control filenames' placeholder='filenames' id='filename" + i + "' value='" + link + "' name='filename" + i + "'>\
-                                        </div>\
-                                    </div>\
-                                    <div class='row nopadding'>\
-                                        <div class='col-xs-2'>\
-                                            <h4 class='nopadding'>Width:</h4>\
-                                        </div>\
-                                        <div class='col-xs-10'>\
-                                            <input type='text' class='form-control widths' placeholder='' id='width" + i + "' name='width" + i + "'>\
-                                        </div>\
-                                    </div>\
-                                    <div class='row nopadding'>\
-                                        <div class='col-xs-2'>\
-                                            <h4 class='nopadding'>Height:</h4>\
-                                        </div>\
-                                        <div class='col-xs-10'>\
-                                            <input type='text' class='form-control heights' placeholder='' id='height" + i + "' name='height" + i + "'>\
-                                        </div>\
-                                    </div>\
-                                    <div class='row nopadding'>\
-                                        <div class='col-xs-4 text-left'>\
-                                            <button type='button' class='btn btn-primary form-control sort_handle'>Sort <i class='fas fa-sort'></i></button>\
-                                        </div>\
-                                        <div class='col-xs-4'>\
-                                        </div>\
-                                        <div class='col-xs-4'>\
-                                            <button type='button' class='btn btn-danger form-control delete_img' data-name='" + fn + "' >Delete <i class='fas fa-trash'></i></button>\
-                                        </div>\
-                                    </div>\
-                                </div>\
-                            </div>"); */
 
                             addImageUrlToCanvas(link, data);
                         },
@@ -476,14 +466,28 @@ if (! isset($_SESSION['myusername'])) {
                             </div>
                         </div>
 
-                        <!-- <div id="image_preview" style="max-height:60vh; overflow-x:auto;" class="row"></div> -->
+                        <br>
 
                         <div class="row">
-                            <br>
                             <div class="col-xs-12 text-left">
+                                
                                 <canvas id="canvas" width="622" height="526"></canvas>
-                                <br>
-                                <button type="button" id="removeImage" class="btn btn-sm btn-danger hidden">Remove Image</button>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div class="row">
+                            <div class="col-xs-9 text-left">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <input type="text" id="photoText" class="form-control input-sm" placeholder="Write your photo text">
+                                    </div>
+                                    <button type="button" id="addText" class="btn btn-sm btn-info">Add Text</button>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 text-right">
+                                <button type="button" id="removeObject" class="btn btn-sm btn-info hidden">Remove Object</button>
                             </div>
                         </div>
                     </div>

@@ -4061,7 +4061,7 @@ class Magazine extends Database
                 return;
             }
 
-            if ($titanium > 0) {
+            /* if ($titanium > 0) {
                 $platinum = 0;
                 $gold = 0;
                 $silver = 0;
@@ -4070,7 +4070,7 @@ class Magazine extends Database
                 $silver = 0;
             } elseif ($gold > 0) {
                 $silver = 0;
-            }
+            } */
 
             $values = [
                 'silver' => $silver,

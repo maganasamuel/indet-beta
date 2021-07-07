@@ -1660,65 +1660,11 @@ class PDF extends FPDF_CellFit
 
     public function PhotosPage($photos)
     {
-        //page 2 BiMonthly API
         $this->AddPage();
-
-        $startingX = 10;
-        $startingY = 10;
-
-        $marginX = 5;
-        $marginY = 5;
-
-        $pointerX = $startingX;
-        $pointerY = 30;
-
-        $widthLimit = 196 + ($marginX * 2);
-        $heightLimit = 259 + ($marginY * 2);
-
-        $rowHeight = 0;
-
-        $labelHeight = 20;
-
-        $labelAndImageMargin = 6;
 
         $this->Header1(15, 'Photos', 20);
 
-        foreach ($photos as $photo) {
-            $imgWidth = $photo['width'];
-            $imgHeight = $photo['height'];
-            $imgLabel = $photo['label'];
-
-            if ('' == $imgLabel) {
-                $labelHeight = 0;
-            } else {
-                $labelHeight = 20;
-            }
-
-            if (($imgWidth + $pointerX) > $widthLimit) {
-                $pointerY += $rowHeight + $marginY + $labelHeight + $labelAndImageMargin;
-                $pointerX = $startingX;
-                $rowHeight = 0;
-            }
-
-            if (((float) $imgHeight + (float) $labelHeight + (float) $pointerY + (float) $marginY) > (float) $heightLimit) {
-                $this->AddPage();
-                $pointerX = $startingX;
-                $pointerY = $startingY;
-                $rowHeight = 0;
-            }
-
-            if ((float) $rowHeight < (float) $photo['height'] + (float) $labelHeight) {
-                $rowHeight = (float) $photo['height'] + (float) $labelHeight;
-            }
-
-            $this->Image($photo['filename'], $pointerX, $pointerY, $imgWidth, $imgHeight);
-
-            if ('' != $imgLabel) {
-                $this->FlexibleHeader1($pointerX, $pointerY + $imgHeight + $labelAndImageMargin, $imgWidth, $labelHeight, $imgLabel);
-            }
-
-            $pointerX += $marginX + $imgWidth;
-        }
+        $this->Image('../indet_photos_stash/' . $photos, 10, 30, 195);
     }
 
     public function ClippingRoundedRect($x, $y, $w, $h, $r, $outline = false)
@@ -1828,7 +1774,7 @@ class PDF extends FPDF_CellFit
         $from = date_create_from_format('Ymd', $bimonthRange->from);
         $to = date_create_from_format('Ymd', $bimonthRange->to);
         $range = $from->format('j') . '-' . $to->format('j F Y');
-        
+
         $this->Header1(15, 'Strings as of ' . $range, 20);
         $this->Ln(6);
         $this->SetFillColor(102, 163, 194);
@@ -1845,7 +1791,7 @@ class PDF extends FPDF_CellFit
         $this->SetTextColor(0, 0, 0);
 
         // Table header
-        $this->SetDrawColor(0 , 0, 0);
+        $this->SetDrawColor(0, 0, 0);
         $this->SetFont('Arial', 'B', 12);
         $this->SetFillColor(255, 255, 255);
         $this->SetTextColor(0, 0, 0);

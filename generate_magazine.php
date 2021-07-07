@@ -10,51 +10,15 @@
     $magazine_file = '';
 
     if (isset($_POST['date'])) {
-        $photos = [];
+        $photos = $_POST['photo_blob'] ?? '';
 
-        if (isset($_POST['widths'])) {
-            if ('onlineinsure.co.nz' == $_SERVER['SERVER_NAME']) {
-                $target_dir = '../indet_photos_stash/';
-            } else {
-                $target_dir = '';
-            }
+        if ($photos) {
+            $blob = substr($photos, strpos($photos, ',') + 1);
+            $blob = base64_decode($blob);
 
-            if (false !== strpos($_POST['widths'], ',')) {
-                $_POST['widths'] = explode(',', $_POST['widths']);
-                $_POST['heights'] = explode(',', $_POST['heights']);
-                $_POST['labels'] = explode(',', $_POST['labels']);
-                $_POST['filenames'] = explode(',', $_POST['filenames']);
-            }
+            $photos = md5(uniqid(rand(), true)) . '.png';
 
-            if (is_array($_POST['widths'])) {
-                // Count total files
-                $countfiles = count($_POST['widths']);
-                // Loop all files
-                for ($index = 0;$index < $countfiles; $index++) {
-                    if ('' != $_POST['filenames'][$index]) {
-                        $photo_data = [
-                            'filename' => FallbackValue($target_dir . $_POST['filenames'][$index], 'Nani'),
-                            'label' => FallbackValue($_POST['labels'][$index], ''),
-                            'width' => FallbackValue($_POST['widths'][$index], 30),
-                            'height' => FallbackValue($_POST['heights'][$index], 30),
-                        ];
-
-                        $photos[] = $photo_data;
-                    }
-                }
-            } else {
-                if ('' != $_POST['filenames']) {
-                    // Count total files
-                    $photo_data = [
-                        'filename' => FallbackValue($target_dir . $_POST['filenames'], 'Nani'),
-                        'label' => FallbackValue($_POST['labels'], ''),
-                        'width' => FallbackValue($_POST['widths'], 30),
-                        'height' => FallbackValue($_POST['heights'], 30),
-                    ];
-
-                    $photos[] = $photo_data;
-                }
-            }
+            file_put_contents('../indet_photos_stash/' . $photos, $blob);
         }
 
         $date = (isset($_POST['date'])) ? $_POST['date'] : '';

@@ -298,7 +298,7 @@ class Magazine extends Database
             $this->PushToPages('Announcements', "Page {$this->last_page_index}");
         }
 
-        if (count($this->photos) > 0) {
+        if ($this->photos) {
             $this->last_page_index++;
             $this->PushToPages('Photos', "Page {$this->last_page_index}");
         }

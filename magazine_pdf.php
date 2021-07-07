@@ -1252,7 +1252,7 @@ class PDF extends FPDF_CellFit
 
             if (0 == $index % 2) {
                 $this->AddPage();
-                $record_type = isset($record['type']) ? $record['type'] : null;
+                $record_type = $record['type'] ?? null;
                 $this->Header1(15, $record_type, 20);
 
                 if (file_exists($image_path)) {
@@ -1293,7 +1293,7 @@ class PDF extends FPDF_CellFit
                 $record_display = ('Count' == $record['record_type']) ? $record['record'] : '$' . number_format($record['record'], 2);
                 $this->Cell(50, 8, $record_display, '', '1', 'L');
             } else {
-                $record_type = isset($record['type']) ? $record['type'] : null;
+                $record_type = $record['type'] ?? null;
                 $this->Header1(140, $record_type, 20);
 
                 if (file_exists($image_path)) {
@@ -1700,15 +1700,15 @@ class PDF extends FPDF_CellFit
                 $rowHeight = 0;
             }
 
-            if (((float)$imgHeight + (float)$labelHeight + (float)$pointerY + (float)$marginY) > (float)$heightLimit) {
+            if (((float) $imgHeight + (float) $labelHeight + (float) $pointerY + (float) $marginY) > (float) $heightLimit) {
                 $this->AddPage();
                 $pointerX = $startingX;
                 $pointerY = $startingY;
                 $rowHeight = 0;
             }
 
-            if ((float)$rowHeight < (float)$photo['height'] + (float)$labelHeight) {
-                $rowHeight = (float)$photo['height'] + (float)$labelHeight;
+            if ((float) $rowHeight < (float) $photo['height'] + (float) $labelHeight) {
+                $rowHeight = (float) $photo['height'] + (float) $labelHeight;
             }
 
             $this->Image($photo['filename'], $pointerX, $pointerY, $imgWidth, $imgHeight);
@@ -1749,7 +1749,7 @@ class PDF extends FPDF_CellFit
         $this->_out(' W ' . $op);
     }
 
-    public function Strings($advisers)
+    public function Strings($advisers, $bimonthRange)
     {
         $sorted_advisers = [];
         $t_array = [];
@@ -1832,36 +1832,31 @@ class PDF extends FPDF_CellFit
         $this->SetTextColor(255, 255, 255);
         $this->Cell(200, 3, 'Everything good happens to a stringwriter.', '', '1', 'C');
 
-        $this->SetY(15);
+        $this->SetY(45);
 
-        $score = $sorted_advisers[0]['score'];
+        $this->SetFont('Arial', 'B', 15);
+        $this->SetFillColor(255, 255, 255);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetTextColor(0, 0, 0);
 
-        switch ($score) {
-            case 'Titanium':
-                $this->SetDrawColor(28, 135, 189);
-                $this->SetFillColor(102, 163, 194);
+        // Table title
+        $from = date_create_from_format('Ymd', $bimonthRange->from);
+        $to = date_create_from_format('Ymd', $bimonthRange->to);
+        $range = $from->format('j') . '-' . $to->format('j F Y');
 
-                break;
-            case 'Platinum':
-                $this->SetDrawColor(207, 21, 21);
-                $this->setFillColor(212, 91, 91);
+        $this->Cell(195, 15, 'Strings as of ' . $range, 1, 0, 'C', true);
+        $this->Ln();
 
-                break;
-            case 'Gold':
-                $this->SetDrawColor(214, 181, 0);
-                $this->setFillColor(255, 239, 148);
+        // Table header
+        $this->SetFont('Arial', 'B', 12);
+        $this->Cell(95, 15, 'Adviser', 1, 0, 'C', true);
+        $this->Cell(25, 15, 'Silver', 1, 0, 'C', true);
+        $this->Cell(25, 15, 'Gold', 1, 0, 'C', true);
+        $this->Cell(25, 15, 'Platinum', 1, 0, 'C', true);
+        $this->Cell(25, 15, 'Titanium', 1, 0, 'C', true);
+        $this->Ln();
 
-                break;
-            case 'Silver':
-                $this->SetDrawColor(163, 163, 163);
-                $this->setFillColor(192, 192, 192);
-
-                break;
-            default:
-                break;
-        }
-
-        $this->RoundedRect(10, $this->GetY() + 25, 195, 50, 5, '24', 'DF');
+        // Table first row
 
         $image_path = '';
 
@@ -1871,36 +1866,37 @@ class PDF extends FPDF_CellFit
             $image_path = $this->uploads_folder . $sorted_advisers[0]['image'];
         }
 
-        if (file_exists($image_path)) {
-            $this->Image($image_path, 20, $this->GetY() + 30, 40, 40);
-        } else {
-            $this->Image($this->default_image, 20, $this->GetY() + 30, 40, 40);
-        }
+        $adviserName = strtoupper($sorted_advisers[0]['name']);
 
-        $this->SetTextColor(0, 0, 0);
+        $this->SetFont('Arial', 'B', 20);
+        $this->Cell(40, 40, $this->Image($image_path, $this->GetX(), $this->GetY(), 40, 40), 1, 0, 'C', false);
+        $this->CellFitScale(55, 40, $adviserName, 1, 0, 'C', true);
+        $this->Cell(25, 40, $sorted_advisers[0]['silver'], 1, 0, 'C', true);
+        $this->Cell(25, 40, $sorted_advisers[0]['gold'], 1, 0, 'C', true);
+        $this->Cell(25, 40, $sorted_advisers[0]['platinum'], 1, 0, 'C', true);
+        $this->Cell(25, 40, $sorted_advisers[0]['titanium'], 1, 0, 'C', true);
+        $this->Ln();
 
-        $this->SetX(50);
-        $this->SetY($this->GetY() + 30);
-
-        $this->Cell(92, 8, '', '', '0', 'L');
-        $this->Cell(50, 8, '', '', '1', 'L');
-        $this->SetFont('Calibri', 'B', 30);
-        $this->Cell(60, 8, '', '', '0', 'L');
-        $this->Cell(50, 8, strtoupper($sorted_advisers[0]['name']), '', '1', 'L');
-        $this->Ln(5);
-
-        $this->SetTextColor(255, 255, 255);
-        $this->SetFont('Calibri', 'B', 20);
-        $this->Cell(60, 8, '', '', '0', 'L');
-        $this->Cell(10, 8, 'Score: ' . $sorted_advisers[0]['score'], '', '0', 'L');
-        $this->Cell(50, 8, '', '', '0', 'L');
-        $this->Cell(50, 8, 'String: ' . $sorted_advisers[0][strtolower($sorted_advisers[0]['score'])], '', '0', 'L');
-
-        $this->SetFillColor(255, 255, 255);
-        $this->SetTextColor(0, 0, 0);
-        $this->SetY(100);
+        // Table preceding row
+        $this->SetFont('Arial', 'B', 12);
 
         foreach (array_slice($sorted_advisers, 1) as $index => $adviser) {
+            if (empty($adviser['image'])) {
+                $image = $this->default_image;
+            } else {
+                $image = $this->uploads_folder . $adviser['image'];
+            }
+
+            $this->Cell(15, 15, $this->Image($image, $this->GetX(), $this->GetY(), 15, 15), 1, 0, 'C');
+            $this->CellFitScale(80, 15, strtoupper($adviser['name']), 1, 0, 'C', true);
+            $this->Cell(25, 15, $adviser['silver'], 1, 0, 'C', true);
+            $this->Cell(25, 15, $adviser['gold'], 1, 0, 'C', true);
+            $this->Cell(25, 15, $adviser['platinum'], 1, 0, 'C', true);
+            $this->Cell(25, 15, $adviser['titanium'], 1, 0, 'C', true);
+            $this->Ln();
+        }
+
+        /* foreach (array_slice($sorted_advisers, 1) as $index => $adviser) {
             if (5 != $index) {
                 if ('Others' != $adviser['name'] && $adviser['score']) {
                     if ('Titanium' == $adviser['score']) {
@@ -2004,7 +2000,7 @@ class PDF extends FPDF_CellFit
                     $this->SetDrawColor(0, 0, 0);
                 }
             }
-        }
+        } */
     }
 
     public function WinnerScore($advisers)
@@ -2332,19 +2328,20 @@ class PDF extends FPDF_CellFit
     //End of pdf
     //START ADR page
     public function ADRBiMonthlyPage($bimonthly)
-    {   
-
+    {
         $highest = [];
-        if(isset($bimonthly['highest'])) {
+
+        if (isset($bimonthly['highest'])) {
             $highest = $bimonthly['highest'];
             unset($bimonthly['highest']);
         }
 
-        $highest_team = "";
-        $highest_issued_api = "";
-        $highest_deals = "";
+        $highest_team = '';
+        $highest_issued_api = '';
+        $highest_deals = '';
         $highest_team_advisers = [];
-        if(isset($highest) && sizeof($highest) >= 1) {
+
+        if (isset($highest) && sizeof($highest) >= 1) {
             $highest_team = $highest['name'];
             $highest_issued_api = $highest['issued_api'];
             $highest_deals = $highest['deals'];
@@ -2379,33 +2376,34 @@ class PDF extends FPDF_CellFit
             $this->Cell(50, 8, 'Policies Issued: ', '0', '0', 'L', true);
             $this->SetFont('Calibri', '', 20);
             $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
-            
+
             foreach ($highest_team_advisers as $k => $v) {
                 if($k == 0) {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(88, 8, $highest_team_advisers[$k].' (ADR)', '0', '0', 'L', true); 
+                    $this->Cell(88, 8, $highest_team_advisers[$k].' (ADR)', '0', '0', 'L', true);
                     $this->SetFont('Calibri', 'B', 20);
                     $this->Cell(50, 8, 'Total API: ', '0', '0', 'L', true);
                     $this->SetFont('Calibri', '', 20);
                     $this->Cell(0, 8, number_format($highest_issued_api, 2), 'R', '1', 'L', true);
                 } else {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true); 
-                }     
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);
+                }
             }
-        
+
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
         } */
         // end comment
 
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
 
         //Tables
-        $this->Header1(($next_Y+15), 'ADR Team Bi-Monthly Issued Policies Table');
+        $this->Header1(($next_Y + 15), 'ADR Team Bi-Monthly Issued Policies Table');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2446,15 +2444,16 @@ class PDF extends FPDF_CellFit
     }
 
     public function ADRCumulativePage($cumulative)
-    {   
+    {
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
 
         //Tables
-        $this->Header1(($next_Y+15), 'ADR Team Cumulative Issued Policies Table');
+        $this->Header1(($next_Y + 15), 'ADR Team Cumulative Issued Policies Table');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2495,18 +2494,20 @@ class PDF extends FPDF_CellFit
     }
 
     public function ADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
-    {   
+    {
         $highest = [];
-        if(isset($bimonthlykiwisavers['highest'])) {
+
+        if (isset($bimonthlykiwisavers['highest'])) {
             $highest = $bimonthlykiwisavers['highest'];
             unset($bimonthlykiwisavers['highest']);
         }
 
-        $highest_team = "";
-        $highest_issued_api = "";
-        $highest_deals = "";
+        $highest_team = '';
+        $highest_issued_api = '';
+        $highest_deals = '';
         $highest_team_advisers = [];
-        if(isset($highest) && sizeof($highest) >= 1) {
+
+        if (isset($highest) && sizeof($highest) >= 1) {
             $highest_team = $highest['name'];
             $highest_deals = $highest['deals'];
             $highest_team_advisers = $highest['advisers'];
@@ -2540,29 +2541,30 @@ class PDF extends FPDF_CellFit
             $this->Cell(50, 8, 'Enrolled: ', '0', '0', 'L', true);
             $this->SetFont('Calibri', '', 20);
             $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
-            
+
             foreach ($highest_team_advisers as $k => $v) {
                 if($k == 0) {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(0, 8, $highest_team_advisers[$k].' (ADR)', 'R', '1', 'L', true);  
+                    $this->Cell(0, 8, $highest_team_advisers[$k].' (ADR)', 'R', '1', 'L', true);
                 } else {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);  
-                }         
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);
+                }
             }
-        
+
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
         } */
         // end comment
-        
+
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
 
         //Tables
-        $this->Header1(($next_Y+15), 'ADR Team Bi-Monthly Table for Kiwisaver Enrolments');
+        $this->Header1(($next_Y + 15), 'ADR Team Bi-Monthly Table for Kiwisaver Enrolments');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2594,14 +2596,15 @@ class PDF extends FPDF_CellFit
     }
 
     public function ADRCumulativeKiwiSaversPage($cumulativekiwisavers)
-    {   
+    {
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
         //Tables
-        $this->Header1(($next_Y+15), 'ADR Team Cumulative Table for Kiwisaver Enrolments');
+        $this->Header1(($next_Y + 15), 'ADR Team Cumulative Table for Kiwisaver Enrolments');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2631,23 +2634,26 @@ class PDF extends FPDF_CellFit
         $this->Cell(120, 10, 'Total', 1, '0', 'L', true);
         $this->Cell(75, 10, $total, 1, '1', 'C', true);
     }
+
     //END ADR page
 
     //START SADR page
     //SADR page
     public function SADRBiMonthlyPage($bimonthly)
-    {   
+    {
         $highest = [];
-        if(isset($bimonthly['highest'])) {
+
+        if (isset($bimonthly['highest'])) {
             $highest = $bimonthly['highest'];
             unset($bimonthly['highest']);
         }
 
-        $highest_team = "";
-        $highest_issued_api = "";
-        $highest_deals = "";
+        $highest_team = '';
+        $highest_issued_api = '';
+        $highest_deals = '';
         $highest_team_advisers = [];
-        if(isset($highest) && sizeof($highest) >= 1) {
+
+        if (isset($highest) && sizeof($highest) >= 1) {
             $highest_team = $highest['name'];
             $highest_issued_api = $highest['issued_api'];
             $highest_deals = $highest['deals'];
@@ -2681,33 +2687,34 @@ class PDF extends FPDF_CellFit
             $this->Cell(50, 8, 'Policies Issued: ', '0', '0', 'L', true);
             $this->SetFont('Calibri', '', 20);
             $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
-            
+
             foreach ($highest_team_advisers as $k => $v) {
                 if($k == 0) {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(88, 8, $highest_team_advisers[$k].' (SADR)', '0', '0', 'L', true); 
+                    $this->Cell(88, 8, $highest_team_advisers[$k].' (SADR)', '0', '0', 'L', true);
                     $this->SetFont('Calibri', 'B', 20);
                     $this->Cell(50, 8, 'Total API: ', '0', '0', 'L', true);
                     $this->SetFont('Calibri', '', 20);
                     $this->Cell(0, 8, number_format($highest_issued_api, 2), 'R', '1', 'L', true);
                 } else {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true); 
-                }     
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);
+                }
             }
-            
+
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
         } */
         // end comment
 
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
 
         //Tables
-        $this->Header1(($next_Y+15), 'SADR Team Bi-Monthly Issued Policies Table');
+        $this->Header1(($next_Y + 15), 'SADR Team Bi-Monthly Issued Policies Table');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2742,16 +2749,16 @@ class PDF extends FPDF_CellFit
         $this->Cell(40, 10, '$' . number_format($total_api, 2), 1, '1', 'C', true);
     }
 
-
     public function SADRCumulativePage($cumulative)
-    {   
+    {
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
         //Tables
-        $this->Header1(($next_Y+15), 'SADR Team Cumulative Issued Policies Table');
+        $this->Header1(($next_Y + 15), 'SADR Team Cumulative Issued Policies Table');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2787,18 +2794,20 @@ class PDF extends FPDF_CellFit
     }
 
     public function SADRBiMonthlyKiwiSaversPage($bimonthlykiwisavers)
-    {   
+    {
         $highest = [];
-        if(isset($bimonthlykiwisavers['highest'])) {
+
+        if (isset($bimonthlykiwisavers['highest'])) {
             $highest = $bimonthlykiwisavers['highest'];
             unset($bimonthlykiwisavers['highest']);
         }
 
-        $highest_team = "";
-        $highest_issued_api = "";
-        $highest_deals = "";
+        $highest_team = '';
+        $highest_issued_api = '';
+        $highest_deals = '';
         $highest_team_advisers = [];
-        if(isset($highest) && sizeof($highest) >= 1) {
+
+        if (isset($highest) && sizeof($highest) >= 1) {
             $highest_team = $highest['name'];
             $highest_deals = $highest['deals'];
             $highest_team_advisers = $highest['advisers'];
@@ -2832,29 +2841,30 @@ class PDF extends FPDF_CellFit
             $this->Cell(50, 8, 'Enrolled: ', '0', '0', 'L', true);
             $this->SetFont('Calibri', '', 20);
             $this->Cell(0, 8, $highest_deals, 'R', '1', 'L', true);
-            
+
             foreach ($highest_team_advisers as $k => $v) {
                 if($k == 0) {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(0, 8, $highest_team_advisers[$k].' (SADR)', 'R', '1', 'L', true);   
+                    $this->Cell(0, 8, $highest_team_advisers[$k].' (SADR)', 'R', '1', 'L', true);
                 } else {
                     $this->Cell(12, 8, '', 'L', '', '', true);
-                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);   
-                }  
+                    $this->Cell(0, 8, $highest_team_advisers[$k], 'R', '1', 'L', true);
+                }
             }
-        
+
             $this->Cell(0, 3, '', 'L,B,R', '1', 'L', true);
         } */
         // end comment
-        
+
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
 
         //Tables
-        $this->Header1(($next_Y+15), 'SADR Team Bi-Monthly Table for Kiwisaver Enrolments');
+        $this->Header1(($next_Y + 15), 'SADR Team Bi-Monthly Table for Kiwisaver Enrolments');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2886,14 +2896,15 @@ class PDF extends FPDF_CellFit
     }
 
     public function SADRCumulativeKiwiSaversPage($cumulativekiwisavers)
-    {   
+    {
         $next_Y = $this->GetY();
-        if(($next_Y + 15) >= 200) {
+
+        if (($next_Y + 15) >= 200) {
             $this->AddPage();
             $next_Y = $this->GetY();
         }
         //Tables
-        $this->Header1(($next_Y+15), 'SADR Team Cumulative Table for Kiwisaver Enrolments');
+        $this->Header1(($next_Y + 15), 'SADR Team Cumulative Table for Kiwisaver Enrolments');
 
         $this->SetDrawColor(0, 0, 0);
         $this->SetX(8);
@@ -2923,8 +2934,10 @@ class PDF extends FPDF_CellFit
         $this->Cell(130, 10, 'Total', 1, '0', 'L', true);
         $this->Cell(65, 10, $total, 1, '1', 'C', true);
     }
+
     //END SADR page
 }
+
 function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = true)
 {
     $magazineController = new MagazineController();
@@ -2982,7 +2995,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $pdf->SetX(85);
     $pdf->Cell(121, 8, $magazine_data->issue_number, 0, 1, 'L');
     $pdf->SetX(85);
-    $pdf->Cell(121, 8, (isset($magazine_data->issue_number_line_2) ? $magazine_data->issue_number_line_2 : ""), 0, 1, 'L');
+    $pdf->Cell(121, 8, ($magazine_data->issue_number_line_2 ?? ''), 0, 1, 'L');
 
     $blue = [50, 143, 168];
     $darkblue = [50, 91, 168];
@@ -2995,7 +3008,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $g_array = [];
     $s_array = [];
 
-    if(isset($magazine_data->all_winner_score) && (is_array($magazine_data->all_winner_score) || is_object($magazine_data->all_winner_score))) {
+    if (isset($magazine_data->all_winner_score) && (is_array($magazine_data->all_winner_score) || is_object($magazine_data->all_winner_score))) {
         foreach ($magazine_data->all_winner_score as $index => $adviser) {
             if ('Titanium' == $adviser['score']) {
                 $adviser[`platinum`] = 0;
@@ -3030,7 +3043,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
             }
         }
     }
-        
+
     if ($t_array) {
         array_multisort($titanium, SORT_DESC, $t_array);
 
@@ -3118,9 +3131,9 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     }
 
     //Featured Adviser
-    $featured_adviser = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ? 
-        (isset($magazine_data->bi_monthly_advisers[0]) ? $magazine_data->bi_monthly_advisers[0] : null) : 
-        (isset($magazine_data->cumulative_advisers[0]) ? $magazine_data->cumulative_advisers[0] : null);
+    $featured_adviser = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ?
+        ($magazine_data->bi_monthly_advisers[0] ?? null) :
+        ($magazine_data->cumulative_advisers[0] ?? null);
     $featured_title = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ? 'Top Adviser of the Period ' . date('j', strtotime($magazine_data->bimonthRange->from)) . '-' . date('j F Y', strtotime($magazine_data->bimonthRange->to)) : 'Top Adviser of the Period ' . date('j M', strtotime($magazine_data->cumulativeRange->from)) . '-' . date('j M Y', strtotime($magazine_data->cumulativeRange->to));
     $pdf->SetX(0);
     $pdf->SetX(190);
@@ -3147,7 +3160,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $pdf->Text(16.5, 222, $featured_title);
     $pdf->SetTextColor(0, 77, 115);
     $pdf->SetFont('Arial', 'B', 32);
-    $pdf->Text(16.5, 235, (isset($featured_adviser['name']) ? $featured_adviser['name'] : null));
+    $pdf->Text(16.5, 235, ($featured_adviser['name'] ?? null));
     $pdf->SetTextColor(115, 146, 161);
     $pdf->SetFont('Arial', 'B', 27);
     $pdf->Text(16.5, 245, (isset($featured_adviser['issued_api']) ? ('$' . number_format($featured_adviser['issued_api'], 2) . ' Issued API') : null));
@@ -3191,11 +3204,11 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
 
     if (isset($magazine_data->all_winner_score) && (is_array($magazine_data->all_winner_score) && count($magazine_data->all_winner_score) > 0)) {
         if ('Others' != $magazine_data->all_winner_score[0]['name']) {
-            $pdf->Strings($magazine_data->all_winner_score);
+            $pdf->Strings($magazine_data->all_winner_score, $magazine_data->bimonthRange);
         }
     }
 
-    if  (isset($magazine_data->rba_cumulative_advisers) && (is_array($magazine_data->rba_cumulative_advisers) && count($magazine_data->rba_cumulative_advisers) > 0)) {
+    if (isset($magazine_data->rba_cumulative_advisers) && (is_array($magazine_data->rba_cumulative_advisers) && count($magazine_data->rba_cumulative_advisers) > 0)) {
         if ('Others' != $magazine_data->rba_cumulative_advisers[0]['name']) {
             $pdf->CumulativeRBAPage($magazine_data->rba_cumulative_advisers, $magazine_data->overallCumulativeRBA);
         }
@@ -3208,7 +3221,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     //start of ADR and SADR tables
     if (isset($magazine_data->adr_bi_monthly_advisers) && is_array($magazine_data->adr_bi_monthly_advisers) && count($magazine_data->adr_bi_monthly_advisers) > 0) {
         $pdf->ADRBiMonthlyPage($magazine_data->adr_bi_monthly_advisers);
-        
+
         if (isset($magazine_data->adr_cumulative_advisers) && is_array($magazine_data->adr_cumulative_advisers) && count($magazine_data->adr_cumulative_advisers) > 0) {
             $pdf->ADRCumulativePage($magazine_data->adr_cumulative_advisers);
         }
@@ -3231,7 +3244,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
             $pdf->ADRCumulativeKiwiSaversPage($magazine_data->adr_cumulative_advisers_kiwisavers);
         }
     }
-   
+
     //end of ADR
     //start of SADR
     if (isset($magazine_data->sadr_bi_monthly_advisers) && is_array($magazine_data->sadr_bi_monthly_advisers) && count($magazine_data->sadr_bi_monthly_advisers) > 0) {
@@ -3254,10 +3267,10 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
             $pdf->SADRCumulativeKiwiSaversPage($magazine_data->sadr_cumulative_advisers_kiwisavers);
         }
     } else {
-       if (isset($magazine_data->sadr_cumulative_advisers_kiwisavers) && is_array($magazine_data->sadr_cumulative_advisers_kiwisavers) && count($magazine_data->sadr_cumulative_advisers_kiwisavers) > 0) {
+        if (isset($magazine_data->sadr_cumulative_advisers_kiwisavers) && is_array($magazine_data->sadr_cumulative_advisers_kiwisavers) && count($magazine_data->sadr_cumulative_advisers_kiwisavers) > 0) {
             $pdf->AddPage();
             $pdf->SADRCumulativeKiwiSaversPage($magazine_data->sadr_cumulative_advisers_kiwisavers);
-        } 
+        }
     }
     //end of ADR and SADR tables
 
@@ -3271,7 +3284,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
 
     if (is_array($magazine_data->bdm_performances) && count($magazine_data->bdm_performances) > 0) {
         if ('Others' != $magazine_data->bdm_performances[0]['name']) {
-            $quarterTitle = isset($magazine_data->quarterTitle) ? $magazine_data->quarterTitle : null;
+            $quarterTitle = $magazine_data->quarterTitle ?? null;
             $pdf->BDMCumulativePage($magazine_data->bdm_performances, $quarterTitle);
         }
     }
@@ -3299,7 +3312,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $path = '';
 
     if ($preview) {
-        $pdf->Output('I', 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . (isset($magazine_data->issue_number_line_2) ? $magazine_data->issue_number_line_2 : "") . '.pdf');
+        $pdf->Output('I', 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . ($magazine_data->issue_number_line_2 ?? '') . '.pdf');
     } else {
         $filename = (! $randomize_name) ? 'EliteInsure Magazine ' . $magazine_data->issue_number . ' ' . $magazine_data->issue_number_line_2 . '.pdf' : 'EliteInsure Magazine ' . md5(uniqid()) . '.pdf';
         $path = 'files/' . $filename;

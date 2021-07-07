@@ -259,6 +259,7 @@ if (! isset($_SESSION['myusername'])) {
 
                 $('#create').on('click', function(e) {
                     e.preventDefault();
+
                     var formData = new FormData();
                     var fileUpload = document.getElementById('photos');
                     let button = $(this);
@@ -293,13 +294,20 @@ if (! isset($_SESSION['myusername'])) {
                     formData.append("widths", widths);
                     formData.append("heights", heights);
                     formData.append("labels", labels);
-                    formData.append("filenames", filenames);
                     formData.append("date", date);
                     formData.append("quote", quote);
                     formData.append("message", message);
                     formData.append("announcement", announcement);
                     formData.append("output", true);
                     formData.append("random_filename", true);
+
+                    if(canvas.getObjects().length){
+                        var dataUrl = canvas.toDataURL({
+                            format: 'png',
+                        });
+
+                        formData.append('photo_blob', dataUrl);
+                    }
 
                     $.ajax({
                         dataType: 'json',

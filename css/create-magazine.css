@@ -1,0 +1,76 @@
+div#myModal {
+    padding-top: 0px !important;
+}
+
+#myModal .modal-dialog {
+    min-width: 100%;
+    min-height: 100%;
+    height: auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+#mymodal .modal-content {
+    width: 100% !important;
+    height: auto;
+    min-height: 100%;
+    border-radius: 0;
+}
+
+#drop_zone {
+    border: 5px solid blue;
+    width: 200px;
+    height: 100px;
+}
+
+.nopadding {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.sort_handle {
+    cursor: pointer;
+}
+
+#pageWrapper {
+    overflow-y: auto;
+    text-align: center;
+    height: 600px;
+    max-height: 600px;
+    padding: 1em;
+    border: 1px solid #dddddd;
+    margin-top: 0.5em;
+}
+
+.page-label.active {
+    box-shadow: 0 0 0.25em 0.5em #d9edf7;
+}
+
+.page {
+    border: 1px solid #dddddd;
+}
+
+.p-4 {
+    padding: 1em;
+}
+
+.m-2 {
+    margin: 0.5em;
+}
+
+.mb-1 {
+    margin-bottom: 0.25em;
+}
+
+.border {
+    border: 1px solid #dddddd;
+}
+
+.rounded {
+    border-radius: 0.5em;
+}
+
+.pointer {
+    cursor: pointer;
+}

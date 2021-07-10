@@ -161,7 +161,7 @@ window.onload = function () {
 
 		}).click();
 
-		testPage();
+		// testPage();
 
 		$(document).on('change', '[name="page_radio"]', function () {
 			$('.page-label').removeClass('active');

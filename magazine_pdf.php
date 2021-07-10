@@ -1664,7 +1664,13 @@ class PDF extends FPDF_CellFit
 
         $this->Header1(15, 'Photos', 20);
 
-        $this->Image('../indet_photos_stash/' . $photos, 10, 30, 195);
+        foreach ($photos as $key => $photo) {
+            if ($key) {
+                $this->AddPage();
+            }
+
+            $this->Image('../indet_photos_stash/' . $photo, 10, $key ? 20 : 30, 195);
+        }
     }
 
     public function ClippingRoundedRect($x, $y, $w, $h, $r, $outline = false)

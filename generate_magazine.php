@@ -10,15 +10,21 @@
     $magazine_file = '';
 
     if (isset($_POST['date'])) {
-        $photos = $_POST['photo_blob'] ?? '';
+        $filenames = [];
 
-        if ($photos) {
-            $blob = substr($photos, strpos($photos, ',') + 1);
-            $blob = base64_decode($blob);
+        $photos = $_POST['photos'] ?? [];
 
-            $photos = md5(uniqid(rand(), true)) . '.png';
+        if (count($photos)) {
+            foreach ($photos as $photo) {
+                $blob = substr($photo, strpos($photo, ',') + 1);
+                $blob = base64_decode($blob);
 
-            file_put_contents('../indet_photos_stash/' . $photos, $blob);
+                $filename = md5(uniqid(rand(), true)) . '.png';
+
+                file_put_contents('../indet_photos_stash/' . $filename, $blob);
+
+                $filenames[] = $filename;
+            }
         }
 
         $date = (isset($_POST['date'])) ? $_POST['date'] : '';
@@ -38,7 +44,7 @@
         $preview = (isset($_POST['output'])) ? false : true;
         $random_filename = (isset($_POST['random_filename'])) ? true : false;
 
-        $magazine_data = new Magazine($date, $announcement, $quote, $message, $photos);
+        $magazine_data = new Magazine($date, $announcement, $quote, $message, $filenames);
         $magazine_file = CreateMagazinePDF($magazine_data, $preview, $random_filename);
 
         echo $magazine_file;

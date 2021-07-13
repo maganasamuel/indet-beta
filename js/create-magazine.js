@@ -173,6 +173,8 @@ window.onload = function () {
 			if (!hasActivePage()) {
 				return false;
 			}
+
+			$(this).prop('value', null);
 		});
 
 		$('#photos').on('change', function () {
@@ -215,9 +217,6 @@ window.onload = function () {
 					error: function (response, status, error) {
 						console.log(error);
 						alert('An error occurred when uploading the file!');
-					},
-					complete: function () {
-						$(this).val('');
 					}
 				});
 			});

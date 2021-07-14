@@ -2347,10 +2347,10 @@ class PDF extends FPDF_CellFit
         $highest_team_advisers = [];
 
         if (isset($highest) && sizeof($highest) >= 1) {
-            $highest_team = $highest['name'];
-            $highest_issued_api = $highest['issued_api'];
-            $highest_deals = $highest['deals'];
-            $highest_team_advisers = $highest['advisers'];
+            $highest_team = ($highest['name'] ?? '');
+            $highest_issued_api = ($highest['issued_api'] ?? '');
+            $highest_deals = ($highest['deals'] ?? '');
+            $highest_team_advisers = ($highest['advisers'] ?? '');
         }
 
         //page 2 BiMonthly API
@@ -2513,9 +2513,9 @@ class PDF extends FPDF_CellFit
         $highest_team_advisers = [];
 
         if (isset($highest) && sizeof($highest) >= 1) {
-            $highest_team = $highest['name'];
-            $highest_deals = $highest['deals'];
-            $highest_team_advisers = $highest['advisers'];
+            $highest_team = ($highest['name'] ?? '');
+            $highest_deals = ($highest['deals'] ?? '');
+            $highest_team_advisers = ($highest['advisers'] ?? '');
         }
 
         //page 2 BiMonthly API
@@ -2659,10 +2659,10 @@ class PDF extends FPDF_CellFit
         $highest_team_advisers = [];
 
         if (isset($highest) && sizeof($highest) >= 1) {
-            $highest_team = $highest['name'];
-            $highest_issued_api = $highest['issued_api'];
-            $highest_deals = $highest['deals'];
-            $highest_team_advisers = $highest['advisers'];
+            $highest_team = ($highest['name'] ?? '');
+            $highest_issued_api = ($highest['issued_api'] ?? '');
+            $highest_deals = ($highest['deals'] ?? '');
+            $highest_team_advisers = ($highest['advisers'] ?? '');
         }
 
         //page 2 BiMonthly API
@@ -2813,9 +2813,9 @@ class PDF extends FPDF_CellFit
         $highest_team_advisers = [];
 
         if (isset($highest) && sizeof($highest) >= 1) {
-            $highest_team = $highest['name'];
-            $highest_deals = $highest['deals'];
-            $highest_team_advisers = $highest['advisers'];
+            $highest_team = ($highest['name'] ?? '');
+            $highest_deals = ($highest['deals'] ?? '');
+            $highest_team_advisers = ($highest['advisers'] ?? '');
         }
 
         //page 2 BiMonthly API

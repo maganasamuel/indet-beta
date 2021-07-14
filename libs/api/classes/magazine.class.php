@@ -23,6 +23,8 @@ if (file_exists('libs/indet_dates_helper.php')) {
 
 require __DIR__ . '../../../composer/vendor/autoload.php';
 
+use Carbon\Carbon;
+
 class Magazine extends Database
 {
     public $date = '';
@@ -887,7 +889,7 @@ class Magazine extends Database
         $output = $this->FilterOutput($output, 'deals');
 
         usort($output, function ($a, $b) {
-            return $a['team'] <=> $b['team'];
+            return ($a['team'] ?? '') <=> ($b['team'] ?? '');
         });
 
         $team_flag = '';
@@ -900,52 +902,52 @@ class Magazine extends Database
 
         foreach ($output as $k => $v) {
             if ('' == $team_flag) {
-                if ('Vacant ADR' == $output[$k]['team']) {
-                    $tmp_vacant_adr['name'] = $output[$k]['team'];
+                if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                    $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                } elseif ('Others' == $output[$k]['team']) {
-                    $tmp_others_adr['name'] = $output[$k]['team'];
+                } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                    $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
-                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['team_id'] = ($output[$k]['team_id'] ?? '');
+                    $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                     $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                 }
             } else {
-                if ($team_flag == $output[$k]['team']) {
-                    if ('Vacant ADR' == $output[$k]['team']) {
+                if ($team_flag == ($output[$k]['team'] ?? '')) {
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
                         $tmp_vacant_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] += $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
                         $tmp_others_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] += $output[$k]['deals'];
                     } else {
-                        $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
+                        $tmp_output[$team_flag_cnt]['team_id'] = ($output[$k]['team_id'] ?? '');
                         $tmp_output[$team_flag_cnt]['issued_api'] += $output[$k]['issued_api'];
                         $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                     }
                 } else {
-                    if ('Vacant ADR' == $output[$k]['team']) {
-                        $tmp_vacant_adr['name'] = $output[$k]['team'];
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                        $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
-                        $tmp_others_adr['name'] = $output[$k]['team'];
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                        $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
-                        $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                        $tmp_output[$team_flag_cnt]['team_id'] = ($output[$k]['team_id'] ?? '');
+                        $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                         $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     }
                 }
             }
-            $team_flag = $output[$k]['team'];
+            $team_flag = ($output[$k]['team'] ?? '');
         }
 
         usort($tmp_output, function ($a, $b) {
@@ -1143,25 +1145,25 @@ class Magazine extends Database
 
         foreach ($output as $k => $v) {
             if ('' == $team_flag) {
-                if ('Vacant ADR' == $output[$k]['team']) {
-                    $tmp_vacant_adr['name'] = $output[$k]['team'];
+                if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                    $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                } elseif ('Others' == $output[$k]['team']) {
-                    $tmp_others_adr['name'] = $output[$k]['team'];
+                } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                    $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                     $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                 }
             } else {
-                if ($team_flag == $output[$k]['team']) {
-                    if ('Vacant ADR' == $output[$k]['team']) {
+                if ($team_flag == ($output[$k]['team'] ?? '')) {
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
                         $tmp_vacant_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] += $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
                         $tmp_others_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] += $output[$k]['deals'];
                     } else {
@@ -1169,23 +1171,23 @@ class Magazine extends Database
                         $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                     }
                 } else {
-                    if ('Vacant ADR' == $output[$k]['team']) {
-                        $tmp_vacant_adr['name'] = $output[$k]['team'];
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                        $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
-                        $tmp_others_adr['name'] = $output[$k]['team'];
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                        $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                        $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                         $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     }
                 }
             }
-            $team_flag = $output[$k]['team'];
+            $team_flag = ($output[$k]['team'] ?? '');
         }
 
         usort($tmp_output, function ($a, $b) {
@@ -1297,45 +1299,45 @@ class Magazine extends Database
 
         foreach ($output as $k => $v) {
             if ('' == $team_flag) {
-                if ('Vacant ADR' == $output[$k]['team']) {
-                    $tmp_vacant_adr['name'] = $output[$k]['team'];
+                if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                    $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                } elseif ('Others' == $output[$k]['team']) {
-                    $tmp_others_adr['name'] = $output[$k]['team'];
+                } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                    $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
-                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['team_id'] = ($output[$k]['team_id'] ?? '');
+                    $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     $tmp_output[$team_flag_cnt]['team_count'] = 1;
                 }
             } else {
-                if ($team_flag == $output[$k]['team']) {
-                    if ('Vacant ADR' == $output[$k]['team']) {
+                if ($team_flag == ($output[$k]['team'] ?? '')) {
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
                         $tmp_vacant_adr['deals'] += $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
                         $tmp_others_adr['deals'] += $output[$k]['deals'];
                     } else {
                         $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                         ++$tmp_output[$team_flag_cnt]['team_count'];
                     }
                 } else {
-                    if ('Vacant ADR' == $output[$k]['team']) {
-                        $tmp_vacant_adr['name'] = $output[$k]['team'];
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                        $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
-                        $tmp_others_adr['name'] = $output[$k]['team'];
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                        $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['team_id'] = $output[$k]['team_id'];
-                        $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                        $tmp_output[$team_flag_cnt]['team_id'] = ($output[$k]['team_id'] ?? '');
+                        $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                         $tmp_output[$team_flag_cnt]['team_count'] = 1;
                     }
                 }
             }
-            $team_flag = $output[$k]['team'];
+            $team_flag = ($output[$k]['team'] ?? '');
         }
 
         usort($tmp_output, function ($a, $b) {
@@ -1490,40 +1492,40 @@ class Magazine extends Database
 
         foreach ($output as $k => $v) {
             if ('' == $team_flag) {
-                if ('Vacant ADR' == $output[$k]['team']) {
-                    $tmp_vacant_adr['name'] = $output[$k]['team'];
+                if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                    $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                } elseif ('Others' == $output[$k]['team']) {
-                    $tmp_others_adr['name'] = $output[$k]['team'];
+                } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                    $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                    $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                 }
             } else {
-                if ($team_flag == $output[$k]['team']) {
-                    if ('Vacant ADR' == $output[$k]['team']) {
+                if ($team_flag == ($output[$k]['team'] ?? '')) {
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
                         $tmp_vacant_adr['deals'] += $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
                         $tmp_others_adr['deals'] += $output[$k]['deals'];
                     } else {
                         $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                     }
                 } else {
-                    if ('Vacant ADR' == $output[$k]['team']) {
-                        $tmp_vacant_adr['name'] = $output[$k]['team'];
+                    if ('Vacant ADR' == ($output[$k]['team'] ?? '')) {
+                        $tmp_vacant_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['team']) {
-                        $tmp_others_adr['name'] = $output[$k]['team'];
+                    } elseif ('Others' == ($output[$k]['team'] ?? '')) {
+                        $tmp_others_adr['name'] = ($output[$k]['team'] ?? '');
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['name'] = $output[$k]['team'];
+                        $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['team'] ?? '');
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     }
                 }
             }
-            $team_flag = $output[$k]['team'];
+            $team_flag = ($output[$k]['team'] ?? '');
         }
 
         usort($tmp_output, function ($a, $b) {
@@ -1681,7 +1683,7 @@ class Magazine extends Database
         $output = $this->FilterOutput($output, 'deals');
 
         usort($output, function ($a, $b) {
-            return $a['steam'] <=> $b['steam'];
+            return ($a['steam'] ?? '') <=> ($b['steam'] ?? '');
         });
 
         $team_flag = '';
@@ -1694,26 +1696,26 @@ class Magazine extends Database
 
         foreach ($output as $k => $v) {
             if ('' == $team_flag) {
-                if ('Vacant SADR' == $output[$k]['steam']) {
-                    $tmp_vacant_adr['name'] = $output[$k]['steam'];
+                if ('Vacant SADR' == ($output[$k]['steam'] ?? '')) {
+                    $tmp_vacant_adr['name'] = ($output[$k]['steam'] ?? '');
                     $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                } elseif ('Others' == $output[$k]['steam']) {
-                    $tmp_others_adr['name'] = $output[$k]['steam'];
+                } elseif ('Others' == ($output[$k]['steam'] ?? '')) {
+                    $tmp_others_adr['name'] = ($output[$k]['steam'] ?? '');
                     $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
-                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                    $tmp_output[$team_flag_cnt]['steam_id'] = ($output[$k]['steam_id'] ?? '');
+                    $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['steam'] ?? '');
                     $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                 }
             } else {
-                if ($team_flag == $output[$k]['steam']) {
-                    if ('Vacant SADR' == $output[$k]['steam']) {
+                if ($team_flag == ($output[$k]['steam'] ?? '')) {
+                    if ('Vacant SADR' == ($output[$k]['steam'] ?? '')) {
                         $tmp_vacant_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] += $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['steam']) {
+                    } elseif ('Others' == ($output[$k]['steam'] ?? '')) {
                         $tmp_others_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] += $output[$k]['deals'];
                     } else {
@@ -1721,24 +1723,24 @@ class Magazine extends Database
                         $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                     }
                 } else {
-                    if ('Vacant SADR' == $output[$k]['steam']) {
-                        $tmp_vacant_adr['name'] = $output[$k]['steam'];
+                    if ('Vacant SADR' == ($output[$k]['steam'] ?? '')) {
+                        $tmp_vacant_adr['name'] = ($output[$k]['steam'] ?? '');
                         $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['steam']) {
-                        $tmp_others_adr['name'] = $output[$k]['steam'];
+                    } elseif ('Others' == ($output[$k]['steam'] ?? '')) {
+                        $tmp_others_adr['name'] = ($output[$k]['steam'] ?? '');
                         $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
-                        $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                        $tmp_output[$team_flag_cnt]['steam_id'] = ($output[$k]['steam_id'] ?? '');
+                        $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['steam'] ?? '');
                         $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     }
                 }
             }
-            $team_flag = $output[$k]['steam'];
+            $team_flag = ($output[$k]['steam'] ?? '');
         }
 
         usort($tmp_output, function ($a, $b) {
@@ -1938,25 +1940,25 @@ class Magazine extends Database
 
         foreach ($output as $k => $v) {
             if ('' == $team_flag) {
-                if ('Vacant SADR' == $output[$k]['steam']) {
-                    $tmp_vacant_adr['name'] = $output[$k]['steam'];
+                if ('Vacant SADR' == ($output[$k]['steam'] ?? '')) {
+                    $tmp_vacant_adr['name'] = ($output[$k]['steam'] ?? '');
                     $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                } elseif ('Others' == $output[$k]['steam']) {
-                    $tmp_others_adr['name'] = $output[$k]['steam'];
+                } elseif ('Others' == ($output[$k]['steam'] ?? '')) {
+                    $tmp_others_adr['name'] = ($output[$k]['steam'] ?? '');
                     $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                    $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['steam'] ?? '');
                     $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                 }
             } else {
-                if ($team_flag == $output[$k]['steam']) {
-                    if ('Vacant SADR' == $output[$k]['steam']) {
+                if ($team_flag == ($output[$k]['steam'] ?? '')) {
+                    if ('Vacant SADR' == ($output[$k]['steam'] ?? '')) {
                         $tmp_vacant_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] += $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['steam']) {
+                    } elseif ('Others' == ($output[$k]['steam'] ?? '')) {
                         $tmp_others_adr['issued_api'] += $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] += $output[$k]['deals'];
                     } else {
@@ -1964,23 +1966,23 @@ class Magazine extends Database
                         $tmp_output[$team_flag_cnt]['deals'] += $output[$k]['deals'];
                     }
                 } else {
-                    if ('Vacant SADR' == $output[$k]['steam']) {
-                        $tmp_vacant_adr['name'] = $output[$k]['steam'];
+                    if ('Vacant SADR' == ($output[$k]['steam'] ?? '')) {
+                        $tmp_vacant_adr['name'] = ($output[$k]['steam'] ?? '');
                         $tmp_vacant_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_vacant_adr['deals'] = $output[$k]['deals'];
-                    } elseif ('Others' == $output[$k]['steam']) {
-                        $tmp_others_adr['name'] = $output[$k]['steam'];
+                    } elseif ('Others' == ($output[$k]['steam'] ?? '')) {
+                        $tmp_others_adr['name'] = ($output[$k]['steam'] ?? '');
                         $tmp_others_adr['issued_api'] = $output[$k]['issued_api'];
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
+                        $tmp_output[$team_flag_cnt]['name'] = ($output[$k]['steam'] ?? '');
                         $tmp_output[$team_flag_cnt]['issued_api'] = $output[$k]['issued_api'];
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     }
                 }
             }
-            $team_flag = $output[$k]['steam'];
+            $team_flag = ($output[$k]['steam'] ?? '');
         }
 
         usort($tmp_output, function ($a, $b) {
@@ -2100,7 +2102,7 @@ class Magazine extends Database
                     $tmp_others_adr['name'] = $output[$k]['steam'];
                     $tmp_others_adr['deals'] = $output[$k]['deals'];
                 } else {
-                    $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
+                    $tmp_output[$team_flag_cnt]['steam_id'] = ($output[$k]['steam_id'] ?? '');
                     $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
                     $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                     $tmp_output[$team_flag_cnt]['team_count'] = 1;
@@ -2124,7 +2126,7 @@ class Magazine extends Database
                         $tmp_others_adr['deals'] = $output[$k]['deals'];
                     } else {
                         $team_flag_cnt++;
-                        $tmp_output[$team_flag_cnt]['steam_id'] = $output[$k]['steam_id'];
+                        $tmp_output[$team_flag_cnt]['steam_id'] = ($output[$k]['steam_id'] ?? '');
                         $tmp_output[$team_flag_cnt]['name'] = $output[$k]['steam'];
                         $tmp_output[$team_flag_cnt]['deals'] = $output[$k]['deals'];
                         $tmp_output[$team_flag_cnt]['team_count'] = 1;
@@ -3886,7 +3888,7 @@ class Magazine extends Database
         return strcmp($a['score'], $b['score']);
     }
 
-    public function getFirstDealDateIssued($adviserId)
+    public function getFirstDealDateIssued($adviserId, $biYearly = false)
     {
         $query = 'SELECT
                     c.id AS client_id,
@@ -3911,8 +3913,8 @@ class Magazine extends Database
             $deals = array_merge($deals, json_decode($data['deals']));
         }
 
-        $firstDeal = collect($deals)->filter(function ($deal) {
-            if (! isset($deal->status)) {
+        $firstDeal = collect($deals)->filter(function ($deal) use ($biYearly) {
+            if (! isset($deal->status) || ! isset($deal->date_issued)) {
                 return false;
             }
 
@@ -3922,11 +3924,17 @@ class Magazine extends Database
                 }
             }
 
-            if ('Issued' == $deal->status) {
-                return true;
+            if ($biYearly) {
+                if (! ($deal->date_issued >= $this->actualCumulativeRange->from && $deal->date_issued <= $this->actualCumulativeRange->to)) {
+                    return false;
+                }
             }
 
-            return false;
+            if ('Issued' != $deal->status) {
+                return false;
+            }
+
+            return true;
         })->sortBy('date_issued', SORT_NUMERIC)
             ->first();
 
@@ -3944,6 +3952,21 @@ class Magazine extends Database
         }
 
         return $newDate;
+    }
+
+    public function getBiYearlyLimit($carbonDate)
+    {
+        $month = (int) $carbonDate->format('m');
+
+        $biYearlyLimit = $carbonDate->format('Y');
+
+        if ($month >= 1 && $month <= 6) {
+            $biYearlyLimit .= '0630';
+        } else {
+            $biYearlyLimit .= '1231';
+        }
+
+        return $biYearlyLimit;
     }
 
     public function SetWinnerScore()
@@ -3976,7 +3999,15 @@ class Magazine extends Database
         }
 
         foreach ($winner_adviser as $adviser) {
-            $counterDate = $this->getFirstDealDateIssued($adviser['id']);
+            if (! isset($adviser['id'])) {
+                continue;
+            }
+
+            $counterDate = $this->getFirstDealDateIssued($adviser['id'], $this->runAdviserId ? false : true);
+
+            $biYearlyDate = Carbon::createFromFormat('Ymd', $this->getBiMonthlyRange($counterDate)->from, 'NZ');
+
+            $biYearlyLimit = $this->getBiYearlyLimit($biYearlyDate);
 
             $runs = [];
 
@@ -3988,13 +4019,28 @@ class Magazine extends Database
             while ($counterDate <= $this->date) {
                 $biMonthRange = $this->getBiMonthlyRange($counterDate);
 
+                $biYearlyDate = Carbon::createFromFormat('Ymd', $biMonthRange->from, 'NZ');
+
                 $run = $this->GetWinnerBiMonthlyAdvisers($adviser['id'], $biMonthRange);
 
                 $run = $run[0] ?? [];
 
+                $run['reset'] = false;
+
+                if ($this->runAdviserId && $biYearlyDate->format('Ymd') > $biYearlyLimit) {
+                    $biYearlyLimit = $this->getBiYearlyLimit($biYearlyDate);
+
+                    $silver = 0;
+                    $gold = 0;
+                    $platinum = 0;
+                    $titanium = 0;
+
+                    $run['reset'] = true;
+                }
+
                 if (count($run)) {
                     foreach ($levels as $level) {
-                        if ((int) $run['deals'] >= $level['deal'] && (float) $run['issued_api'] > $level['api']) {
+                        if ((int) ($run['deals'] ?? 0) >= $level['deal'] && (float) $run['issued_api'] > $level['api']) {
                             $run['level'] = $level['level'];
 
                             break;
@@ -4048,6 +4094,11 @@ class Magazine extends Database
 
                 if ($this->runAdviserId) {
                     $run['biMonthRange'] = $biMonthRange;
+
+                    $run['silver'] = $silver;
+                    $run['gold'] = $gold;
+                    $run['platinum'] = $platinum;
+                    $run['titanium'] = $titanium;
                 }
 
                 $runs[] = $run;

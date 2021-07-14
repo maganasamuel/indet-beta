@@ -1,5 +1,6 @@
 {
 	"require": {
-		"tightenco/collect": "^8.34"
+		"tightenco/collect": "^8.34",
+		"nesbot/carbon": "^2.50"
 	}
 }

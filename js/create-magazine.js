@@ -301,6 +301,14 @@ window.onload = function () {
 		$('#create').on('click', function (e) {
 			e.preventDefault();
 
+			if (!$('#date').val()) {
+				alert('Please provide a value for date.');
+
+				$('#date').focus();
+
+				return false;
+			}
+
 			var data = new FormData();
 			var button = $(this);
 

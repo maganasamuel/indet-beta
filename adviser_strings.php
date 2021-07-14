@@ -46,7 +46,7 @@ $levelClasses = [
     'Platinum' => 'bg-red-500 text-white',
     'Gold' => 'bg-yellow-500 text-white',
     'Silver' => 'bg-gray-500 text-white',
-	'none' => 'bg-white text-gray-900',
+    'none' => 'bg-white text-gray-900',
 ];
 
 $uploadsFolder = '../indet_photos_stash/';
@@ -94,15 +94,15 @@ $defaultImagePath = implode('/', $folders) . '/images/default_pic.png';
 					<div class="sm:flex sm:space-x-5">
 						<div class="flex-shrink-0">
 							<?php
-							$src = $defaultImagePath;
+                            $src = $defaultImagePath;
 
-							$imagePath = $uploadsFolder . $adviser['image'];
+                            $imagePath = $uploadsFolder . $adviser['image'];
 
-							if($adviser['image'] && file_exists($imagePath)){
-								$src = 'https://onlineinsure.co.nz/indet_photos_stash/' . $adviser['image'];
-							}
+                            if ($adviser['image'] && file_exists($imagePath)) {
+                                $src = 'https://onlineinsure.co.nz/indet_photos_stash/' . $adviser['image'];
+                            }
 
-							?>
+                            ?>
 							<img class="mx-auto h-40 w-40 rounded-full"
 								src="<?php echo $src; ?>"
 								alt="">
@@ -150,7 +150,11 @@ $defaultImagePath = implode('/', $folders) . '/images/default_pic.png';
 					<tbody>
 						<?php
                         foreach ($runs as $run) {
-                            ?>
+                            if ($run['reset']) {
+                                ?>
+								<tr><td class="border border-gray-200 px-6 py-3" colspan="6">&nbsp;</td></tr>
+								<?php
+                            } ?>
 						<tr class="<?php echo $levelClasses[$run['level']]; ?>">
 							<td class="border border-gray-200 px-6 py-3">
 								<?php echo date('jS F, Y', strtotime($run['biMonthRange']->from)); ?>

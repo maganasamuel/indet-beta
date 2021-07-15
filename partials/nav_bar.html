@@ -463,6 +463,13 @@
 
     });
 
+    $('.a_redirect').click(function (e) {
+      e.preventDefault();
+
+      var loc = $(this).attr('href');
+      location.href = loc;
+
+    });
 
 
     $('.a_single_email').click(function (e) {

@@ -47,3 +47,28 @@ if (! $con) {
     echo 'Failed to connect to MySQL: ' . mysqli_connect_error();
     echo '</div>';
 }
+  
+
+  $_SESSION['LAST_ACTIVITY'] = $_SERVER['REQUEST_TIME'];  
+
+  // Production
+  // $host="localhost";
+  // $username="onlinei1_user";
+  // $password="cW;h8Yjw@h_}";
+  // $db="onlinei1_indet";
+ 
+  // Local Development
+  $host="localhost";
+  $username="root";
+  $password="";
+  $db="ei_indet";
+
+
+  $con=mysqli_connect($host,$username,$password,$db)or die("could not connect to sql");
+  if (!$con) {
+    echo "<div>";
+    echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    echo "</div>";  
+  }
+
+?>

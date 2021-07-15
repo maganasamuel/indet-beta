@@ -512,25 +512,53 @@ if (!isset($_SESSION["myusername"])) {
 			</div>
 
 			<?php
-			$invoice_num = 'EI' . date("Ymd");
+			$invoice_num = 'EI' . date('Y') . '0001';
+			$init_check_flag_query = "SELECT EXISTS(SELECT 1 FROM (SELECT number AS invoice_number FROM invoices UNION (SELECT invoice_number FROM customized_invoices)) AS invoice_tbl WHERE invoice_number LIKE '$invoice_num%') AS flag";
+			$init_check_flag = mysqli_query($con, $init_check_flag_query) or die('Could not look up user information; ' . mysqli_error($con));
+			$init_check_flag = mysqli_fetch_array($init_check_flag);
+			$init_check_flag = isset($init_check_flag['flag']) ? $init_check_flag['flag'] : 0;
 
-			$count_query = "SELECT * FROM invoices where number LIKE '" . $invoice_num . "%' ORDER BY id DESC";
+			if($init_check_flag != '0') {
+				$query = "SELECT * FROM (SELECT number AS invoice_number, CAST(date_created AS CHAR(50)) AS date_created  FROM invoices UNION (SELECT invoice_number, date_created FROM customized_invoices)) AS invoice_tbl WHERE invoice_number = '$invoice_num'";
+			    $result = mysqli_query($con, $query);
+			    $result = mysqli_fetch_array($result);
+
+			    $result_date_created = isset($result['date_created']) ? $result['date_created'] : date("Ymd");
+
+			    $invoice_num = 'EI' . date("Y");
+			    $count_query = "SELECT * FROM (SELECT number AS invoice_number, CAST(date_created AS CHAR(50)) AS date_created FROM invoices UNION (SELECT invoice_number, date_created FROM customized_invoices)) AS invoice_tbl WHERE invoice_number LIKE '$invoice_num%' AND date_created >= '$result_date_created' ORDER BY invoice_number DESC";
+			} else {
+				$count_query = "SELECT * FROM (SELECT number AS invoice_number, CAST(date_created AS CHAR(50)) AS date_created FROM invoices UNION (SELECT invoice_number, date_created FROM customized_invoices)) AS invoice_tbl WHERE invoice_number LIKE '$invoice_num%' ORDER BY invoice_number DESC";
+			}
+
+			
 			$searchsum = mysqli_query($con, $count_query) or die('Could not look up user information; ' . mysqli_error($con));
 			//echo $count_query;
 			$rows = mysqli_fetch_array($searchsum);
-			$rows_count = isset($rows['id']) ? substr($rows['number'], -3) : 0;
+			$rows_count = isset($rows['invoice_number']) ? substr($rows['invoice_number'], -3) : 0;
 			$rows_count++;
+
+			if($init_check_flag == '0') {
+				$invoice_num = 'EI' . date("Y");
+				$rows_count = 1;
+			} 
+				
+
 			switch ($rows_count) {
 				case ($rows_count < 10):
-					$invoice_num .= '00' . $rows_count;
+					$invoice_num .= '000' . $rows_count;
 
 					break;
 				case ($rows_count < 100 && $rows_count >= 10):
-					$invoice_num .= '0' . $rows_count;
+					$invoice_num .= '00' . $rows_count;
 
 					break;
 
-				case ($rows_count >= 100):
+				case ($rows_count < 1000 && $rows_count >= 10):
+					$invoice_num .= '000' . $rows_count;
+
+					break;
+				case ($rows_count >= 1000):
 					$invoice_num .= $rows_count;
 
 					break;

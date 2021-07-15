@@ -217,7 +217,7 @@ $(function(){
 	</td>
 	<td><a class="a_single_view btn btn-primary" target="_blank" href="invoice<?php echo "?id=$invoice_id"?>" ><span class="glyphicon glyphicon-search" style="font-size:15px;"></span>
 	</a></td>
-
+	<td><a class="a_redirect" href="edit_invoice.php<?php echo "?invoice_id=$invoice_id"?>" ><img src="edit.png" /></a></td>
 	<td><a class="a_single" href="delete_pdf.php<?php echo "?invoice_id=$invoice_id"?>" ><img src="delete.png" /></a></td>
 
 

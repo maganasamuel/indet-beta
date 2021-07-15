@@ -65,6 +65,46 @@ class PDF_MC_Table extends PDF_Gradients
         $this->Ln($h);
     }
 
+    public function LRow($data, $border = false, $rectColor = array(255, 255, 255), $useFontStyles = false)
+    {
+        //Calculate the height of the row
+        $nb = 0;
+        for ($i = 0; $i < count($data); $i++) {
+            $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
+        }
+
+        $h = 5 * $nb;
+        //Issue a page break first if needed
+        $this->CheckPageBreak($h);
+        //Draw the cells of the row
+        for ($i = 0; $i < count($data); $i++) {
+            $w = $this->widths[$i];
+            $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+
+            if (count($this->mc_fonts) >= 1) {
+                if (isset($this->mc_fonts[$i])) {
+                    $this->SetFont($this->mc_fonts[$i][0], $this->mc_fonts[$i][1], $this->mc_fonts[$i][2]);
+                }
+            }
+
+            //Save the current position
+            $x = $this->GetX();
+            $y = $this->GetY();
+            //Draw the border
+            $this->SetDrawColor($rectColor[0], $rectColor[1], $rectColor[2]);
+            if ($border) {
+                $this->Rect($x, $y, $w, $h, "FD");
+            }
+
+            //Print the text
+            $this->MultiCell($w, 5, $data[$i], 0, $a);
+            //Put the position to the right of the cell
+            $this->SetXY($x + $w, $y);
+        }
+        //Go to the next line
+        $this->Ln($h);
+    }
+
     public function CheckPageBreak($h)
     {
         //If the height h would cause an overflow, add a new page immediately

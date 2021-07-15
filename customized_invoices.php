@@ -214,7 +214,9 @@ if (!isset($_SESSION["myusername"])) {
 								?>
 						<td><a class="a_single_view btn btn-primary" target="_blank" href="customized_invoice_view<?php echo "?id=$id" ?>"><span class="glyphicon glyphicon-search" style="font-size:15px;"></span>
 							</a></td>
-
+						<td>
+							<a class="a_redirect" href="edit_customized_invoice.php<?php echo "?id=$id"?>" ><img src="edit.png" /></a>
+						</td>
 						<td><input type='image' class='delete' src='delete.png' data-id="<?php echo $id ?>"></td>
 						<td><a class="email_invoice" href="#" data-id="<?php echo "$id" ?>" data-number="<?php echo "$invoice_number" ?>" data><img src="email.png"></a>
 						</td>

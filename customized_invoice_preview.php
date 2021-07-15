@@ -7,16 +7,43 @@ require("libs/indet_alphanumeric_helper.php");
 class PDF extends PDF_MC_Table
 {
 
+    function Header()
+    {
+        $this->AddFont('Calibri','','calibri.php'); 
+        $this->SetFont('Calibri','',11);
+        // $this->Cell(80);
+        $this->SetXY(0,5);
+
+        $this->setFillColor(68,84,106); 
+        $this->Cell(17,15,'',0,0,'L',1);
+        $this->SetX($this->GetX()+3);
+        $this->Cell(30,15,$this->Image('Logo_ImageOnly.png',$this->GetX(),$this->GetY()-3,-200),0,0,'L');
+
+        $this->AddFont('Calibri-Bold','B','calibrib.php'); 
+        $this->SetFont('Calibri-Bold','B',18);
+        $this->SetTextColor(69,90,115);
+        $this->SetXY($this->GetX(),$this->GetY()+6);
+        $this->Cell(147,15,'TAX INVOICE',0,0,'R');
+        $this->AddFont('Calibri','','calibri.php'); 
+        $this->SetFont('Calibri','',11);
+
+        $this->SetXY($this->GetX()+3,$this->GetY()-6);
+        $this->setFillColor(46,117,182); 
+        $this->Cell(17,15,'',0,0,'L',1);
+    }
 
 	function Footer()
 	{
 		global $invoice_num;
 		global $name;
 		$this->SetY(-15);
-		$this->SetFont('Helvetica','',10);
-		$this->SetTextColor(0,0,0);
-		$this->Cell(0,10,"Customized Invoice $invoice_num". ''.' '.preg_replace("/\([^)]+\)/","",''),0,0,'L');	
-		$this->Cell(0,10,'Page '.$this->PageNo(),0,1,'R');
+		$this->AddFont('Calibri','','calibri.php'); 
+        $this->SetFont('Calibri','',11);
+        $this->SetTextColor(103,173,233);
+
+		$this->Cell(0,10,$this->Image('logo.png',$this->GetX(),$this->GetY()-2,-200),0,0,'L');	
+		$this->Cell(0,10,'www.eliteinsure.co.nz | Page '.$this->PageNo(),0,1,'R');
+        $this->SetTextColor(0,0,0);
 	}
 
 	function getPage(){
@@ -77,17 +104,35 @@ function getOrderEndDate( $start_date, $orderDaysCode ){
 $alpha_helper = new INDET_ALPHANUMERIC_HELPER();
 //convert post data into an object
 $customized_invoice_data = json_decode(json_encode($_POST));
-
-
 $customized_invoice_data->invoice_date = $customized_invoice_data->date;
-$customized_invoice_data->date_stamp = date("Ymd");
 
-$query = "Select * from customized_invoices WHERE invoice_number LIKE 'CI-$customized_invoice_data->date_stamp-%'";
-$result = mysqli_query($con, $query);
-$invoices_today = mysqli_num_rows($result);
+if(!isset($customized_invoice_data->invoice_id)) :
+    $customized_invoice_data->date_stamp = date("Y");
+    $customized_invoice_num = 'EI' . date('Y') . '0001';
+    $init_check_flag_query = "SELECT EXISTS(SELECT 1 FROM (SELECT number AS invoice_number FROM invoices UNION (SELECT invoice_number FROM customized_invoices)) AS invoice_tbl WHERE invoice_number LIKE '$customized_invoice_num%') AS flag";
+    $init_check_flag = mysqli_query($con, $init_check_flag_query) or die('Could not look up user information; ' . mysqli_error($con));
+    $init_check_flag = mysqli_fetch_array($init_check_flag);
+    $init_check_flag = isset($init_check_flag['flag']) ? $init_check_flag['flag'] : 0;
 
-$customized_invoice_data->invoice_number = "CI-$customized_invoice_data->date_stamp-" . $alpha_helper->convertToFourDigits($invoices_today + 1);
-$invoice_num = $customized_invoice_data->invoice_number;
+    if($init_check_flag != 0) {
+        $query = "SELECT * FROM (SELECT number AS invoice_number, CAST(date_created AS CHAR(50)) AS date_created  FROM invoices UNION (SELECT invoice_number, date_created FROM customized_invoices)) AS invoice_tbl WHERE invoice_number = '$customized_invoice_num'";
+        $result = mysqli_query($con, $query);
+        $result = mysqli_fetch_array($result);
+
+        $result_date_created = isset($result['date_created']) ? $result['date_created'] : date("Ymd");
+
+        $query = "SELECT * FROM (SELECT number AS invoice_number, CAST(date_created AS CHAR(50)) AS date_created FROM invoices UNION (SELECT invoice_number, date_created FROM customized_invoices)) AS invoice_tbl WHERE invoice_number LIKE 'EI$customized_invoice_data->date_stamp%' AND date_created >= '$result_date_created'";
+        $result = mysqli_query($con, $query);
+        // $result = mysqli_fetch_array($result);
+
+        $invoices_today = mysqli_num_rows($result);
+        $customized_invoice_data->invoice_number = "EI$customized_invoice_data->date_stamp" . $alpha_helper->convertToFourDigits($invoices_today + 1);
+        
+    } else {
+        $customized_invoice_data->invoice_number = 'EI' . date('Y') . '0001';
+    }
+endif;
+    $invoice_num = $customized_invoice_data->invoice_number; 
 
 $pdf = new PDF('P', 'mm', 'Legal');
 $x = $pdf->GetX();
@@ -97,118 +142,148 @@ $y = $pdf->GetY();
 $pdf->AddPage('P', 'Legal');
 
 $pdf->SetFillColor(224,224,224);
-$pdf->Image('logo.png',10,10,-160);
-$pdf->SetFont('Helvetica','B',18);
+// $pdf->Image('logo.png',10,10,-160);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',14);
 $pdf->SetTextColor(0,0,0);
 $pdf->Cell(0,20,'',"0","1","C");
 $pdf->SetTextColor(0,0,0);
-$pdf->SetFont('Helvetica','B',10);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->SetFillColor(224,224,224);
 
-
-$pdf->SetFont('Helvetica','',12);
+$pdf->SetY($y+33);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->MultiCell(55,6,"3G/39 Mackelvie Street Grey Lynn 1021 Auckland New Zealand 0508 123 467",0,"L",false);
 
 $pdf->SetTextColor(44,44,44);
 $pdf->SetXY($x+100, $y+35); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Write(0, 'Phone');
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetXY($x+120, $y+35); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, '0508 123 467');
 
 
 $pdf->SetXY($x+100, $y+40); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->SetTextColor(44,44,44);
-$pdf->Write(0, 'Wesbite');
+$pdf->Write(0, 'Website');
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetXY($x+120, $y+40); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, 'www.eliteinsure.co.nz');
 
 $pdf->SetTextColor(44,44,44);
 $pdf->SetXY($x+100, $y+45); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Write(0, 'Email');
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetXY($x+120, $y+45); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, 'admin@eliteinsure.co.nz');
 
 $pdf->SetTextColor(12,31,69);
 $pdf->SetXY($x+100, $y+60); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Write(0, 'Invoice Date');
 
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetXY($x+150, $y+60); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, $customized_invoice_data->invoice_date);
 
 $pdf->SetTextColor(12,31,69);
 $pdf->SetXY($x+100, $y+67); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Write(0, 'Invoice Number');
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetXY($x+150, $y+67); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, $customized_invoice_data->invoice_number);
 
 $pdf->SetTextColor(12,31,69);
 $pdf->SetXY($x+100, $y+74); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Write(0, 'GST Number');
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetTextColor(12,31,69);
 $pdf->SetXY($x+100, $y+81); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Write(0, 'Due Date: ');
 $pdf->SetTextColor(0,0,0);
 
 $pdf->SetXY($x+150, $y+74); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, '119-074-304');
 
 $pdf->SetXY($x+150, $y+81); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Write(0, getOrderEndDate(date("Y-m-d", strtotime($customized_invoice_data->invoice_date)), 'meal_weekly'));
 
 
 $pdf->SetXY($x+10, $y+60); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','',18);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',14);
 $pdf->Cell(0,10,'TAX INVOICE',"0","1","L");
 
 $pdf->SetXY($x+10, $y+75); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetFont('Helvetica','B',12);
-$pdf->Write(0,'To: ');
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
+$pdf->Cell(50,5,'To:',"0","0","L");
+// $pdf->Write(0,'To: ');
 
 $pdf->SetXY($x+20, $y+75); // position of text1, numerical, of course, not x1 and y1
 
-$pdf->SetFont('Helvetica','B',12);
-$pdf->Write(0,$customized_invoice_data->company_name);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
+$pdf->MultiCell(50,5,"$customized_invoice_data->name",0,"L",false);
+// $pdf->Write(0,$customized_invoice_data->name);
 
-$pdf->SetXY($x+20, $y+80); // position of text1, numerical, of course, not x1 and y1
+if($customized_invoice_data->company_name != "") {
+    $pdf->SetXY($x+20, $pdf->getY()+3); // position of text1, numerical, of course, not x1 and y1
+    $pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+    $pdf->SetFont('Calibri-Bold','B',11);
+    $pdf->MultiCell(50,5,"$customized_invoice_data->company_name",0,"L",false);
+    // $pdf->Write(0,$customized_invoice_data->company_name);
+}
 
-$pdf->SetFont('Helvetica','B',12);
-$pdf->Write(0,$customized_invoice_data->name);
-
-$pdf->SetFont('Helvetica','',12);
-$pdf->SetXY($x+20, $y+85);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
+$pdf->SetXY($x+20, $pdf->getY()+3);
 $pdf->MultiCell(50,5,"$customized_invoice_data->address",0,"L",false);
 
 //$pdf->SetXY($x+10, $y+60); // position of text1, numerical, of course, not x1 and y1
-$pdf->SetXY($x+10, $y+118); 
+// $pdf->SetXY($x+10, $y+118); 
+if($pdf->getY() <= 118)
+    $pdf->SetXY($x+10, $y+118); 
+else
+    $pdf->SetXY($x+10, $pdf->getY()+5);
 
-
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->SetTextColor(255,255,255);
 $pdf->SetDrawColor(91,155,213);
 $pdf->SetFillColor(68,117,161);
@@ -216,7 +291,8 @@ $pdf->Cell(70,10,'ITEM', 1, 0,'C','true');
 $pdf->Cell(100,10,'DESCRIPTION', 1, 0,'C','true');
 $pdf->Cell(30,10,'AMOUNT', 1, 1,'C','true');
 
-$pdf->SetFont('Helvetica','',10);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->SetFillColor(223,235,247);
 $customized_invoice_data->subtotal = 0;
 
@@ -224,86 +300,126 @@ $pdf->SetWidths(array(70,100,30));
 
 $pdf->SetTextColor(0,0,0);
 foreach($customized_invoice_data->items as $item){
-    $pdf->Row(array($item->name,$item->description, "$" . number_format($item->total_amount,2)),true,array(91,155,213));
+    if($pdf->getY() >= 318) {
+        $pdf->AddPage();
+        $pdf->setY(30);
+    }
+    
+    $pdf->LRow(array($item->name,$item->description, "$" . number_format($item->total_amount,2)),true,array(91,155,213));
     $customized_invoice_data->subtotal += $item->total_amount;
 }
 $pdf->Ln(4);
 $pdf->SetFillColor(255,255,255);
 //Subtotal
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(70,10,'', 0, 0,'C','true');
 $pdf->Cell(97,10,'Invoice Subtotal', 0, 0,'R','true');
 $pdf->Cell(3,10,'', 0, 0,'R','true');
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(30,10,"$" . number_format($customized_invoice_data->subtotal,2), 0, 1,'L','true');
 
 
 $customized_invoice_data->gst = GetGST($customized_invoice_data->subtotal, $customized_invoice_data->gst_type, $customized_invoice_data->gst);
 
 //GST
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(70,10,'', 0, 0,'C','true');
 $pdf->Cell(97,10,'Incl. Tax (GST):', 0, 0,'R','true');
 $pdf->Cell(3,10,'', 0, 0,'R','true');
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(30,10,"$" . number_format($customized_invoice_data->gst,2), 0, 1,'L','true');
 
 
 $customized_invoice_data->total_amount = $customized_invoice_data->subtotal + $customized_invoice_data->gst;
 //Total
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Cell(70,10,'', 0, 0,'C','true');
 $pdf->Cell(97,10,'TOTAL:', 0, 0,'R','true');
 $pdf->Cell(3,10,'', "T", 0,'R','true');
-$pdf->SetFont('Helvetica','BU',12);
+$pdf->AddFont('Calibri-Bold','BU','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','BU',11);
 $pdf->SetTextColor(45,78,107);
 $pdf->Cell(30,10,"$" . number_format($customized_invoice_data->total_amount,2), "T", 1,'L','true');
 
 $pdf->Ln(10);
 
-$pdf->SetFont('Helvetica','B',12);
-$pdf->SetTextColor(255,255,255);
+if($pdf->getY() >= 318) {
+    $pdf->AddPage();
+    $pdf->setY(30);
+}
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',14);
+$pdf->SetTextColor(91,155,213);
+// $pdf->SetTextColor(255,255,255);
 $pdf->SetDrawColor(91,155,213);
 $pdf->SetFillColor(68,117,161);
-$pdf->Cell(200,10,'Payment Advice', 1, 1,'L','true');
+$pdf->Cell(200,10,'PAYMENT ADVICE', 'B', 1,'L');
 
+if($pdf->getY() >= 318) {
+    $pdf->AddPage();
+    $pdf->setY(30);
+}
 $pdf->Ln(8);
 $pdf->SetTextColor(0,0,0);
-$pdf->SetFont('Helvetica','B',12);
-$pdf->Cell(40,0,'Client',"0","0","L");
-$pdf->SetFont('Helvetica','',12);
-$pdf->Cell(40,0,$customized_invoice_data->name,"0",0,"L");
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
+$pdf->Cell(40,5,'Name',"0","0","L");
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
+$pdf->MultiCell(40,5,"$customized_invoice_data->name",0,"L",false);
+// $pdf->Cell(40,0,$customized_invoice_data->name,"0",0,"L");
 $pdf->Cell(60,0,'',"0",1,"C");
 
+if($pdf->getY() >= 318) {
+    $pdf->AddPage();
+    $pdf->setY(30);
+}
 $pdf->Ln(8);
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Cell(40,0,'Invoice Number',"0","0","L");
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(40,0,$customized_invoice_data->invoice_number,"0",0,"L");
 $pdf->Cell(60,0,'',"0",1,"C");
 
+if($pdf->getY() >= 318) {
+    $pdf->AddPage();
+    $pdf->setY(40);
+}
 $pdf->Ln(8);
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->SetFillColor(0,0,0);
-$pdf->SetFont('Helvetica','B',14);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Cell(40,0,'Total Due',"0","0","L");
-$pdf->SetFont('Helvetica','',14);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(40,0,'$'.number_format($customized_invoice_data->total_amount,2),"0",0,"L");
 $pdf->Cell(60,0,'',"0",1,"C");
 
 
 $pdf->SetXY($x+100, $pdf->getY() - 18); // position of text1, numerical, of course, not x1 and y1
 
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->MultiCell(105,5,"Direct Credit
 Please make payment into the following account:",0,"L",false);
 
 $pdf->SetXY($x+100, $pdf->getY());
-$pdf->SetFont('Helvetica','B',12);
+$pdf->AddFont('Calibri-Bold','B','calibrib.php'); 
+$pdf->SetFont('Calibri-Bold','B',11);
 $pdf->MultiCell(105,5,"Eliteinsure Ltd, ANZ Bank, 06-0254-0426124-00.",0,"L",false);
 
 $pdf->SetXY($x+100, $pdf->getY());
-$pdf->SetFont('Helvetica','',12);
+$pdf->AddFont('Calibri','','calibri.php'); 
+$pdf->SetFont('Calibri','',11);
 $pdf->Cell(105,5,"on or before ".getOrderEndDate(date("Y-m-d", strtotime($customized_invoice_data->invoice_date)), "meal_weekly"),0,"L",false);
 
 
@@ -321,7 +437,7 @@ $pdf->Output($path,'F');
 $file=array();
 $file['link']="$path";
 $file['filename']=$mix;
-$file['date_created']=$customized_invoice_data->date_stamp;
+$file['date_created']= date("Ymd");
 $file['invoice_number']=$customized_invoice_data->invoice_number;
 $file['type']='invoice';
 $file['gst_type']=$customized_invoice_data->gst_type;

@@ -7,8 +7,7 @@
 
   include "create_invoice_for_email.php";
 
-  // $myid=$_GET["id"];
-  $myid = $_POST["id"];
+  $myid=$_POST["id"];
 
   $query = "SELECT * FROM invoices i INNER JOIN adviser_tbl a ON i.adviser_id = a.id where i.id = $myid";
   $displayquery=mysqli_query($con,$query) or die('Could not look up user information; ' . mysqli_error($con));
@@ -17,8 +16,7 @@
 
   $sent_status_sql = "UPDATE invoices SET sent_status = 1 WHERE id = $myid"; 
   mysqli_query($con,$sent_status_sql);
-
-  $email = $_POST["emails"];
+  
   $startingdate=isset($_GET["startingdate"])?$_GET["startingdate"]:'';
 
     $link=$path;
@@ -52,8 +50,6 @@
       $mail->Username = $config['smtp_test_username'];
       $mail->Password = $config['smtp_test_password'];
     }
-
-      
 
     $mail->setFrom('executive.admin@eliteinsure.co.nz', 'Invoice Statement');
     $mail->addAddress($email, $name);

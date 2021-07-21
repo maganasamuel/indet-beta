@@ -109,6 +109,11 @@ if (!isset($_SESSION["myusername"])) {
 
 			$("#confirm_email").on("click", function() {
 				var data = $("#email_info").serializeArray();
+				var email_val = $('#emails').val();
+
+				if(email_val == '')
+					return false;
+				
 				var url = "";
 				$("#sending_spinner").show();
 				var btn = $(this);
@@ -146,6 +151,17 @@ if (!isset($_SESSION["myusername"])) {
 				$('#emailModal').modal('hide');
 				$("#email_info").trigger("reset");
 			});
+
+			$('#emailModal').on('hide.bs.modal', function (e) {
+				var email_btn = $(".email_invoice");
+				email_btn.prop("disabled", false);
+			})
+
+			$("#email_selection").on("change", function() {
+				var email = $(this).val();
+				$('#emails').val(email);
+			});
+			
 		});
 	</script>
 	<!--nav bar end-->
@@ -179,6 +195,9 @@ if (!isset($_SESSION["myusername"])) {
 
 				$query = "SELECT * FROM customized_invoices ORDER BY date_created DESC";
 				$displayquery = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
+
+				$query = "SELECT * FROM adviser_tbl WHERE termination_date = '' OR termination_date IS NULL";
+				$adviser_query = mysqli_query($con, $query) or die('Could not look up user information; ' . mysqli_error($con));
 				?>
 			<div class="margined table-responsive">
 				<table id='me' data-toggle="table" id='example' class="table table-striped " cellpadding="5px" cellspacing="5px" width='95%'>
@@ -252,9 +271,24 @@ if (!isset($_SESSION["myusername"])) {
 						<form id="email_info" name="email_info" class="form-horizontal" novalidate="">
 							<div class="modal-body">
 								<div class="form-group error">
-									<label for="inputTask" class="col-sm-2 control-label">Email(s)</label>
+									<label for="inputTask" class="col-sm-2 control-label">Adviser</label>
 									<div class="col-sm-10">
-										<textarea class="form-control has-error" id="emails" name="emails" placeholder="Separate multiple emails by adding a comma in between." value="" required></textarea>
+										<select id="email_selection" class="form-control" required/>
+							            	<option value="" selected>
+							            		Manual Input
+							            	</option>
+							            <?php while ($rows = mysqli_fetch_array($adviser_query)) : extract($rows); ?>
+											<option value="<?php echo isset($email) ? $email : ''; ?>">
+												<?php echo $name; ?>	
+											</option>
+										<?php endwhile; ?>							            
+							          </select>
+									</div>
+								</div>
+								<div class="form-group error">
+									<label for="inputTask" class="col-sm-2 control-label">Email</label>
+									<div class="col-sm-10">
+										<textarea class="form-control has-error" id="emails" name="emails" placeholder="" value="" required></textarea>
 									</div>
 								</div>
 							</div>

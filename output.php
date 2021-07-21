@@ -504,7 +504,7 @@ $pdf->SetFont('Calibri-Bold','B',11);
 $pdf->Cell(40,5,'Name',"0","0","L");
 $pdf->AddFont('Calibri','','calibri.php'); 
 $pdf->SetFont('Calibri','',11);
-$pdf->MultiCell(40,5,"$adv_name",0,"L",false);
+$pdf->MultiCell(60,5,"$adv_name",0,"L",false);
 // $pdf->Cell(40,0,$adv_name,"0",0,"L");
 $pdf->Cell(60,0,'',"0","1","C");
 

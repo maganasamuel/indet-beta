@@ -91,7 +91,7 @@ if (!isset($_SESSION["myusername"])) {
 							});
 						},
 						cancel: function() {
-							me.val(prev);
+							// me.val(prev);
 						}
 					}
 				});
@@ -116,6 +116,7 @@ if (!isset($_SESSION["myusername"])) {
 				btn.prop("disabled", true);
 				cancel_btn.prop("disabled", true);
 				
+				var invoice_id = $("#email_info #id").val();
 				$.ajax({
 					data: data,
 					type: "post",
@@ -126,12 +127,17 @@ if (!isset($_SESSION["myusername"])) {
 						cancel_btn.prop("disabled", false);
 						$("#email_info").trigger("reset");
 						$('#emailModal').modal('hide');
+
+						$("#sending_spinner").hide();
+						$("#id_"+invoice_id).attr("src", "emailsent.png");
 					},
 					error: function(data) {
 						btn.prop("disabled", false);
 						cancel_btn.prop("disabled", false);
 						console.log(data);
 						console.log('Error:', data);
+
+						$("#sending_spinner").hide();
 					}
 				});
 			});
@@ -186,6 +192,7 @@ if (!isset($_SESSION["myusername"])) {
 							<th></th>
 							<th class='text-center'></th>
 							<th class='text-center'></th>
+							<th class='text-center'></th>
 							<!--td></td-->
 
 						</tr>
@@ -211,6 +218,10 @@ if (!isset($_SESSION["myusername"])) {
 		<td>$name</td>
 		<td>$" . number_format($total_amount, 2, ".", ",") . "</td>
 		";
+
+		$email_png = "email.png";
+		if($sent_status == 1)
+			$email_png = "emailsent.png";
 								?>
 						<td><a class="a_single_view btn btn-primary" target="_blank" href="customized_invoice_view<?php echo "?id=$id" ?>"><span class="glyphicon glyphicon-search" style="font-size:15px;"></span>
 							</a></td>
@@ -218,7 +229,7 @@ if (!isset($_SESSION["myusername"])) {
 							<a class="a_redirect" href="edit_customized_invoice.php<?php echo "?id=$id"?>" ><img src="edit.png" /></a>
 						</td>
 						<td><input type='image' class='delete' src='delete.png' data-id="<?php echo $id ?>"></td>
-						<td><a class="email_invoice" href="#" data-id="<?php echo "$id" ?>" data-number="<?php echo "$invoice_number" ?>" data><img src="email.png"></a>
+						<td><a class="email_invoice" href="#" data-id="<?php echo "$id" ?>" data-number="<?php echo "$invoice_number" ?>" data><img id="id_<?php echo "$id"?>" src="<?= $email_png; ?>"></a>
 						</td>
 						<?php
 								echo "</tr>";

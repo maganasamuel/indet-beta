@@ -173,11 +173,89 @@ $(function(){
 			$("#email_info").trigger("reset");
 		});
 
+		$("#cancel_bulk_email").on("click", function() {
+			$('#bulkEmailModal').modal('hide');
+		});
+
+		$("#confirm_bulk_email").on("click", function() {
+			$('#bulkEmailModal .modal-body').html(
+				'<div id="myProgress">'+
+  					'<div id="myBar">0%</div>'+
+				'</div>'
+				);
+			$('#bulkEmailModal .modal-footer').hide();
+			
+			var i = 0;
+			if (i == 0) {
+			    item = 1;
+			    var elem = document.getElementById("myBar");
+			    var width = 0;
+
+			    $("input[name='ids']:checked").each(function() {
+					var invoice_id = this.value;
+					var emailurl = "email_invoice_bulk.php";   
+
+					$.ajax({
+						type: "post",
+						url: emailurl,
+						data: {
+							id : invoice_id
+						},
+						success: function(data){
+							console.log("Feedback: ", data);
+							$('.email_bulk_invoice').prop('disabled', false);
+							$("#id_"+invoice_id).attr("src", "emailsent.png");
+
+        					var id = setInterval(function(){ 
+        						percentage = (item / $("input[name='ids']:checked").length) * 100;
+        						if(percentage > 100)
+        							percentage = 100;
+        						
+        						if (width >= percentage) {
+        							item++;
+							        clearInterval(id);
+							    } else {
+							    	width++;
+							        elem.style.width = width + "%";
+							        elem.innerHTML = width  + "%";
+							    }
+							  	
+							  	if(width >= 100) {
+							  		$("input:checkbox:checked").prop('checked', false);
+							  		$('#bulkEmailModal').modal('hide');
+							  	}
+        					}, 10);
+
+        					// console.log("precentage: "+percentage);
+        					// console.log("width: "+width);
+        					// console.log("length: "+length);
+						},
+						error: function(data){
+							console.log("Error Sending Mail", data);
+							$('.email_bulk_invoice').prop('disabled', false);
+						}
+					});
+					
+				})	
+
+			    function frame() {
+			      if (width >= 100) {
+			        clearInterval(id);
+			        i = 0;
+			      } else {
+			        width++;
+			        elem.style.width = width + "%";
+			        elem.innerHTML = width  + "%";
+			      }
+			    }
+		  	}
+		});
+
 		$(".email_bulk_invoice").on("click", function(){
 			$(this).prop('disabled', true);
 
 			message_flag = 0;
-			$("input[name='ids']").each(function() {
+			$("input[name='ids']:checked").each(function() {
 				if(this.checked) {
 					message_flag = 1;
 				}
@@ -190,47 +268,68 @@ $(function(){
 				});
 				$('.email_bulk_invoice').prop('disabled', false);
 			} else {
-				$.confirm({
-					title: 'Confirm Sending Invoice',
-					content: "Are you sure that you want to send invoices in bulk?",
-					buttons: {
-						confirm: function () { 
-							$("input[name='ids']").each(function() {
-								if(this.checked) {
-									var invoice_id = this.value;
-									var emailurl = "email_invoice_bulk.php";   
+				$('#bulkEmailModal .modal-body').html('Are you sure that you want to send invoices in bulk?');
+				$('#bulkEmailModal .modal-footer').show();
+				$('#bulkEmailModal').modal('show');
+				$('.email_bulk_invoice').prop('disabled', false);
+				// $.confirm({
+				// 	title: 'Confirm Sending Invoice',
+				// 	content: "Are you sure that you want to send invoices in bulk?",
+				// 	buttons: {
+				// 		confirm: function () { 
+				// 			$("input[name='ids']:checked").each(function() {
+				// 				if(this.checked) {
+				// 					var invoice_id = this.value;
+				// 					var emailurl = "email_invoice_bulk.php";   
 
-									$.ajax({
-										type: "post",
-										url: emailurl,
-										data: {
-											id : invoice_id
-										},
-										success: function(data){
-											console.log("Feedback: ", data);
-											$('.email_bulk_invoice').prop('disabled', false);
-											$("#id_"+invoice_id).attr("src", "emailsent.png");
-										},
-										error: function(data){
-											console.log("Error Sending Mail", data);
-											$('.email_bulk_invoice').prop('disabled', false);
-										}
-									});
-								}
-							})													
-						},
-						cancel: function () {
-							$('.email_bulk_invoice').prop('disabled', false);
-						},
+				// 					$.ajax({
+				// 						type: "post",
+				// 						url: emailurl,
+				// 						data: {
+				// 							id : invoice_id
+				// 						},
+				// 						success: function(data){
+				// 							console.log("Feedback: ", data);
+				// 							$('.email_bulk_invoice').prop('disabled', false);
+				// 							$("#id_"+invoice_id).attr("src", "emailsent.png");
+				// 						},
+				// 						error: function(data){
+				// 							console.log("Error Sending Mail", data);
+				// 							$('.email_bulk_invoice').prop('disabled', false);
+				// 						}
+				// 					});
+				// 				}
+				// 			})													
+				// 		},
+				// 		cancel: function () {
+				// 			$('.email_bulk_invoice').prop('disabled', false);
+				// 		},
 
-					}
-				})
+				// 	}
+				// })
 			}
 		})
 });
-
 </script>
 <!--nav bar end-->
+
+<!-- progress bar css -->
+<style>
+#myProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#myBar {
+  width: 1%;
+  height: 30px;
+  background-color: #0081b8;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+}
+</style>
+<!-- progress bar css end-->
 
 <div align="center">
 
@@ -268,6 +367,23 @@ $(function(){
 	</div>
 </div>
 
+<div class="modal fade" id="bulkEmailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+				<h4 class="modal-title" id="myModalLabel">Email Invoice</h4>
+			</div>
+			<div class="modal-body" style="text-align: left">
+				Are you sure that you want to send invoices in bulk?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" id="confirm_bulk_email" value="Yes">Yes</button>
+				<button type="button" class="btn btn-primary" id="cancel_bulk_email" value="No">No</button>
+			</div>
+		</div>
+	</div>
+</div>
 <!--modal end-->
 <!--search-->
 <div>

@@ -4221,9 +4221,18 @@ class Magazine extends Database
     {
         $output = [];
 
-        $from = Carbon::createFromFormat('Ymd', $this->bimonthRange->from)->addMonths(1);
-        
-        $to = Carbon::createFromFormat('Ymd', $this->bimonthRange->to)->addMonths(1)->endOfMonth();
+        $date = Carbon::createFromFormat('Ymd', $this->date);
+
+        $day = (int) $date->format('d');
+
+        if($day <= 15){
+            $from = $date->format('m') . 16;
+            $to = $date->endOfMonth()->format('md');
+        }else{
+            $date = $date->addMonths(1);
+            $from = $date->firstOfmonth()->format('md');
+            $to = $date->format('m') . 15;
+        }
 
         //Get Admins
         $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE RIGHT(p.birthday,4) >= '$from' AND RIGHT(p.birthday,4) <= '$to' AND p.termination_date = '' ORDER BY name";

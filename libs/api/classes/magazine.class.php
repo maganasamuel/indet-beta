@@ -4220,8 +4220,18 @@ class Magazine extends Database
     public function GetBirthdays()
     {
         $output = [];
-        $from = date('md', strtotime($this->currentBiMonthRange->to));
-        $to = date('md', strtotime($this->currentBiMonthRange->from));
+
+        $date = Carbon::createFromFormat('Ymd', $this->date);
+
+        $day = (int) $date->format('d');
+
+        if ($day >= 1 && $day <= 15) {
+            $from = $date->format('m') . str_pad($day, 2, '0', STR_PAD_LEFT);
+            $to = $date->format('m') . 15;
+        } else {
+            $from = $date->format('m') . 16;
+            $to = $date->endOfMonth()->format('md');
+        }
 
         //Get Admins
         $query = "SELECT p.full_name as name, p.image as image, p.role, p.birthday FROM personal_data p WHERE RIGHT(p.birthday,4) >= '$from' AND RIGHT(p.birthday,4) <= '$to' AND p.termination_date = '' ORDER BY name";

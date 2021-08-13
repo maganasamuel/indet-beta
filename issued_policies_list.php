@@ -120,7 +120,7 @@ $db = new Database();
 			});
 
 			$.ajax({
-				url: '<?php echo 'onlineinsure.co.nz' == $_SERVER['SERVER_NAME'] ? '/indet-beta' : ''; ?>/libs/api/adviser_api.php',
+				url: '/indet-beta/libs/api/adviser_api.php',
 				type: 'POST',
 				data: {
 					action: 'get_advisers'

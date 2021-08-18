@@ -117,6 +117,8 @@ class Magazine extends Database
 
     public $overallCumulativeRBA = [];
 
+    // public $otherData = [];
+
     /**
      * @desc: init the class
      *
@@ -209,6 +211,7 @@ class Magazine extends Database
 
         $this->winner_score = $this->GetWinnerBiMonthlyAdvisers();
         $this->winner_score = $this->CheckRows($this->winner_score);
+        $this->winner_score = $this->BiMonthlyWinnerScoreSort($this->winner_score);
 
         $this->all_winner_score = $this->GetStringsWinnerScore();
         $this->winnerScore = $this->winnerScore();
@@ -3181,6 +3184,8 @@ class Magazine extends Database
             $otherBDMs[] = $row['id'];
             $output['Others']['generated'] += $row['generated'];
             $output['Others']['cancelled'] += $row['cancelled'];
+
+            // array_push($this->otherData, $row);
         }
 
         $otherBDMsArrayString = implode(',', $otherBDMs);
@@ -4225,10 +4230,10 @@ class Magazine extends Database
 
         $day = (int) $date->format('d');
 
-        if($day <= 15){
+        if ($day <= 15) {
             $from = $date->format('m') . 16;
             $to = $date->endOfMonth()->format('md');
-        }else{
+        } else {
             $date = $date->addMonths(1);
             $from = $date->firstOfmonth()->format('md');
             $to = $date->format('m') . 15;
@@ -4340,6 +4345,20 @@ class Magazine extends Database
     {
         $out = array_splice($array, $from, 1);
         array_splice($array, $to, 0, $out);
+    }
+
+    public function BiMonthlyWinnerScoreSort($winner_score)
+    {
+        $scores = [
+            'Titanium' => 1,
+            'Platinum' => 2,
+            'Gold' => 3,
+            'Silver' => 4,
+        ];
+
+        return collect($winner_score)->sortBy(function ($item) use ($scores) {
+            return $scores[$item['scores']];
+        })->all();
     }
 
     private static function sortByName($a, $b)

@@ -3190,7 +3190,7 @@ class Magazine extends Database
 
         $otherBDMsArrayString = implode(',', $otherBDMs);
 
-        $query = "SELECT c.id as client_id, l.name as lname, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($otherBDMsArrayString) order by l.name";
+        $query = "SELECT c.id as client_id, c.lead_by, l.name as lname, l.id as leadgen_id, s.deals as deals FROM issued_clients_tbl i LEFT JOIN submission_clients s ON s.client_id = i.name LEFT JOIN leadgen_tbl l ON i.assigned_to = l.id LEFT JOIN clients_tbl c ON i.name = c.id  WHERE i.leadgen IN ($otherBDMsArrayString) and c.lead_by != 'Self-Generated' order by l.name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 

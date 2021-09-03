@@ -117,6 +117,8 @@ class Magazine extends Database
 
     public $overallCumulativeRBA = [];
 
+    public $disclaimer = '';
+
     // public $otherData = [];
 
     /**
@@ -310,6 +312,10 @@ class Magazine extends Database
 
         // Overall Cumulative Percentage of Replacement Business
         $this->overallCumulativeRBA = $this->getOverallCumulativeRBA();
+
+        $dataset = $this->execute($this->prepare('SELECT name, value FROM settings WHERE name = "magazine-disclaimer"'));
+
+        $this->disclaimer = $dataset->fetch_assoc()['value'] ?? '';
     }
 
     //Return empty if the only rows left are others

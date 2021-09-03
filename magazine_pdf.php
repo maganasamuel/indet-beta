@@ -2982,7 +2982,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $coords = [0, 0.69, 1, 0];
 
     //paint a linear gradient
-    $pdf->LinearGradient(81, 11, 120, 254, $white, $gray, $coords);
+    $pdf->LinearGradient(81, 11, 120, 223, $white, $gray, $coords);
 
     $pdf->Image('images/EliteInsure Horizonal Logo.png', 10, 15, 185);
 
@@ -3085,10 +3085,9 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         if ('Others' != $magazine_data->all_winner_score[0]['name']) {
             $pdf->SetDrawColor(50, 143, 168);
             $pdf->SetLineWidth(1);
-            $pdf->RoundedRect($pdf->GetX() - 3, $pdf->GetY() - 2, 80, 62, 5, '1234', 'DF');
+            $pdf->RoundedRect($pdf->GetX() - 3, $pdf->GetY() - 2, 80, 52, 5, '1234', 'DF');
             $pdf->SetFont('Arial', 'I', 15);
-            $pdf->Cell(8, 3, $pdf->MultiCell(78, 10, '"Everything good happens to a stringwriter."', 0, 'L', false, 15), '0', '1', 'L');
-            $pdf->Cell(5, 3, '', '0', '1', 'L');
+            $pdf->Cell(8, 3, $pdf->MultiCell(78, 8, '"Everything good happens to a stringwriter."', 0, 'L', false, 15), '0', '1', 'L');
             $pdf->Cell(5, 3, '', '0', '1', 'L');
             $pdf->Cell(5, 3, '', '0', '0', 'L');
             $pdf->SetFont('Arial', 'B', 20);
@@ -3121,11 +3120,11 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         $pdf->Cell(90, 3, '', '0', 'L');
         $pdf->Cell(100, 3, $pdf->MultiCell(90, 5, $magazine_data->quote, 0, 'C', false, 10), '0', 'L');
     }
-
-    $pdf->SetY(136);
+    
     $pdf->SetFont('Calibri', 'U', 16);
+    $pdf->Text(101, 123, 'Contents');
 
-    $pdf->Text(100, 125, 'Contents');
+    $pdf->SetY(128);
     $pdf->SetX(10);
     $pdf->SetFont('Calibri', '', 16);
 
@@ -3140,6 +3139,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         ($magazine_data->bi_monthly_advisers[0] ?? null) :
         ($magazine_data->cumulative_advisers[0] ?? null);
     $featured_title = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ? 'Top Adviser of the Period ' . date('j', strtotime($magazine_data->bimonthRange->from)) . '-' . date('j F Y', strtotime($magazine_data->bimonthRange->to)) : 'Top Adviser of the Period ' . date('j M', strtotime($magazine_data->cumulativeRange->from)) . '-' . date('j M Y', strtotime($magazine_data->cumulativeRange->to));
+    
     $pdf->SetX(0);
     $pdf->SetX(190);
 
@@ -3153,25 +3153,34 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     }
 
     if (file_exists($image_path)) {
-        $pdf->Image($image_path, 15, 140, 75);
+        $pdf->Image($image_path, 15, 130, 75);
     } else {
-        $pdf->Image($pdf->default_image, 15, 140, 75);
+        $pdf->Image($pdf->default_image, 15, 130, 75);
     }
 
     $pdf->SetDrawColor(200, 200, 200);
-    $pdf->Rect(15, 210, 185, 49, 'FD');
-    $pdf->SetFont('Arial', 'BU', 23);
+    $pdf->Rect(15, 205, 185.5, 33, 'FD');
+    $pdf->SetFont('Arial', 'BU', 18);
     $pdf->SetTextColor(100, 100, 100);
-    $pdf->Text(16.5, 222, $featured_title);
+    $pdf->Text(18, 213, $featured_title);
     $pdf->SetTextColor(0, 77, 115);
-    $pdf->SetFont('Arial', 'B', 32);
-    $pdf->Text(16.5, 235, ($featured_adviser['name'] ?? null));
-    $pdf->SetTextColor(115, 146, 161);
     $pdf->SetFont('Arial', 'B', 27);
-    $pdf->Text(16.5, 245, (isset($featured_adviser['issued_api']) ? ('$' . number_format($featured_adviser['issued_api'], 2) . ' Issued API') : null));
+    $pdf->Text(18, 225, ($featured_adviser['name'] ?? null));
+    $pdf->SetTextColor(115, 146, 161);
+    $pdf->SetFont('Arial', 'B', 22);
+    $pdf->Text(18, 235, (isset($featured_adviser['issued_api']) ? ('$' . number_format($featured_adviser['issued_api'], 2) . ' Issued API') : null));
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->SetFont('Arial', 'B', 15);
-    $pdf->Text(16.5, 255, $magazine_data->pages[0]['page']);
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetY(228);
+    $pdf->SetX(0);
+    $pdf->Cell(198, 10, $magazine_data->pages[0]['page'], 0, 0, 'R');
+
+    // Disclaimer
+    if($magazine_data->disclaimer){
+        $pdf->SetFont('Arial', '', 7);
+        $pdf->SetXY(14, $pdf->GetPageHeight() - 37);
+        $pdf->MultiCell(187, 3, 'DISCLAIMER: ' . $magazine_data->disclaimer);
+    }
 
     if (! empty($magazine_data->message)) {
         $pdf->MessagePage($magazine_data->message);

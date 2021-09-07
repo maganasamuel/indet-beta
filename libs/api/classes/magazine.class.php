@@ -4363,7 +4363,7 @@ class Magazine extends Database
         ];
 
         return collect($winner_score)->sortBy(function ($item) use ($scores) {
-            return $scores[$item['scores']];
+            return $scores[$item['scores'] ?? null] ?? null;
         })->all();
     }
 

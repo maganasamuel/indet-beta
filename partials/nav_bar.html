@@ -64,7 +64,7 @@
             Staff
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Advisers</a>
               <ul class="dropdown-menu">
@@ -92,9 +92,9 @@
         </li>
         <?php
         }
-        
+
         if($_SESSION['myusertype']=="Admin"||$_SESSION['myusertype']=="User"){
-      
+
       ?>
         <!--ADMIN ONLY -->
 
@@ -119,7 +119,7 @@
       ?>
 
         <?php if($_SESSION['myusertype']=="User"){ ?>
-          
+
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
             Client Data
@@ -131,15 +131,16 @@
           </ul>
         </li>
         <li></li>
-        
+
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
             Deals
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
+            <!-- <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
             <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
-            <li><a href="arrear_deals" class='mw'>Arrears Deals</a></li>
+            <li><a href="arrear_deals" class='mw'>Arrears Deals</a></li> -->
+            <li><a href="arrears_tracker" class="mw">Arrears Tracker</a></li>
           </ul>
         </li>
 
@@ -149,7 +150,7 @@
             Create Report
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-             
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
               <ul class="dropdown-menu">
@@ -191,7 +192,7 @@
             Deals
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Insurance</a>
               <ul class="dropdown-menu">
@@ -200,6 +201,7 @@
                   <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
                   <li><a href="arrear_deals" class='mw'>Arrears Deals</a></li>
                   <li><a href="cancelled_deals" class='mw'>Cancelled Deals</a></li>
+                  <li><a href="arrears_tracker" class="mw">Arrears Tracker</a></li>
                 </li>
               </ul>
             </li>
@@ -215,7 +217,7 @@
                 </li>
               </ul>
             </li>
-            
+
             <li><a href="create_send_issued_client_data_request" class='mw'>Send Issued Client Profile</a></li>
           </ul>
         </li>
@@ -232,7 +234,7 @@
             Create Report
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
               <ul class="dropdown-menu">
@@ -243,7 +245,7 @@
                 </li>
               </ul>
             </li>
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
               <ul class="dropdown-menu">
@@ -254,7 +256,7 @@
               </ul>
             </li>
 
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
               <ul class="dropdown-menu">
@@ -275,7 +277,7 @@
             Reports
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
               <ul class="dropdown-menu">
@@ -286,7 +288,7 @@
                 </li>
               </ul>
             </li>
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
               <ul class="dropdown-menu">
@@ -306,7 +308,7 @@
                 </li>
               </ul>
             </li>
-            
+
             <!--
               <li><a href="deal_tracker_summaries" class='mw'>Deal Tracker Summaries</a></li>
           -->
@@ -319,7 +321,7 @@
           <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span> Others
             <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Telemarketing App</a>
               <ul class="dropdown-menu">
@@ -334,7 +336,7 @@
                 </li>
               </ul>
             </li>
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Magazine</a>
               <ul class="dropdown-menu">
@@ -345,7 +347,7 @@
                 </li>
               </ul>
             </li>
-            
+
             <li class="dropdown dropdown-submenu">
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">HTML Emails</a>
               <ul class="dropdown-menu">
@@ -391,7 +393,7 @@
         <?php
             if($_SESSION['myusertype']=="Admin"){
           ?>
-          
+
 
         <?php
           }
@@ -406,8 +408,8 @@
   $(function () {
 
     $('ul.dropdown-menu [data-toggle=dropdown]').on('click', function(event) {
-			event.preventDefault(); 
-			event.stopPropagation(); 
+			event.preventDefault();
+			event.stopPropagation();
 			$(this).parent().siblings().removeClass('open');
 			$(this).parent().toggleClass('open');
 		});

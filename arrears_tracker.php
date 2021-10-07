@@ -181,11 +181,11 @@ class arrears_tracker
                                     <?php foreach ($this->listArrearDeals() as $arrear) { ?>
                                         <tr>
                                             <td><?php echo $arrear->client_name; ?></td>
-                                            <td><?php echo $arrear->company; ?></td>
-                                            <td><?php echo $arrear->policy_number; ?></td>
-                                            <td><?php echo $arrear->arrear_status; ?></td>
+                                            <td class="text-nowrap"><?php echo $arrear->company; ?></td>
+                                            <td class="text-nowrap"><?php echo $arrear->policy_number; ?></td>
+                                            <td class="text-nowrap"><?php echo $arrear->arrear_status; ?></td>
                                             <td><?php echo $arrear->arrear_notes; ?></td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 <button type="button" class="btn-edit btn btn-warning" data-client_id="<?php echo $arrear->client_id; ?>" data-key="<?php echo $arrear->key; ?>" data-toggle="tooltip" title="Edit"><span class="glyphicon glyphicon-pencil"></span></button>
                                                 <button type="button" class="btn-delete btn btn-danger" data-client_id="<?php echo $arrear->client_id; ?>" data-key="<?php echo $arrear->key; ?>" data-toggle="tooltip" title="Delete"><span class="glyphicon glyphicon-trash"></span></button>
                                             </td>
@@ -223,6 +223,8 @@ class arrears_tracker
                         formUpdate = true;
                         oldClientId = $(this).data('client_id');
                         oldKey = $(this).data('key');
+
+                        $('#formModalTitle').text('Edit Policy');
 
                         $.get('arrears_tracker', {
                             action: 'show',

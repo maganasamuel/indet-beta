@@ -459,7 +459,7 @@ $pdf->Cell(18, 10, count($report_data->kiwisaver_deals), '0', '1', 'L');
 if (count($report_data->issued_deals) > 0) {
 
     //Space
-    AddLineSpace($pdf);
+    // AddLineSpace($pdf); // this causes an extra blank space
 	$pdf->AddPage();
 
     //Production

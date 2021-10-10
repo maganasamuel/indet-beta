@@ -88,7 +88,7 @@ $("#datefrom").datepicker(
 $("#datefrom").on('change',function(){
 	var $this=$(this).val();
 	var m=parseInt($this.substr(3,2));
-	var month=m-1;	
+	var month=m-1;
 	var year=parseInt($this.substr(6,4));
 	var ifday=parseInt($this.substr(0,2));
 	var pay_day = 0;
@@ -104,7 +104,7 @@ $("#datefrom").on('change',function(){
 		var ld=lastday(year,month)+'/'+n(m)+'/'+year;
 		var next_month = m + 1;
 		var next_year = year;
-		
+
 		if(next_month>12){
 			console.log("Next Month:" + next_month);
 			next_month=1;
@@ -118,15 +118,15 @@ $("#datefrom").on('change',function(){
 	else{
 		//Second Half
 		var ld='15'+'/'+n(m)+'/'+year;
-		
-		
+
+
 		var pd = '21'+'/'+n(m)+'/'+year;
 		$('#dateuntil').val(ld);
 		$('#pay_date').val(pd);
 	}
 
 
-}); 
+});
 
 function n(n){
     return n > 9 ? "" + n: "0" + n;
@@ -159,9 +159,9 @@ console.log(date_from + ":" + until);
 		data:{adv_name:adv_name,
 			adviser_id:adviser_id,
 			date_from:date_from,
-			invoice_date:invoice_date, 
+			invoice_date:invoice_date,
 			pay_date:pay_date,
-			notes:notes, 
+			notes:notes,
 			until:until},
 		url:"deal_tracker_preview.php",
 		success:function(e){
@@ -179,7 +179,7 @@ console.log(date_from + ":" + until);
 					type:'POST',
 					url:"save_deal_tracker_report.php",
 				beforeSend:function(){
-					
+
 				},
 				success:function(x){
 					console.log(x);
@@ -190,7 +190,7 @@ console.log(date_from + ":" + until);
 					        Ok: function () {
 									console.log(x);
 						   			window.location='create_deal_tracker_report.php';
-						        },	 
+						        },
 					    	}
 						});
 				}
@@ -235,7 +235,7 @@ console.log(date_from + ":" + until);
  if (!$con) {
         echo "<div>";
         echo "Failed to connect to MySQL: " . mysqli_connect_error();
-	    echo "</div>";	
+	    echo "</div>";
 }
 
 ?>
@@ -250,7 +250,7 @@ console.log(date_from + ":" + until);
 	    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
 	    <select name="adviser_id" class="form-control" id="adviser_id" required />
 		  <option value="" disabled selected>Select Adviser</option>
-			<?php 
+			<?php
 				$query = "SELECT id,name FROM adviser_tbl ORDER BY name asc";
 				$displayquery=mysqli_query($con,$query) or die('Could not look up user information; ' . mysqli_error($con));
 				WHILE($rows = mysqli_fetch_array($displayquery)){
@@ -312,7 +312,7 @@ console.log(date_from + ":" + until);
 </div>
 
 <div id="notes_div">
-	
+
 </div>
 
 

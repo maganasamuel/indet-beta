@@ -459,11 +459,10 @@ $pdf->Cell(18, 10, count($report_data->kiwisaver_deals), '0', '1', 'L');
 if (count($report_data->issued_deals) > 0) {
 
     //Space
-    if($pdf->PageNo() > 1){
+    if ($pdf->PageNo() > 1) {
         AddLineSpace($pdf);
-
-    }else{
-	    $pdf->AddPage();
+    } else {
+        $pdf->AddPage();
     }
 
     //Production
@@ -525,7 +524,7 @@ if (count($report_data->issued_deals) > 0) {
                 $source,
                 NZEntryToDateTime($date),
                 '$' . number_format($api, 2),
-				$deal['record_keeping'] ?? '',
+                $deal['record_keeping'] ?? '',
                 $compliance_status,
                 $audit_status,
                 str_replace('<br>', "\r\n", $notes),
@@ -547,7 +546,15 @@ if (count($report_data->issued_deals) > 0) {
 if (count($report_data->cancelled_deals) > 0) {
 
     //Space
-    AddLineSpace($pdf);
+    if (! count($report_data->issued_deals)) {
+        if ($pdf->PageNo() > 1) {
+            AddLineSpace($pdf);
+        } else {
+            $pdf->AddPage();
+        }
+    } else {
+        AddLineSpace($pdf);
+    }
 
     //Clawbacks
     $pdf->SetFont('Helvetica', 'B', 14);

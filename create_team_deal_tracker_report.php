@@ -149,7 +149,7 @@ if (!isset($_SESSION["myusername"])) {
 						url: "team_deal_tracker_preview.php",
 						beforeSend: function(){
 							$("#create_spinner").show();
-						},	
+						},
 						success: function(e) {
 							$("#create_spinner").hide();
 							var mydata = JSON.stringify(e);
@@ -214,7 +214,7 @@ if (!isset($_SESSION["myusername"])) {
 
 			<!--label-->
 			<div class="jumbotron">
-				<h2 class="slide">Create Team Deal Tracker Report</h2>
+				<h2 class="slide">Create Team Policy Tracker Report</h2>
 			</div>
 			<!--label end-->
 
@@ -290,7 +290,7 @@ if (!isset($_SESSION["myusername"])) {
 						<div class="col-sm-2 center">
 
 							<button type="button" class="btn btn-danger center form-control" id='create' style="margin-top:30px;"> <i id="create_spinner" class="fas fa-spinner fa-spin" style="display:none;"></i> Create Report</button>
-							
+
 						</div>
 					</div>
 			</form>
@@ -304,7 +304,7 @@ if (!isset($_SESSION["myusername"])) {
 						<div class="modal-content">
 							<div class="modal-header">
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
-								<h2 class="modal-title" style="float: left;">Deals Report Preview</h2>
+								<h2 class="modal-title" style="float: left;">Policy Report Preview</h2>
 							</div>
 							<div class="modal-body">
 

@@ -25,7 +25,7 @@ class PDF extends PDF_MC_Table
         $this->Rect(5, 342, 330, .5, 'FD');
         $this->SetFont('Helvetica', '', 10);
         $this->SetTextColor(0, 0, 0);
-        $this->Cell(100, 10, 'Deal Tracker-' . $name, 0, 0, 'L');
+        $this->Cell(100, 10, 'Policy Tracker-' . $name, 0, 0, 'L');
         $this->AliasNbPages('{totalPages}');
         $this->Cell(248, 10, 'Page ' . $this->PageNo() . ' of ' . '{totalPages}', 0, 1, 'R');
     }
@@ -330,7 +330,7 @@ $pdf->AddPage();
 
 $pdf->SetFillColor(224, 224, 224);
 $pdf->SetFont('Helvetica', 'B', 20);
-$pdf->Cell(330, 10, 'Deal Tracker', '0', '1', 'C', 'true');
+$pdf->Cell(330, 10, 'Policy Tracker', '0', '1', 'C', 'true');
 
 $pdf->SetFont('Helvetica', 'B', 15);
 $pdf->Cell(17, 10, 'Name:', '0', '0', 'L');

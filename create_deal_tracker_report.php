@@ -226,7 +226,7 @@ console.log(date_from + ":" + until);
 
 <!--label-->
   <div class="jumbotron">
-    <h2 class="slide">Create Deal Tracker Report</h2>
+    <h2 class="slide">Create Policy Tracker Report</h2>
 </div>
 <!--label end-->
 
@@ -332,7 +332,7 @@ console.log(date_from + ":" + until);
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h2 class="modal-title" style="float: left;">Deals Report Preview</h2>
+          <h2 class="modal-title" style="float: left;">Policy Report Preview</h2>
         </div>
         <div class="modal-body">
 

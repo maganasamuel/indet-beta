@@ -3,8 +3,7 @@
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-        aria-expanded="false" aria-controls="navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -69,322 +68,323 @@
               <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Advisers</a>
               <ul class="dropdown-menu">
                 <li>
-                  <li><a href="advisers" class='mw'>Adviser Profiles</a></li>
-                  <li><a href="teams" class='mw'>Teams (ADR)</a></li>
-                  <li><a href="steams" class='mw'>Teams (SADR)</a></li>
-                </li>
-              </ul>
-            </li>
-
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Lead Generators</a>
-              <ul class="dropdown-menu">
-                <li><li><a href="lead_generator_profiles?type=Face-to-Face Marketer" class='mw'>Face to Face Profiles</a></li>
-                <li><a href="lead_generator_profiles?type=Telemarketer" class='mw'>Telemarketer Profiles</a></li>
-                </li>
-              </ul>
-            </li>
-
-            <li>
-              <a href="personal_data" class='mw'>Personal Data</a>
+                <li><a href="advisers" class='mw'>Adviser Profiles</a></li>
+                <li><a href="teams" class='mw'>Teams (ADR)</a></li>
+                <li><a href="steams" class='mw'>Teams (SADR)</a></li>
             </li>
           </ul>
         </li>
-        <?php
+
+        <li class="dropdown dropdown-submenu">
+          <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Lead Generators</a>
+          <ul class="dropdown-menu">
+            <li>
+            <li><a href="lead_generator_profiles?type=Face-to-Face Marketer" class='mw'>Face to Face Profiles</a></li>
+            <li><a href="lead_generator_profiles?type=Telemarketer" class='mw'>Telemarketer Profiles</a></li>
+        </li>
+      </ul>
+      </li>
+
+      <li>
+        <a href="personal_data" class='mw'>Personal Data</a>
+      </li>
+      </ul>
+      </li>
+      <?php
         }
 
         if($_SESSION['myusertype']=="Admin"||$_SESSION['myusertype']=="User"){
 
       ?>
-        <!--ADMIN ONLY -->
+      <!--ADMIN ONLY -->
 
-        <?php
+      <?php
         if($_SESSION['myusertype']=="Admin"){
       ?>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>
-            Clients
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="clients" class='mw'>Clients Profiles</a></li>
-            <li><a href="annual_reviews" class='mw'>Annual Reviews</a></li>
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>
+          Clients
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="clients" class='mw'>Clients Profiles</a></li>
+          <li><a href="annual_reviews" class='mw'>Annual Reviews</a></li>
 
-            <li><a href="clients_bin" class='mw'>Clients Bin</a></li>
-            <li><a href="create_send_client_data_request" class='mw'>Send Client Data</a></li>
+          <li><a href="clients_bin" class='mw'>Clients Bin</a></li>
+          <li><a href="create_send_client_data_request" class='mw'>Send Client Data</a></li>
 
-          </ul>
-        </li>
-        <?php
+        </ul>
+      </li>
+      <?php
         }
       ?>
 
-        <?php if($_SESSION['myusertype']=="User"){ ?>
+      <?php if($_SESSION['myusertype']=="User"){ ?>
 
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
-            Client Data
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="clients" class='mw'>Client Profiles</a></li>
-            <li><a href="do_not_calls" class='mw'>Do Not Calls</a></li>
-            <li><a href="leads_data" class='mw'>Leads Data </a></li>
-          </ul>
-        </li>
-        <li></li>
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
+          Client Data
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="clients" class='mw'>Client Profiles</a></li>
+          <li><a href="do_not_calls" class='mw'>Do Not Calls</a></li>
+          <li><a href="leads_data" class='mw'>Leads Data </a></li>
+        </ul>
+      </li>
+      <li></li>
 
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
-            Deals
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <!-- <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
+          Deals
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <!-- <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
             <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
             <li><a href="arrear_deals" class='mw'>Arrears Deals</a></li> -->
-            <li><a href="arrears_tracker" class="mw">Arrears Tracker</a></li>
-          </ul>
-        </li>
+          <li><a href="arrears_tracker" class="mw">Arrears Tracker</a></li>
+        </ul>
+      </li>
 
 
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-pencil"></span>
-            Create Report
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-pencil"></span>
+          Create Report
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_lead_gen_report" class='mw'>Create Lead Gen Report</a></li>
-                </li>
-                <li><a href="create_magazine" class='mw'>Create Magazine</a></li>
-              </ul>
-            </li>
+          <li class="dropdown dropdown-submenu">
+            <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+            <ul class="dropdown-menu">
+              <li>
+              <li><a href="create_lead_gen_report" class='mw'>Create Lead Gen Report</a></li>
+          </li>
+          <li><a href="create_magazine" class='mw'>Create Magazine</a></li>
+        </ul>
+      </li>
 
-          </ul>
-        </li>
+      </ul>
+      </li>
 
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list-alt"></span>
-            Reports
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list-alt"></span>
+          Reports
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="lead_gen_reports" class='mw'>Lead Gen Reports</a></li>
-                </li>
-                <li><a href="magazines" class='mw'>Magazines</a></li>
-                <li><a href="records_to_beat" class='mw'>Record-Breakers</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <?php
+          <li class="dropdown dropdown-submenu">
+            <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+            <ul class="dropdown-menu">
+              <li>
+              <li><a href="lead_gen_reports" class='mw'>Lead Gen Reports</a></li>
+          </li>
+          <li><a href="magazines" class='mw'>Magazines</a></li>
+          <li><a href="records_to_beat" class='mw'>Record-Breakers</a></li>
+        </ul>
+      </li>
+      </ul>
+      </li>
+      <?php
         }
       }
             if($_SESSION['myusertype']=="Admin"){
           ?>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
-            Deals
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-briefcase"></span>
+          Deals
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Insurance</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
-                  <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
-                  <li><a href="arrear_deals" class='mw'>Arrears</a></li>
-                  <li><a href="cancelled_deals" class='mw'>Cancelled</a></li>
-                  <li><a href="arrears_tracker" class="mw">Arrears Tracker</a></li>
-                </li>
-              </ul>
-            </li>
+          <li class="dropdown dropdown-submenu">
+            <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Insurance</a>
+            <ul class="dropdown-menu">
+              <li>
+              <li><a href="submission_client_profiles" class='mw'>Submission Clients Profiles</a></li>
+              <li><a href="issued_client_profiles" class='mw'>Issued Clients Profiles</a></li>
+              <li><a href="arrear_deals" class='mw'>Arrears</a></li>
+              <li><a href="cancelled_deals" class='mw'>Cancelled</a></li>
+              <li><a href="arrears_tracker" class="mw">Arrears Tracker</a></li>
+          </li>
+        </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">KiwiSaver</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a href="kiwisavers" class='mw'>KiwiSaver Clients Profiles</a>
-                </li>
-                <li>
-                  <a href="kiwisaver_deals" class='mw'>KiwiSaver Deals</a>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">KiwiSaver</a>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="kiwisavers" class='mw'>KiwiSaver Clients Profiles</a>
+          </li>
+          <li>
+            <a href="kiwisaver_deals" class='mw'>KiwiSaver Deals</a>
+          </li>
+        </ul>
+      </li>
 
-            <li><a href="create_send_issued_client_data_request" class='mw'>Send Issued Client Profile</a></li>
-          </ul>
-        </li>
+      <li><a href="create_send_issued_client_data_request" class='mw'>Send Issued Client Profile</a></li>
+      </ul>
+      </li>
 
-        <?php
+      <?php
           }
         ?>
-        <!--ADMIN ONLY -->
-        <?php
+      <!--ADMIN ONLY -->
+      <?php
         if($_SESSION['myusertype']=="Admin"){
       ?>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-pencil"></span>
-            Create Report
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-pencil"></span>
+          Create Report
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_invoice" class='mw'>Create Invoice</a></li>
-                  <li><a href="create_summary" class='mw'>Create Invoice Summary</a></li>
-                  <li><a href="create_customized_invoice" class='mw'>Create Customized Invoice</a></li>
-                </li>
-              </ul>
-            </li>
+          <li class="dropdown dropdown-submenu">
+            <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
+            <ul class="dropdown-menu">
+              <li>
+              <li><a href="create_invoice" class='mw'>Create Invoice</a></li>
+              <li><a href="create_summary" class='mw'>Create Invoice Summary</a></li>
+              <li><a href="create_customized_invoice" class='mw'>Create Customized Invoice</a></li>
+          </li>
+        </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_production_report" class='mw'>Create Adviser Report</a></li>
-                  <li><a href="create_lead_gen_report" class='mw'>Create Lead Gen Report</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="create_production_report" class='mw'>Create Adviser Report</a></li>
+          <li><a href="create_lead_gen_report" class='mw'>Create Lead Gen Report</a></li>
+      </li>
+      </ul>
+      </li>
 
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_deal_tracker_report" class='mw'>Create Policy Tracker Report</a></li>
-                  <li><a href="create_team_deal_tracker_report" class='mw'>Create Policy Tracker Summary Report</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="create_deal_tracker_report" class='mw'>Create Policy Tracker Report</a></li>
+          <li><a href="create_team_deal_tracker_report" class='mw'>Create Policy Tracker Summary Report</a></li>
+      </li>
+      </ul>
+      </li>
 
-            <li><a href="create_client_data_report" class='mw'>Create Client Data Report</a></li>
-            <li><a href="issued_policies_list" class='mw'>Issued Policies List</a></li>
-          </ul>
-        </li>
+      <li><a href="create_client_data_report" class='mw'>Create Client Data Report</a></li>
+      <li><a href="issued_policies_list" class='mw'>Issued Policies List</a></li>
+      </ul>
+      </li>
 
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list-alt"></span>
-            Reports
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list-alt"></span>
+          Reports
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="invoices" class='mw'>Invoices</a></li>
-                  <li><a href="summaries" class='mw'>Invoice Summaries</a></li>
-                  <li><a href="customized_invoices" class='mw'>Customized Invoices</a></li>
-                </li>
-              </ul>
-            </li>
+          <li class="dropdown dropdown-submenu">
+            <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Billing</a>
+            <ul class="dropdown-menu">
+              <li>
+              <li><a href="invoices" class='mw'>Invoices</a></li>
+              <li><a href="summaries" class='mw'>Invoice Summaries</a></li>
+              <li><a href="customized_invoices" class='mw'>Customized Invoices</a></li>
+          </li>
+        </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="deals_reports" class='mw'>Adviser Reports</a></li>
-                  <li><a href="lead_gen_reports" class='mw'>Lead Gen Reports</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Performance</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="deals_reports" class='mw'>Adviser Reports</a></li>
+          <li><a href="lead_gen_reports" class='mw'>Lead Gen Reports</a></li>
+      </li>
+      </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="deal_tracker_reports" class='mw'>Deal Tracker Reports</a></li>
-                  <li><a href="team_deal_tracker_reports" class='mw'>Deal Tracker Summary Reports</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Deals</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="deal_tracker_reports" class='mw'>Deal Tracker Reports</a></li>
+          <li><a href="team_deal_tracker_reports" class='mw'>Deal Tracker Summary Reports</a></li>
+      </li>
+      </ul>
+      </li>
 
-            <!--
+      <!--
               <li><a href="deal_tracker_summaries" class='mw'>Deal Tracker Summaries</a></li>
           -->
-            <li><a href="client_databases" class='mw'>Client Database Reports</a></li>
-          </ul>
-        </li>
+      <li><a href="client_databases" class='mw'>Client Database Reports</a></li>
+      </ul>
+      </li>
 
 
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span> Others
-            <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span> Others
+          <span class="caret"></span></a>
+        <ul class="dropdown-menu">
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Telemarketing App</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="leads_data" class='mw'>Leads Data</a></li>
-                  <li><a href="products" class='mw'>Products</a></li>
-                  <li><a href="scripts" class='mw'>Scripts</a></li>
-                  <li><a href="script_groups" class='mw'>Script Groups</a></li>
-                  <li><a href="insurance_types" class='mw'>Insurance Types</a></li>
-                  <li><a href="insurance_companies" class='mw'>Insurance Companies</a></li>
-                  <li><a href="do_not_calls" class='mw'>Do Not Call</a></li>
-                </li>
-              </ul>
-            </li>
+          <li class="dropdown dropdown-submenu">
+            <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Telemarketing App</a>
+            <ul class="dropdown-menu">
+              <li>
+              <li><a href="leads_data" class='mw'>Leads Data</a></li>
+              <li><a href="products" class='mw'>Products</a></li>
+              <li><a href="scripts" class='mw'>Scripts</a></li>
+              <li><a href="script_groups" class='mw'>Script Groups</a></li>
+              <li><a href="insurance_types" class='mw'>Insurance Types</a></li>
+              <li><a href="insurance_companies" class='mw'>Insurance Companies</a></li>
+              <li><a href="do_not_calls" class='mw'>Do Not Call</a></li>
+          </li>
+        </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Magazine</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_magazine" class='mw'>Create Magazine</a></li>
-                  <li><a href="magazines" class='mw'>Magazines</a></li>
-                  <li><a href="records_to_beat" class='mw'>Record-Breakers</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">Magazine</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="create_magazine" class='mw'>Create Magazine</a></li>
+          <li><a href="magazines" class='mw'>Magazines</a></li>
+          <li><a href="records_to_beat" class='mw'>Record-Breakers</a></li>
+      </li>
+      </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">HTML Emails</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_html_email" class='mw'>Create HTML Email</a></li>
-                  <li><a href="html_emails" class='mw'>HTML Emails</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">HTML Emails</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="create_html_email" class='mw'>Create HTML Email</a></li>
+          <li><a href="html_emails" class='mw'>HTML Emails</a></li>
+      </li>
+      </ul>
+      </li>
 
-            <li class="dropdown dropdown-submenu">
-              <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">PDF Emails</a>
-              <ul class="dropdown-menu">
-                <li>
-                  <li><a href="create_bulk_email" class='mw'>Create PDF Email</a></li>
-                  <li><a href="bulk_emails" class='mw'>PDF Emails</a></li>
-                </li>
-              </ul>
-            </li>
+      <li class="dropdown dropdown-submenu">
+        <a href="#" class="mw dropdown-toggle" data-toggle="dropdown">PDF Emails</a>
+        <ul class="dropdown-menu">
+          <li>
+          <li><a href="create_bulk_email" class='mw'>Create PDF Email</a></li>
+          <li><a href="bulk_emails" class='mw'>PDF Emails</a></li>
+      </li>
+      </ul>
+      </li>
 
-            <li>
-              <a href="bin_entries" class='mw'> Bin Entries </a>
-            </li>
-            <li>
-              <a href="users" class='mw'>User Accounts</a>
-            </li>
-            <li>
-              <a href="settings" class='mw'> Account Settings</a>
-            </li>
-          </ul>
-        </li>
-        <?php
+      <li>
+        <a href="bin_entries" class='mw'> Bin Entries </a>
+      </li>
+      <li>
+        <a href="users" class='mw'>User Accounts</a>
+      </li>
+      <li>
+        <a href="settings" class='mw'> Account Settings</a>
+      </li>
+      </ul>
+      </li>
+      <?php
         }
       ?>
-        <!--ADMIN ONLY -->
+      <!--ADMIN ONLY -->
 
-        <li><a href="index"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      <li><a href="index"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
       </ul>
 
       <!--
@@ -407,12 +407,12 @@
 <script type="text/javascript">
   $(function () {
 
-    $('ul.dropdown-menu [data-toggle=dropdown]').on('click', function(event) {
-			event.preventDefault();
-			event.stopPropagation();
-			$(this).parent().siblings().removeClass('open');
-			$(this).parent().toggleClass('open');
-		});
+    $('ul.dropdown-menu [data-toggle=dropdown]').on('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      $(this).parent().siblings().removeClass('open');
+      $(this).parent().toggleClass('open');
+    });
 
     $('.a').click(function (e) {
       e.preventDefault();

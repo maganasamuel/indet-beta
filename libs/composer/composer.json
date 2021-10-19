@@ -1,6 +1,7 @@
 {
 	"require": {
 		"tightenco/collect": "^8.34",
-		"nesbot/carbon": "^2.50"
+		"nesbot/carbon": "^2.50",
+		"coolpraz/php-blade": "^0.1.0"
 	}
 }

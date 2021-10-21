@@ -8,25 +8,26 @@ if (false === strpos($_SERVER['REQUEST_URI'], '?')) {
         if (! isset($restrict_session_check)) {
             if (isset($_SESSION['myusertype'])) {
                 include_once('user_checker.php');
-            }
+            } ?>
+            <script>
+                window.addEventListener('load', function(){
+                    $(function(){
+                        function session_check(){
+                            $.get('session_check.php',function(data){
+                                console.log('Session Checked. ' + data);
 
-            echo "
-				<script>
-				$(function(){
+                                if(data=='SESSION INACTIVE'){
+                                    console.debug('Session Expired, logging out.');
+                                    window.location.replace('index.php');
+                                }
+                            });
+                        };
 
-				function session_check(){
-				$.get('session_check.php',function(data){
-				console.log('Session Checked. ' + data);
-				if(data=='SESSION INACTIVE'){
-				console.debug('Session Expired, logging out.');
-				window.location.replace('index.php');
-				}
-				});
-				};
-				window.setInterval(function(){ session_check() }, 5000);
-				});
-				</script>
-				";
+                        window.setInterval(function(){ session_check() }, 5000);
+                    });
+                });
+            </script>
+            <?php
         }
     }
 }

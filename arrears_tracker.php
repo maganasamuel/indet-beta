@@ -406,7 +406,7 @@ class arrears_tracker
         }
 
         return $collection
-            ->whereNotNull('client_id')
+            ->where('client_id', '!=', null)
             ->sortBy('client_name');
     }
 
@@ -425,7 +425,7 @@ class arrears_tracker
     public function listArrearDeals()
     {
         return $this->listDeals()
-            ->whereNotNull('arrear_status')
+            ->where('arrear_status', '!=', null)
             ->values()
             ->all();
     }

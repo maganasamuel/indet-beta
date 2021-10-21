@@ -8,6 +8,20 @@
     <link id="favicon" rel="icon" href="Logo_ImageOnly.png" type="image/png" sizes="16x16">
     <title>INDET | Advisers</title>
 
+    <style>
+        .td-notes {
+            width: 100%;
+            text-align: left;
+        }
+
+        .td-action {
+            width: 0%;
+            white-space: nowrap;
+            vertical-align: top !important;
+        }
+
+    </style>
+
     <script>
         var table = null;
     </script>
@@ -25,13 +39,42 @@
                 });
 
                 $('#advisers_table').dataTable({
+                    "columns": [{}, {}, {}, {}, {}, {}, {},
+                        {
+                            render: function(data, type, row) {
+                                return '<input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" data-toggle="tooltip" title="Edit Adviser Profile" value="' +
+                                    row[0] + '">';
+                            }
+                        },
+                        {
+                            render: function(data, type, row) {
+                                return `
+                                    <a href="adviser_profile.php?id=` + row[0] + `" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile">
+                                        <i class="fas fa-search"></i>
+                                    </a>
+                                    &nbsp;
+                                    <button type="button" class="btn btn-primary btn-view-notes" data-id="` + row[0] + `" data-name="` + row[1] + `" data-toggle="tooltip" title="View Notes">
+                                        <i class="far fa-file-alt"></i>
+                                    </button>
+                                    &nbsp;
+                                    <a href="adviser_strings.php?adviser_id=` + row[0] + `">View Strings</i></a>
+                                `;
+                            }
+                        },
+                    ],
                     "order": [
-                        [0, "asc"]
+                        [1, "asc"]
                     ],
                     "columnDefs": [{
-                        "targets": [1, 2],
-                        "orderable": true
-                    }]
+                            "targets": [2, 3],
+                            "orderable": true
+                        },
+                        {
+                            "targets": [0],
+                            "visible": false,
+                            "searchable": false,
+                        }
+                    ]
                 });
 
                 table = $("#advisers_table").DataTable();
@@ -57,6 +100,7 @@
             <br>
             <table id='advisers_table' data-toggle="table" class="table table-striped " cellpadding="5px" cellspacing="5px" width='95%' style=" display: block; overflow-x: auto; white-space: nowrap;">
                 <thead>
+                    <td>&nbsp;</td>
                     <td>Adviser Name</td>
                     <td>Adviser FSP number</td>
                     <td>Adviser Address</td>
@@ -76,20 +120,15 @@
                 <tbody id="advisers-list">
                     @while ($rows = $advisers->fetch_assoc())
                         <tr id="adviser{{ $rows['id'] }}" cellpadding='5px' cellspacing='5px'>
+                            <td>{{ $rows['id'] }}</td>
                             <td>{{ $rows['name'] }}</td>
                             <td>{{ $rows['fsp_num'] }}</td>
                             <td>{{ $rows['address'] }}</td>
                             <td>{{ $rows['email'] }}</td>
                             <td>{{ $rows['leads'] }}</td>
                             <td>{{ $rows['bonus'] }}</td>
-                            <td>
-                                <input data-toggle="modal" data-target="#myModal" type="image" class="open-modal" src="edit.png" data-toggle="tooltip" title="Edit Adviser Profile" value="{{ $rows['id'] }}">
-                            </td>
-                            <td>
-                                <a href="adviser_profile.php?id={{ $rows['id'] }}" class="btn btn-primary" data-toggle="tooltip" title="View Adviser Profile"><i class="fas fa-search"></i></a>
-                                &nbsp;
-                                <a href="adviser_strings.php?adviser_id={{ $rows['id'] }}">View Strings</i></a>
-                            </td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     @endwhile
                 </tbody>
@@ -97,7 +136,6 @@
         </div>
 
         <!-- Modals Editor -->
-
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -337,6 +375,88 @@
             </div>
         </div>
         <!-- End of Confirm Delete -->
+
+        {{-- Notes Modal --}}
+        <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalTitle">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="notesModalTitle">Adviser Notes</h4>
+                    </div>
+                    <div class="modal-body text-left">
+                        <form id="notesForm" class="form-inline" style="margin-top: 0;">
+                            <input type="hidden" id="notes_adviser_id" name="adviser_id" />
+                            <div class="row">
+                                <div class="form-group col-sm-9">
+                                    <textarea id="notes" name="notes" class="form-control" rows="5" placeholder="Notes..." required="true" style="width: 100%;"></textarea>
+                                </div>
+                                <div class="col-sm-3">
+                                    <button type="submit" class="btn btn-primary" style="vertical-align: top;">Add Notes</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div>
+                            <table id="notesTable" data-toggle="table" class="table table-striped " cellpadding="5px" cellspacing="5px" style="width: 95%;">
+                                <thead>
+                                    <tr>
+                                        <td>ID</td>
+                                        <td>Notes</td>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="updateNotesModal" tabindex="-1" role="dialog" aria-labelledby="updateNotesModalTitle">
+            <div class="modal-dialog" role="document">
+                <form id="updateNotesForm" class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="updateNotesModalTitle">Update Notes</h4>
+                    </div>
+                    <div class="modal-body text-left">
+                        <input type="hidden" id="update_id" name="id" />
+                        <input type="hidden" id="update_adviser_id" name="adviser_id" />
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <textarea id="update_notes" name="notes" class="form-control" rows="5" placeholder="Notes..." required="true" style="width: 100%;"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteNotesModal" tabindex="-1" role="dialog" aria-labelledby="deleteNotesModalTitle">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="deleteNotesModalTitle">Delete Notes</h4>
+                    </div>
+                    <div class="modal-body text-left">
+                        <input type="hidden" id="delete_id" name="id" />
+                        <div>Are you sure to delete this note?</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnDeleteNotes" class="btn btn-primary">Yes</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @include('advisers.script')
 </body>
 
 </html>

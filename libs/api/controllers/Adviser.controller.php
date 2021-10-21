@@ -1,42 +1,43 @@
 <?php
 
 /**
-@name: Question.controller.php
-@author: Jesse
-@desc:
-	Serves as the API of the users
-    This page handles all asynchronous javascript request from the above mentioned page
-    
-@returnType:
-	JSON
+ * @name: Question.controller.php
+ * @author: Jesse
+ * @desc:
+ * Serves as the API of the users
+ * This page handles all asynchronous javascript request from the above mentioned page
+ *
+ * @returnType:
+ * JSON
  */
-if (!isset($_SESSION)) {
+if (! isset($_SESSION)) {
     session_start();
 }
 
-if (file_exists("api/classes/database.class.php"))
-    include_once("api/classes/database.class.php");
-elseif (file_exists("libs/api/classes/database.class.php"))
-    include_once("libs/api/classes/database.class.php");
-elseif (file_exists("classes/database.class.php"))
-    include_once("classes/database.class.php");
-elseif (file_exists("../classes/database.class.php"))
-    include_once("../classes/database.class.php");
+if (file_exists('api/classes/database.class.php')) {
+    include_once('api/classes/database.class.php');
+} elseif (file_exists('libs/api/classes/database.class.php')) {
+    include_once('libs/api/classes/database.class.php');
+} elseif (file_exists('classes/database.class.php')) {
+    include_once('classes/database.class.php');
+} elseif (file_exists('../classes/database.class.php')) {
+    include_once('../classes/database.class.php');
+}
 
-
-if (file_exists("indet_dates_helper.php"))
-    include_once("indet_dates_helper.php");
-elseif (file_exists("libs/indet_dates_helper.php"))
-    include_once("libs/indet_dates_helper.php");
-elseif (file_exists("../libs/indet_dates_helper.php"))
-    include_once("../libs/indet_dates_helper.php");
-elseif (file_exists("../../libs/indet_dates_helper.php"))
-    include_once("../../libs/indet_dates_helper.php");
+if (file_exists('indet_dates_helper.php')) {
+    include_once('indet_dates_helper.php');
+} elseif (file_exists('libs/indet_dates_helper.php')) {
+    include_once('libs/indet_dates_helper.php');
+} elseif (file_exists('../libs/indet_dates_helper.php')) {
+    include_once('../libs/indet_dates_helper.php');
+} elseif (file_exists('../../libs/indet_dates_helper.php')) {
+    include_once('../../libs/indet_dates_helper.php');
+}
 
 class AdviserController extends Database
 {
     /**
-        @desc: Init class
+     * @desc: Init class
      */
     public function __construct()
     {
@@ -45,11 +46,11 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Get all users
+     * @desc: Get all users
      */
     public function getAllAdvisers()
     {
-        $query = "Select * from adviser_tbl ORDER BY name";
+        $query = 'Select * from adviser_tbl ORDER BY name';
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -57,18 +58,19 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Get all users
+     * @desc: Get all users
      */
     public function getAllAdvisersOrderedByTerminationDate()
     {
-        $query = "Select * from adviser_tbl ORDER BY termination_date, name";
+        $query = 'Select * from adviser_tbl ORDER BY termination_date, name';
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         return $dataset;
     }
+
     /**
-		@desc: Get all users
+     * @desc: Get all users
      */
     public function getActiveAdvisers()
     {
@@ -80,11 +82,11 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Get all users
+     * @desc: Get all users
      */
     public function getExAdvisers()
     {
-        $date = date("Ymd");
+        $date = date('Ymd');
         $query = "Select * from adviser_tbl WHERE termination_date != '' AND termination_date <= '$date' ORDER BY name";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
@@ -93,28 +95,34 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Get all questions from the specified Question Set
+     * @desc: Get all questions from the specified Question Set
+     *
+     * @param mixed $id
      */
     public function getAdviser(
-        $id = 0    //
+        $id = 0
     ) {
         $query = "Select * from adviser_tbl WHERE id = $id LIMIT 1";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $dataset = $dataset->fetch_assoc();
+
         return $dataset;
     }
 
     /**
-		@desc: Get all questions from the specified Question Set
+     * @desc: Get all questions from the specified Question Set
+     *
+     * @param mixed $name
      */
     public function getAdviserFromPayroll(
-        $name = ""    //
+        $name = ''
     ) {
         $query = "Select * from adviser_tbl WHERE payroll_name = '$name' LIMIT 1";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $dataset = $dataset->fetch_assoc();
+
         return $dataset;
     }
 
@@ -132,22 +140,27 @@ class AdviserController extends Database
         while ($row = $dataset->fetch_assoc()) {
             extract($row);
             $status = $this->CheckTransactionStatus($status);
+
             switch ($status) {
-                case "Manual Billed Assigned Leads":
-                case "Billed Assigned Leads":
+                case 'Manual Billed Assigned Leads':
+                case 'Billed Assigned Leads':
                     $total_leads_payable += $number_of_leads;
+
                     break;
-                case "Manual Billed Issued Leads":
-                case "Billed Issued Leads":
+                case 'Manual Billed Issued Leads':
+                case 'Billed Issued Leads':
                     $total_issued_payable += $number_of_leads;
+
                     break;
-                case "Paid Issued Leads":
-                case "Waived Issued Leads":
-                case "Cancelled Issued Leads":
+                case 'Paid Issued Leads':
+                case 'Waived Issued Leads':
+                case 'Cancelled Issued Leads':
                     $total_issued_payable -= $number_of_leads;
+
                     break;
                 default:
                     $total_leads_payable -= $number_of_leads;
+
                     break;
             }
             //echo $status . " from " . $amount . "<hr>";
@@ -165,13 +178,13 @@ class AdviserController extends Database
     public function getInvoiceNumbersFromTransactions(
         $adviser_id = 0
     ) {
-        $invoices = array();
+        $invoices = [];
         $query = "SELECT DISTINCT LEFT(status, 13) as invoice_number FROM transactions WHERE adviser_id = '$adviser_id' AND LEFT(status,2) = 'EI'";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
         while ($row = $dataset->fetch_assoc()) {
-            $invoices[] = $row["invoice_number"];
+            $invoices[] = $row['invoice_number'];
         }
 
         return $invoices;
@@ -183,6 +196,7 @@ class AdviserController extends Database
         $query = "SELECT * FROM transactions WHERE adviser_id = '$adviser_id' ORDER BY date DESC";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
+
         return $dataset;
     }
 
@@ -194,6 +208,7 @@ class AdviserController extends Database
         $query = "SELECT * FROM transactions WHERE adviser_id = '$adviser_id' AND date <= '$date_to' AND date >='$date_from' ORDER BY date DESC";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
+
         return $dataset;
     }
 
@@ -232,64 +247,63 @@ class AdviserController extends Database
         $clientController = new ClientController();
 
         $tmp_assigned_date = $this->getAdviserOldestClient($adviser_id);
-        $date_from = isset($tmp_assigned_date["assigned_date"]) ? $tmp_assigned_date["assigned_date"] : null;
-        $until = date("Ymd");
+        $date_from = $tmp_assigned_date['assigned_date'] ?? null;
+        $until = date('Ymd');
 
         $summary_data = new stdClass();
 
         $summary_data->date_from = $date_from;
         $summary_data->date_to = $until;
-        $summary_data->invoices = array();
-        $summary_data->invoice_numbers = array();
-        $summary_data->invoices_in_range = array();
-        $summary_data->payable_invoices = array();
-        $summary_data->invoice_transaction_histories = array();
+        $summary_data->invoices = [];
+        $summary_data->invoice_numbers = [];
+        $summary_data->invoices_in_range = [];
+        $summary_data->payable_invoices = [];
+        $summary_data->invoice_transaction_histories = [];
         $summary_data->data = new stdClass();
         $summary_data->data->leads_payable = 0;
         $summary_data->data->issued_payable = 0;
-        $summary_data->valid_invoices = array();
+        $summary_data->valid_invoices = [];
         $summary_data->total_paid_assigned_leads = 0;
         $summary_data->total_paid_issued_leads = 0;
         $summary_data->total_billed_assigned_leads = 0;
         $summary_data->total_billed_issued_leads = 0;
-        $summary_data->leads = array();
-        $summary_data->issued = array();
-        $summary_data->invoice_numbers_list = array();
+        $summary_data->leads = [];
+        $summary_data->issued = [];
+        $summary_data->invoice_numbers_list = [];
 
         //Amendents
-        $summary_data->clients_amended = array();
-        $summary_data->issued_clients_amended = array();
+        $summary_data->clients_amended = [];
+        $summary_data->issued_clients_amended = [];
 
         //amendments variables
-        $summary_data->issued_clients = array();
+        $summary_data->issued_clients = [];
         $summary_data->amendments = 0;
         $summary_data->issued_amendments = 0;
         $summary_data->amendments_amount = 0;
         $summary_data->issued_amendments_amount = 0;
 
         //exempted variables
-        $summary_data->exempted_clients = array();
-        $summary_data->exempted_issued_clients = array();
+        $summary_data->exempted_clients = [];
+        $summary_data->exempted_issued_clients = [];
 
         //Search all issued clients and store them in a string
         $dataset = $clientController->getIssuedClientsAssignedTo($adviser_id);
         while ($row = $dataset->fetch_assoc()) {
-            $summary_data->issued_clients[] = $row["name"];
+            $summary_data->issued_clients[] = $row['name'];
         }
-        $issued_clients_list = implode(",", $summary_data->issued_clients);
+        $issued_clients_list = implode(',', $summary_data->issued_clients);
 
         //Fetch Invoices Data
-        $invoices_id_list = "";
-        $invoices_array = array();
+        $invoices_id_list = '';
+        $invoices_array = [];
         $total_due = 0;
-
 
         $summary_data->adviser = $adviserController->getAdviser($adviser_id);
 
-        $name = $summary_data->adviser["name"];
-        $fsp_num = $summary_data->adviser["fsp_num"];
-        $adviser_address = $summary_data->adviser["address"];
-        $adviser_id = $summary_data->adviser["id"];
+        $name = $summary_data->adviser['name'];
+        $fsp_num = $summary_data->adviser['fsp_num'];
+        $adviser_address = $summary_data->adviser['address'];
+        $adviser_id = $summary_data->adviser['id'];
 
         //fetch all valid invoices
         $summary_data->valid_invoices = $adviserController->getInvoiceNumbersFromTransactions($adviser_id);
@@ -302,49 +316,53 @@ class AdviserController extends Database
         while ($row = $dataset->fetch_assoc()) {
             $summary_data->invoice_transaction_histories[] = $row;
 
-            if (strpos($row["status"], 'Billed') !== false) {
-                if (strpos($row["status"], 'Issued') !== false) {
+            if (false !== strpos($row['status'], 'Billed')) {
+                if (false !== strpos($row['status'], 'Issued')) {
                     //Manual Issued Leads
-                    if (strpos($row["status"], 'Manual') !== false) {
-                        $summary_data->total_paid_issued_leads -= $row["number_of_leads"];
+                    if (false !== strpos($row['status'], 'Manual')) {
+                        $summary_data->total_paid_issued_leads -= $row['number_of_leads'];
                     } else {
-                        $summary_data->total_billed_issued_leads += $row["number_of_leads"];
+                        $summary_data->total_billed_issued_leads += $row['number_of_leads'];
                     }
                 } else {
                     //Manual Assigned Leads
-                    if (strpos($row["status"], 'Manual') !== false) {
-                        $summary_data->total_paid_assigned_leads -= $row["number_of_leads"];
+                    if (false !== strpos($row['status'], 'Manual')) {
+                        $summary_data->total_paid_assigned_leads -= $row['number_of_leads'];
                     } else {
-                        $summary_data->total_billed_assigned_leads += $row["number_of_leads"];
+                        $summary_data->total_billed_assigned_leads += $row['number_of_leads'];
                     }
                 }
             } else {
-                switch ($row["status"]) {
-                    case "Paid Assigned Leads":
-                        $summary_data->total_paid_assigned_leads += $row["number_of_leads"];
+                switch ($row['status']) {
+                    case 'Paid Assigned Leads':
+                        $summary_data->total_paid_assigned_leads += $row['number_of_leads'];
+
                         break;
-                    case "Paid Issued Leads":
-                        $summary_data->total_paid_issued_leads += $row["number_of_leads"];
+                    case 'Paid Issued Leads':
+                        $summary_data->total_paid_issued_leads += $row['number_of_leads'];
+
                         break;
-                    case "Cancelled Leads":
-                    case "Waived Leads":
-                        if ($row["clients_list"] != "") {
-                            $clients_list_array = explode(",", $row["clients_list"]);
+                    case 'Cancelled Leads':
+                    case 'Waived Leads':
+                        if ('' != $row['clients_list']) {
+                            $clients_list_array = explode(',', $row['clients_list']);
                             $summary_data->exempted_clients = array_merge($summary_data->exempted_clients, $clients_list_array);
                         }
-                        $summary_data->total_billed_assigned_leads -= $row["number_of_leads"];
-                        $clients_in_transaction = explode(",", $row["clients_list"]);
+                        $summary_data->total_billed_assigned_leads -= $row['number_of_leads'];
+                        $clients_in_transaction = explode(',', $row['clients_list']);
                         $summary_data->clients_amended = array_merge($summary_data->clients_amended, $clients_in_transaction);
+
                         break;
-                    case "Cancelled Issued Leads":
-                    case "Waived Issued Leads":
-                        if ($row["clients_list"] != "") {
-                            $clients_list_array = explode(",", $row["clients_list"]);
+                    case 'Cancelled Issued Leads':
+                    case 'Waived Issued Leads':
+                        if ('' != $row['clients_list']) {
+                            $clients_list_array = explode(',', $row['clients_list']);
                             $summary_data->exempted_issued_clients = array_merge($summary_data->exempted_issued_clients, $clients_list_array);
                         }
-                        $summary_data->total_billed_issued_leads -= $row["number_of_leads"];
-                        $clients_in_transaction = explode(",", $row["clients_list"]);
+                        $summary_data->total_billed_issued_leads -= $row['number_of_leads'];
+                        $clients_in_transaction = explode(',', $row['clients_list']);
                         $summary_data->issued_clients_amended = array_merge($summary_data->clients_amended, $clients_in_transaction);
+
                         break;
                 }
             }
@@ -354,7 +372,7 @@ class AdviserController extends Database
         $exempted_clients = [];
 
         while ($row = $dataset->fetch_assoc()) {
-            $exempted_clients[] = $row["id"];
+            $exempted_clients[] = $row['id'];
         }
 
         //Attach Clients Exempted
@@ -362,12 +380,12 @@ class AdviserController extends Database
 
         //Get Ammendments
         foreach ($summary_data->invoice_transaction_histories as $transaction) {
-            if ($transaction["status"] == "Waived Leads" || $transaction["status"] == "Cancelled Leads") {
-                $summary_data->amendments += $transaction["number_of_leads"];
-                $summary_data->amendments_amount += $transaction["amount"];
-            } elseif ($transaction["status"] == "Waived Issued Leads" || $transaction["status"] == "Cancelled Issued Leads") {
-                $summary_data->issued_amendments += $transaction["number_of_leads"];
-                $summary_data->issued_amendments_amount += $transaction["amount"];
+            if ('Waived Leads' == $transaction['status'] || 'Cancelled Leads' == $transaction['status']) {
+                $summary_data->amendments += $transaction['number_of_leads'];
+                $summary_data->amendments_amount += $transaction['amount'];
+            } elseif ('Waived Issued Leads' == $transaction['status'] || 'Cancelled Issued Leads' == $transaction['status']) {
+                $summary_data->issued_amendments += $transaction['number_of_leads'];
+                $summary_data->issued_amendments_amount += $transaction['amount'];
             }
         }
 
@@ -394,12 +412,12 @@ class AdviserController extends Database
                 $payment = 0;
                 //Check if wallet is lesser than remaining leads
                 if ($paid_assigned_wallet < $inv->leads) {
-                    $payment = $summary_data->adviser["leads"] * $paid_assigned_wallet;
+                    $payment = $summary_data->adviser['leads'] * $paid_assigned_wallet;
                     $paid_assigned_wallet = 0;
                 }
                 //If wallet is greater than or equal to remaining leads
                 else {
-                    $payment = $summary_data->adviser["leads"] * $inv->leads;
+                    $payment = $summary_data->adviser['leads'] * $inv->leads;
                     $paid_assigned_wallet -= $inv->leads;
                 }
                 $payment += ($payment * .15);
@@ -412,18 +430,17 @@ class AdviserController extends Database
 
                 //Check if wallet is lesser than remaining leads
                 if ($paid_issued_wallet < $inv->issued) {
-                    $payment = $summary_data->adviser["bonus"] * $paid_issued_wallet;
+                    $payment = $summary_data->adviser['bonus'] * $paid_issued_wallet;
                     $paid_issued_wallet = 0;
                 }
                 //If wallet is greater than or equal to remaining leads
                 else {
-                    $payment = $summary_data->adviser["bonus"] * $inv->issued;
+                    $payment = $summary_data->adviser['bonus'] * $inv->issued;
                     $paid_issued_wallet -= $inv->issued;
                 }
                 $payment += ($payment * .15);
                 $inv->remaining_amount -= $payment;
             }
-
 
             $total_due += $row['amount'];
 
@@ -434,7 +451,7 @@ class AdviserController extends Database
         }
 
         //Get numbers
-        $summary_data->invoice_numbers_list = implode(", ", $summary_data->invoice_numbers_list);
+        $summary_data->invoice_numbers_list = implode(', ', $summary_data->invoice_numbers_list);
 
         //fetch all valid invoice numbers within date range
         $dataset = $adviserController->getAdviserValidInvoicesInRange($adviser_id, $date_from, $until, $valid_invoices);
@@ -447,83 +464,89 @@ class AdviserController extends Database
 
             //Remove clients in ammendments
             foreach ($rowleads as $lead) {
-                if (!in_array($lead, $summary_data->clients_amended)) {
+                if (! in_array($lead, $summary_data->clients_amended)) {
                     $summary_data->leads[] = $lead;
                 }
             }
 
             foreach ($rowissued as $issued) {
-                if (!in_array($issued, $summary_data->issued_clients_amended)) {
+                if (! in_array($issued, $summary_data->issued_clients_amended)) {
                     $summary_data->issued[] = $issued;
                 }
             }
         }
 
-        //Get all valid invoices and place it in the invoices in range pool 
+        //Get all valid invoices and place it in the invoices in range pool
         foreach ($summary_data->invoices as $inv) {
             if (in_array($inv->invoice_no, $summary_data->invoice_numbers)) {
                 $summary_data->invoices_in_range[] = $inv;
             }
         }
 
-        $invoices_id_list = implode(", ", $summary_data->invoice_numbers);
-
+        $invoices_id_list = implode(', ', $summary_data->invoice_numbers);
 
         $summary_data->payable_assigned_leads = $summary_data->total_billed_assigned_leads - $summary_data->total_paid_assigned_leads;
         $summary_data->payable_issued_leads = $summary_data->total_billed_issued_leads - $summary_data->total_paid_issued_leads;
 
         $summary_data->leads = array_slice($summary_data->leads, 0, $summary_data->payable_assigned_leads);
         $summary_data->issued = array_slice($summary_data->issued, 0, $summary_data->payable_issued_leads);
+
         return $summary_data;
     }
 
-
-    function CheckTransactionStatus($status)
+    public function CheckTransactionStatus($status)
     {
-        $issued = stripos($status, 'Billed Issued Leads') !== false;
-        $assigned = stripos($status, 'Billed Assigned Leads') !== false;
+        $issued = false !== stripos($status, 'Billed Issued Leads');
+        $assigned = false !== stripos($status, 'Billed Assigned Leads');
         $op = $status;
+
         if ($issued) {
-            $op = "Billed Issued Leads";
+            $op = 'Billed Issued Leads';
         } elseif ($assigned) {
-            $op = "Billed Assigned Leads";
+            $op = 'Billed Assigned Leads';
         }
 
         return $op;
     }
 
     /**
-		@desc: Get all questions from the specified Question Set
+     * @desc: Get all questions from the specified Question Set
+     *
+     * @param mixed $email
      */
     public function getAdviserByEmail(
-        $email = ""    //
+        $email = ''
     ) {
         $query = "Select * from adviser_tbl WHERE email = '$email' AND email != '' LIMIT 1";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
+
         return $dataset;
     }
 
-
     /**
-		@desc: Get all questions from the specified Question Set
+     * @desc: Get all questions from the specified Question Set
+     *
+     * @param mixed $id
      */
     public function getAdviserWithTeamData(
-        $id = 0    //
+        $id = 0
     ) {
         $query = "SELECT * , a.name as name, t.name as team_name FROM adviser_tbl a LEFT JOIN teams t ON a.team_id = t.id where a.id = $id LIMIT 1";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $dataset = $dataset->fetch_assoc();
+
         return $dataset;
     }
 
-
     /**
-		@desc: Get oldest client assigned to adviser
+     * @desc: Get oldest client assigned to adviser
+     *
+     * @param mixed $adviser_id
      */
     public function getAdviserOldestClient(
-        $adviser_id = 0    //
+        $adviser_id = 0
     ) {
         //Get first client
         $date_helper = new INDET_DATES_HELPER();
@@ -531,15 +554,18 @@ class AdviserController extends Database
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
         $data = $dataset->fetch_assoc();
-        $data["translated_assigned_date"] = isset($data["assigned_date"]) ? $date_helper->NZEntryToDateTime($data["assigned_date"]) : null;
+        $data['translated_assigned_date'] = isset($data['assigned_date']) ? $date_helper->NZEntryToDateTime($data['assigned_date']) : null;
+
         return $data;
     }
 
     /**
-		@desc: Get all questions from the specified Question Set
+     * @desc: Get all questions from the specified Question Set
+     *
+     * @param mixed $id
      */
     public function getAdviserDealsData(
-        $id = 0    //
+        $id = 0
     ) {
         $query = "SELECT *, a.name as name, t.name as team_name, c.name as client_name, c.date_submitted as date_generated, s.timestamp as date_submitted, i.date_issued as date_issued, a.id as adviser_id, a.fsp_num as fsp_num, c.id as client_id, i.id as issued_client_id, s.id as submission_client_id FROM clients_tbl c LEFT JOIN submission_clients s ON c.id = s.client_id LEFT JOIN issued_clients_tbl i ON i.name = c.id LEFT JOIN adviser_tbl a ON a.id=c.assigned_to LEFT JOIN teams t ON a.team_id = t.id WHERE a.id = $id AND c.status!='Cancelled'";
         $statement = $this->prepare($query);
@@ -549,27 +575,43 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Create new user with name and email
+     * @desc: Create new user with name and email
+     *
+     * @param mixed $team_id
+     * @param mixed $steam_id
+     * @param mixed $position_id
+     * @param mixed $name
+     * @param mixed $company_name
+     * @param mixed $payroll_name
+     * @param mixed $fsp_num
+     * @param mixed $address
+     * @param mixed $email
+     * @param mixed $birthday
+     * @param mixed $leads
+     * @param mixed $bonus
+     * @param mixed $image
+     * @param mixed $date_hired
+     * @param mixed $termination_date
+     * @param mixed $ird_num
      */
     public function createAdviser(
-        $team_id = "",
-        $steam_id = "",
-        $position_id = "",
-        $name = "",
-        $company_name = "",
-        $payroll_name = "",
-        $fsp_num = "",
-        $address = "",
-        $email = "",
-        $birthday = "",
+        $team_id = '',
+        $steam_id = '',
+        $position_id = '',
+        $name = '',
+        $company_name = '',
+        $payroll_name = '',
+        $fsp_num = '',
+        $address = '',
+        $email = '',
+        $birthday = '',
         $leads = 35,
         $bonus = 50,
-        $image = "",
-        $date_hired = "",
-        $termination_date = "",
-        $ird_num = ""
+        $image = '',
+        $date_hired = '',
+        $termination_date = '',
+        $ird_num = ''
     ) {
-
         $date_helper = new INDET_DATES_HELPER();
 
         $name = $this->clean($name);
@@ -577,22 +619,23 @@ class AdviserController extends Database
         $payroll_name = $this->clean($payroll_name);
         $address = $this->clean($address);
 
-        if (strpos($birthday, '/') !== false) {
+        if (false !== strpos($birthday, '/')) {
             $birthday = $date_helper->DateTimeToNZEntry($birthday);
         }
-        if (strpos($date_hired, '/') !== false) {
+
+        if (false !== strpos($date_hired, '/')) {
             $date_hired = $date_helper->DateTimeToNZEntry($date_hired);
         }
-        if (strpos($termination_date, '/') !== false) {
+
+        if (false !== strpos($termination_date, '/')) {
             $termination_date = $date_helper->DateTimeToNZEntry($termination_date);
         }
 
-        if(!empty($image)){
-
+        if (! empty($image)) {
         }
 
-        $query = "INSERT INTO adviser_tbl 
-        (team_id, steam_id, position_id, name, company_name, payroll_name, fsp_num, address, ird_num, email, birthday, leads, bonus, image, date_hired, termination_date) VALUES 
+        $query = "INSERT INTO adviser_tbl
+        (team_id, steam_id, position_id, name, company_name, payroll_name, fsp_num, address, ird_num, email, birthday, leads, bonus, image, date_hired, termination_date) VALUES
         ($team_id, $steam_id, $position_id, '$name','$company_name','$payroll_name','$fsp_num','$address','$ird_num','$email','$birthday','$leads','$bonus', '$image', '$date_hired', '$termination_date')";
 
         $statement = $this->prepare($query);
@@ -607,25 +650,42 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Create new user with name and email
+     * @desc: Create new user with name and email
+     *
+     * @param mixed $id
+     * @param mixed $team_id
+     * @param mixed $steam_id
+     * @param mixed $position_id
+     * @param mixed $name
+     * @param mixed $company_name
+     * @param mixed $payroll_name
+     * @param mixed $fsp_num
+     * @param mixed $address
+     * @param mixed $email
+     * @param mixed $birthday
+     * @param mixed $leads
+     * @param mixed $bonus
+     * @param mixed $image
+     * @param mixed $date_hired
+     * @param mixed $termination_date
      */
     public function updateAdviser(
         $id = 0,
-        $team_id = "",
-        $steam_id = "",
-        $position_id = "",
-        $name = "",
-        $company_name = "",
-        $payroll_name = "",
-        $fsp_num = "",
-        $address = "",
-        $email = "",
-        $birthday = "",
+        $team_id = '',
+        $steam_id = '',
+        $position_id = '',
+        $name = '',
+        $company_name = '',
+        $payroll_name = '',
+        $fsp_num = '',
+        $address = '',
+        $email = '',
+        $birthday = '',
         $leads = 35,
         $bonus = 50,
-        $image = "",
-        $date_hired = "",
-        $termination_date = ""
+        $image = '',
+        $date_hired = '',
+        $termination_date = ''
     ) {
         $date_helper = new INDET_DATES_HELPER();
 
@@ -634,25 +694,26 @@ class AdviserController extends Database
         $payroll_name = $this->clean($payroll_name);
         $address = $this->clean($address);
 
-        if (strpos($birthday, '/') !== false) {
+        if (false !== strpos($birthday, '/')) {
             $birthday = $date_helper->DateTimeToNZEntry($birthday);
         }
-        if (strpos($date_hired, '/') !== false) {
+
+        if (false !== strpos($date_hired, '/')) {
             $date_hired = $date_helper->DateTimeToNZEntry($date_hired);
         }
-        if (strpos($termination_date, '/') !== false) {
+
+        if (false !== strpos($termination_date, '/')) {
             $termination_date = $date_helper->DateTimeToNZEntry($termination_date);
         }
 
-        if(!empty($image)){
-
+        if (! empty($image)) {
         }
 
         $query = "UPDATE adviser_tbl SET team_id = '$team_id', steam_id = '$steam_id', position_id = '$position_id', name = '$name', company_name = '$company_name',
-        payroll_name = '$payroll_name', fsp_num = '$fsp_num', address = '$address', email = '$email', birthday = '$birthday', leads = '$leads', bonus = '$bonus', 
+        payroll_name = '$payroll_name', fsp_num = '$fsp_num', address = '$address', email = '$email', birthday = '$birthday', leads = '$leads', bonus = '$bonus',
         date_hired = '$date_hired', termination_date = '$termination_date', image = '$image'
         WHERE id = $id";
-        
+
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);
 
@@ -664,11 +725,19 @@ class AdviserController extends Database
     }
 
     /**
-		@desc: Get all questions from the specified Question Set
+     * @desc: Get all questions from the specified Question Set
+     *
+     * @param mixed $id
      */
     public function deleteAdviser(
-        $id = 0    //
+        $id = 0
     ) {
+        $query = $this->prepare('DELETE FROM adviser_notes WHERE adviser_id = ?');
+
+        $this->bind_param('i', $id);
+
+        $this->execute($query);
+
         $query = "DELETE from adviser_tbl WHERE id = $id";
         $statement = $this->prepare($query);
         $dataset = $this->execute($statement);

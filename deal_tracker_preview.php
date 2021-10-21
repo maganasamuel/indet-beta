@@ -25,7 +25,7 @@ class PDF extends PDF_MC_Table
         $this->Rect(5, 342, 330, .5, 'FD');
         $this->SetFont('Helvetica', '', 10);
         $this->SetTextColor(0, 0, 0);
-        $this->Cell(100, 10, 'Deal Tracker-' . $name, 0, 0, 'L');
+        $this->Cell(100, 10, 'Policy Tracker-' . $name, 0, 0, 'L');
         $this->AliasNbPages('{totalPages}');
         $this->Cell(248, 10, 'Page ' . $this->PageNo() . ' of ' . '{totalPages}', 0, 1, 'R');
     }
@@ -329,38 +329,38 @@ $y = $pdf->GetY();
 $pdf->AddPage();
 
 $pdf->SetFillColor(224, 224, 224);
-$pdf->SetFont('Helvetica', 'B', 20);
-$pdf->Cell(330, 10, 'Deal Tracker', '0', '1', 'C', 'true');
+$pdf->SetFont('Helvetica', 'B', 16);
+$pdf->Cell(330, 10, 'Policy Tracker', '0', '1', 'C', 'true');
 
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(17, 10, 'Name:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 15);
+$pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(78, 10, $report_data->adviser_data->name, '0', '0', 'L');
 $pdf->Cell(82, 10, '', '0', '0', 'R');
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(16, 10, 'Team:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 15);
+$pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(84, 10, "$adviser_team", '0', '1', 'L');
 
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(35, 10, 'FSP Number:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 15);
+$pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(60, 10, $report_data->adviser_data->fsp_num, '0', '0', 'L');
 
 $pdf->Cell(82, 10, '', '0', '0', 'R');
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(42, 10, 'Period Covered:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 15);
+$pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(58, 10, "$period_covered_title", '0', '1', 'L');
 
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(17, 10, 'Email:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 15);
+$pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(78, 10, $report_data->adviser_data->email, '0', '0', 'L');
 $pdf->Cell(82, 10, '', '0', '0', 'R');
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(25, 10, 'Pay Date:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 15);
+$pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(75, 10, "$pay_date", '0', '1', 'L');
 
 $pdf->SetFont('Helvetica', 'B', 14);
@@ -377,16 +377,87 @@ $pdf->Cell(73, 10, "$created_by", '0', '1', 'L');
 //Space
 AddLineSpace($pdf);
 
-$pdf->SetFont('Helvetica', 'B', 15);
+$pdf->SetFont('Helvetica', 'B', 14);
 $pdf->SetFillColor(224, 224, 224);
-$pdf->Cell(330, 10, 'NOTES', 0, 1, 'C', 'true');
+$pdf->Cell(330, 10, 'LEADS', 0, 1, 'C', 'true');
+
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(34, 10, 'Rate Per Lead:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(61, 10, '$' . $report_data->adviser_data->leads, '0', '0', 'L');
+$pdf->Cell(82, 10, '', '0', '0', 'R');
+
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(50, 10, 'Rate Per Issued Lead:', '0', '', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(50, 10, '$' . $report_data->adviser_data->issued, '0', '1', 'L');
+
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(33, 10, 'Total Balance:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(62, 10, '$' . number_format($report_data->total_balance, 2), '0', '0', 'L');
+$pdf->Cell(82, 10, '', '0', '0', 'R');
+
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(70, 10, 'Assigned Leads for the Period:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(30, 10, "$report_data->assigned_leads_for_period", '0', '1', 'L');
+
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(47, 10, 'Total Leads Payable:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(48, 10, "$report_data->total_leads_payable", '0', '0', 'L');
+$pdf->Cell(82, 10, '', '0', '0', 'R');
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(63, 10, 'Leads Issued for the Period:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(37, 10, "$report_data->issued_leads_for_period", '0', '1', 'L');
+
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(48, 10, 'Total Issued Payable:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(47, 10, "$report_data->total_issued_payable", '0', '0', 'L');
+$pdf->Cell(82, 10, '', '0', '0', 'R');
+$pdf->SetFont('Helvetica', 'B', 13);
+$pdf->Cell(82, 10, 'KiwiSaver Enrolments for the Period:', '0', '0', 'L');
+$pdf->SetFont('Helvetica', '', 12);
+$pdf->Cell(18, 10, count($report_data->kiwisaver_deals), '0', '1', 'L');
+
+AddLineSpace($pdf);
+
+$pdf->SetFont('Helvetica', 'B', 14);
+$pdf->SetFillColor(224, 224, 224);
+$pdf->Cell(330, 10, 'PROFILE NOTES', 0, 1, 'C', true);
+
+$result = mysqli_query($con, 'SELECT * FROM adviser_notes WHERE adviser_id = "' . $adviser_id . '" ORDER BY id DESC');
+
+$notes = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+$pdf->setFont('Helvetica', '', 12);
+
+if (count($notes)) {
+    foreach ($notes as $key => $note) {
+        ($key % 2) ? $pdf->SetFillColor(235, 235, 235) : $pdf->SetFillColor(255, 255, 255);
+        $pdf->MultiCell(330, 10, $key + 1 . '. ' . $note['notes'], 0, 'L', true);
+    }
+} else {
+    $pdf->cell(330, 10, 'No Entries Recorded.', 0, 1, 'C');
+}
+
+//Space
+AddLineSpace($pdf);
+
+$pdf->SetFont('Helvetica', 'B', 14);
+$pdf->SetFillColor(224, 224, 224);
+$pdf->Cell(330, 10, 'PAYRUN NOTES', 0, 1, 'C', 'true');
 
 $show_desc = '';
 
 //formula
+$pdf->SetFont('Helvetica', '', 12);
+
 if (count($note_entries) > 0) {
     if (! empty($note_entries[0])) {
-        $pdf->SetFont('Helvetica', '', 13);
         $ctr = 1;
 
         foreach ($note_entries as $key => $note) {
@@ -406,55 +477,6 @@ if (count($note_entries) > 0) {
 } else {
     $pdf->Cell(330, 10, 'No Entries Recorded.', 0, 1, 'C');
 }
-
-//Space
-AddLineSpace($pdf);
-
-$pdf->SetFont('Helvetica', 'B', 15);
-$pdf->SetFillColor(224, 224, 224);
-$pdf->Cell(330, 10, 'LEADS', 0, 1, 'C', 'true');
-
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(34, 10, 'Rate Per Lead:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(61, 10, '$' . $report_data->adviser_data->leads, '0', '0', 'L');
-$pdf->Cell(82, 10, '', '0', '0', 'R');
-
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(50, 10, 'Rate Per Issued Lead:', '0', '', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(50, 10, '$' . $report_data->adviser_data->issued, '0', '1', 'L');
-
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(33, 10, 'Total Balance:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(62, 10, '$' . number_format($report_data->total_balance, 2), '0', '0', 'L');
-$pdf->Cell(82, 10, '', '0', '0', 'R');
-
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(70, 10, 'Assigned Leads for the Period:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(30, 10, "$report_data->assigned_leads_for_period", '0', '1', 'L');
-
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(47, 10, 'Total Leads Payable:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(48, 10, "$report_data->total_leads_payable", '0', '0', 'L');
-$pdf->Cell(82, 10, '', '0', '0', 'R');
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(63, 10, 'Leads Issued for the Period:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(37, 10, "$report_data->issued_leads_for_period", '0', '1', 'L');
-
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(48, 10, 'Total Issued Payable:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(47, 10, "$report_data->total_issued_payable", '0', '0', 'L');
-$pdf->Cell(82, 10, '', '0', '0', 'R');
-$pdf->SetFont('Helvetica', 'B', 13);
-$pdf->Cell(82, 10, 'KiwiSaver Enrolments for the Period:', '0', '0', 'L');
-$pdf->SetFont('Helvetica', '', 13);
-$pdf->Cell(18, 10, count($report_data->kiwisaver_deals), '0', '1', 'L');
 
 if (count($report_data->issued_deals) > 0) {
 
@@ -678,7 +700,7 @@ function sortFunction($a, $b)
     return strtotime($a['date']) - strtotime($b['date']);
 }
 
-function AddLineSpace($pdf, $linespace = 10)
+function AddLineSpace($pdf, $linespace = 8)
 {
     $pdf->SetFillColor(255, 255, 255);
     $pdf->SetTextColor(0, 0, 0);

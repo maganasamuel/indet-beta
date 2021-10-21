@@ -2,7 +2,7 @@
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+error_reporting(E_ERROR | E_PARSE);
 
 date_default_timezone_set('Pacific/Auckland');
 ob_start();
@@ -3120,7 +3120,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         $pdf->Cell(90, 3, '', '0', 'L');
         $pdf->Cell(100, 3, $pdf->MultiCell(90, 5, $magazine_data->quote, 0, 'C', false, 10), '0', 'L');
     }
-    
+
     $pdf->SetFont('Calibri', 'U', 16);
     $pdf->Text(101, 123, 'Contents');
 
@@ -3139,7 +3139,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
         ($magazine_data->bi_monthly_advisers[0] ?? null) :
         ($magazine_data->cumulative_advisers[0] ?? null);
     $featured_title = (is_array($magazine_data->bi_monthly_advisers) && count($magazine_data->bi_monthly_advisers) > 0) ? 'Top Adviser of the Period ' . date('j', strtotime($magazine_data->bimonthRange->from)) . '-' . date('j F Y', strtotime($magazine_data->bimonthRange->to)) : 'Top Adviser of the Period ' . date('j M', strtotime($magazine_data->cumulativeRange->from)) . '-' . date('j M Y', strtotime($magazine_data->cumulativeRange->to));
-    
+
     $pdf->SetX(0);
     $pdf->SetX(190);
 
@@ -3176,7 +3176,7 @@ function CreateMagazinePDF($magazine_data, $preview = true, $randomize_name = tr
     $pdf->Cell(198, 10, $magazine_data->pages[0]['page'], 0, 0, 'R');
 
     // Disclaimer
-    if($magazine_data->disclaimer){
+    if ($magazine_data->disclaimer) {
         $pdf->SetFont('Arial', '', 7);
         $pdf->SetXY(14, $pdf->GetPageHeight() - 37);
         $pdf->MultiCell(187, 3, 'DISCLAIMER: ' . $magazine_data->disclaimer);

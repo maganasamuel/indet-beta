@@ -2,3 +2,4 @@ libs/api/classes/configurations/config.ini
 libs/composer/vendor
 files
 error_log
+cache

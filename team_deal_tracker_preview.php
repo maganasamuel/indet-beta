@@ -36,13 +36,13 @@ class PDF extends PDF_MC_Table
 		$this->Rect(5,342,206.5,.5,"FD");
 		$this->SetFont('Helvetica','',10);
 		$this->SetTextColor(0,0,0);
-		$this->Cell(100,10,'Deal Tracker-' . $name,0,0,'L');
-		$this->AliasNbPages('{totalPages}');	
+		$this->Cell(100,10,'Policy Tracker-' . $name,0,0,'L');
+		$this->AliasNbPages('{totalPages}');
 		$this->Cell(110,10,'Page '.$this->PageNo() . " of " . "{totalPages}",0,1,'R');
 	}
 
 	function Header()
-	{	
+	{
 		$this->SetFillColor(0,0,0);
 		$this->Image('logo_vertical.png',93,5,30);
 		$this->Rect(5,25,206.5,.5,"FD");
@@ -107,7 +107,7 @@ $created_by = $userController->getUserWithData($created_by)["full_name"];
 var_dump($created_by);
 //Production Desc
 //Test Desc
-//$desc=$_POST['desc'];		
+//$desc=$_POST['desc'];
 $date_created = date("d/m/Y");
 
 $name = $team_row["name"];
@@ -187,18 +187,18 @@ $report_data->cancelled_deals = [];
  	if(!isset($row["deals"]))
  		continue;
  	$source = $row["adv_name"];
- 	
+
  	$deals = json_decode($row["deals"]);
 
  	foreach($deals as $deal){
 		 $life_insured = $row["client_name"];
 		 if(!isset($deal->refund_status))
 			 $deal->refund_status = "No";
-			 
+
  		if(!empty($deal->life_insured))
  			$life_insured .= ", " . $deal->life_insured;
 
- 		
+
  		if($deal->status=="Issued"){
 			if($deal->commission_status=="Not Paid"){
 				if($deal->date_issued <= $until){
@@ -216,14 +216,14 @@ $report_data->cancelled_deals = [];
 					$report_data->total_issued_api += $deal->issued_api;
 				}
 			}
- 			
+
  			//Add to Cancelled Deals
  			if(isset($deal->clawback_status)){
 	 			if($deal->clawback_status!="None"){
 					if($deal->refund_status=="No"){
 						if($deal->clawback_date<=$until){
 							$report_data->cancelled_deals[] = array(
-								 "date" => $deal->clawback_date,		
+								 "date" => $deal->clawback_date,
 								 "life_insured" => $life_insured,
 								 "issued_date" => $deal->date_issued,
 								 "policy_number" => $deal->policy_number,
@@ -232,12 +232,12 @@ $report_data->cancelled_deals = [];
 								 "api" => $deal->clawback_api,
 								 "clawback_status" => $deal->clawback_status,
 								 "notes" => $deal->clawback_notes,
-								 "deal" => $deal,					
+								 "deal" => $deal,
 							 );
- 
+
 							$report_data->total_cancelled_api += $deal->clawback_api;
-						} 
-					}					 
+						}
+					}
  				}
  			}
  		}
@@ -271,7 +271,7 @@ $pdf->AddPage('P', 'Legal');
 $pdf->SetFillColor(224,224,224);
 $pdf->SetFont('Helvetica','B',20);
 $report_title = ($report_data->team["name"]!="EliteInsure Team") ? 'Team ' . $report_data->team["name"] : $report_data->team["name"];
-$pdf->Cell(200,10,$report_title . ' Deal Tracker Summary',"0","1","C",'true');
+$pdf->Cell(200,10,$report_title . ' Policy Tracker Summary',"0","1","C",'true');
 
 $pdf->SetFont('Helvetica','B',15);
 $pdf->Cell(42,10,"Period Covered:","0","0","L");
@@ -312,7 +312,7 @@ if(count($report_data->issued_deals) > 0){
 
 	$pdf->SetWidths(array(40,30,30,40,30,30));
 	$pdf->Row(array("Life Insured", "Policy #", "Company", "Adviser","Issue Date", "API"),false,array(224,224,224));
-		
+
 	$pdf->Ln(2);
 	$pdf->SetFont('Helvetica','',9);
 	$ctr=0;
@@ -438,7 +438,7 @@ $pdf->Output($path,'F');
 //$pdf->Output();
 
 ob_end_clean();
-//OUTPUT 
+//OUTPUT
 $file=array();
 $file['team_id']=$team;
 $file['link']=$path;
@@ -450,7 +450,7 @@ $file['to'] = $until;
 //$file['amount'] = $total_payable;
 //$file['payable_leads'] = $payable_leads;
 //$file['payable_issued_leads'] = $payable_issued_leads;
-	
+
 echo json_encode($file);
 //db add end
 //}

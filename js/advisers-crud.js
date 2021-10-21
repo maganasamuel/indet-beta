@@ -203,23 +203,13 @@ window.addEventListener("load", function () {
                     data = JSON.parse(data);
                     $("#btn-save").prop("disabled", null);
                     var newData = {
-                        0: data.name,
-                        1: data.fsp_num,
-                        2: data.address,
-                        3: data.email,
-                        4: data.leads,
-                        5: data.bonus,
-                        6:
-                            "<input data-toggle='modal' data-target='#myModal' type='image' class='open-modal'  src='edit.png' value='" +
-                            data.id +
-                            "'>",
-                        7:
-                            '<a href="adviser_profile?id=' +
-                            data.id +
-                            '" class="btn btn-primary"><i class="fas fa-search"></i></a>&nbsp;&nbsp;&nbsp;' +
-                            '<a href="adviser_strings.php?adviser_id=' +
-                            data.id +
-                            '">View Strings</i></a>',
+                        0: data.id,
+                        1: data.name,
+                        2: data.fsp_num,
+                        3: data.address,
+                        4: data.email,
+                        5: data.leads,
+                        6: data.bonus,
                     };
                     console.log(newData);
 

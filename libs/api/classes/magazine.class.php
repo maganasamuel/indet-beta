@@ -2501,6 +2501,7 @@ class Magazine extends Database
                 ['deals', 'desc'],
                 ['issued_api', 'desc'],
             ])
+            ->values()
             ->all();
 
         return $filteredOutput;
@@ -4364,7 +4365,7 @@ class Magazine extends Database
 
         return collect($winner_score)->sortBy(function ($item) use ($scores) {
             return $scores[$item['scores'] ?? null] ?? null;
-        })->all();
+        })->values()->all();
     }
 
     private static function sortByName($a, $b)

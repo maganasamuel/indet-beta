@@ -1490,7 +1490,7 @@ class PDF extends FPDF_CellFit
                 //Name
                 $this->SetFont('Calibri', 'B', 20);
                 $this->Cell(12, 8, '', '', '0', 'L');
-                $this->Cell(50, 8, 'Adviser:', '', '1', 'L');
+                $this->Cell(50, 8, 'Name:', '', '1', 'L');
                 $this->SetFont('Calibri', '', 20);
                 $this->Cell(20, 8, '', '', '0', 'L');
                 $this->Cell(50, 8, $person['name'], '', '1', 'L');

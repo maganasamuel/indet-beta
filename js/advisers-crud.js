@@ -89,6 +89,8 @@ window.addEventListener("load", function () {
 
                     $("#action").val("update_adviser");
                     $("#formtype").val("update");
+
+                    $("#notesWrapper").removeClass("hidden");
                 },
                 error: function (data) {
                     console.log("Error", data);
@@ -104,6 +106,7 @@ window.addEventListener("load", function () {
             $("#action").val("create_adviser");
             $("#leads").val("35");
             $("#bonus").val("50");
+            $("#notesWrapper").addClass("hidden");
         });
 
         $("#btn-delete-cancel").on("click", function () {

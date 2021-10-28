@@ -333,7 +333,7 @@ $pdf->SetFillColor(224, 224, 224);
 $pdf->SetFont('Helvetica', 'B', 16);
 $pdf->Cell(330, 10, 'Policy Tracker', '0', '1', 'C', 'true');
 
-$image = 'img/profile-pic.png';
+$image = 'images/default_pic.png';
 
 $file = '../indet_photos_stash/' . $report_data->adviser_data->image;
 

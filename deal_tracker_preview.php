@@ -122,6 +122,7 @@ $report_data->adviser_data->issued = $rows['bonus'];
 $report_data->adviser_data->fsp_num = $rows['fsp_num'];
 $report_data->adviser_data->email = $rows['email'];
 $report_data->adviser_data->company_name = $rows['company_name'];
+$report_data->adviser_data->image = $rows['image'];
 
 $adviser_team = (! empty($report_data->adviser_data->team_name)) ? $report_data->adviser_data->team_name : 'Not Assigned';
 
@@ -332,50 +333,64 @@ $pdf->SetFillColor(224, 224, 224);
 $pdf->SetFont('Helvetica', 'B', 16);
 $pdf->Cell(330, 10, 'Policy Tracker', '0', '1', 'C', 'true');
 
+$image = 'img/profile-pic.png';
+
+$file = '../indet_photos_stash/' . $report_data->adviser_data->image;
+
+if(!empty($report_data->adviser_data->image && file_exists($file))){
+    $image = $file;
+}
+
+$pdf->Image($image, 10, 41, 65, 65);
+
+$pdf->SetXY(80, 55);
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(17, 10, 'Name:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(78, 10, $report_data->adviser_data->name, '0', '0', 'L');
-$pdf->Cell(82, 10, '', '0', '0', 'R');
+$pdf->Cell(32, 10, '', '0', '0', 'R');
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(16, 10, 'Team:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(84, 10, "$adviser_team", '0', '1', 'L');
 
+$pdf->SetX(80);
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(35, 10, 'FSP Number:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(60, 10, $report_data->adviser_data->fsp_num, '0', '0', 'L');
 
-$pdf->Cell(82, 10, '', '0', '0', 'R');
+$pdf->Cell(32, 10, '', '0', '0', 'R');
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(42, 10, 'Period Covered:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(58, 10, "$period_covered_title", '0', '1', 'L');
 
+$pdf->SetX(80);
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(17, 10, 'Email:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(78, 10, $report_data->adviser_data->email, '0', '0', 'L');
-$pdf->Cell(82, 10, '', '0', '0', 'R');
+$pdf->Cell(32, 10, '', '0', '0', 'R');
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(25, 10, 'Pay Date:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(75, 10, "$pay_date", '0', '1', 'L');
 
+$pdf->SetX(80);
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(25, 10, 'Company:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(70, 10, $report_data->adviser_data->company_name, '0', '0', 'L');
 
-$pdf->Cell(82, 10, '', '0', '0', 'R');
+$pdf->Cell(32, 10, '', '0', '0', 'R');
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->Cell(27, 10, 'Report By:', '0', '0', 'L');
 $pdf->SetFont('Helvetica', '', 14);
 $pdf->Cell(73, 10, "$created_by", '0', '1', 'L');
 
 //Space
-AddLineSpace($pdf);
+$pdf->Cell(331, 12, ' ', 0, 1);
 
 $pdf->SetFont('Helvetica', 'B', 14);
 $pdf->SetFillColor(224, 224, 224);
